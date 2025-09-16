@@ -232,18 +232,24 @@
             </div>
             {% set times = ['08:00', '10:00', '12:00', '14:00', '16:00'] %}
             {% set days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
-            {% for time in times %}
-            <div class="grid grid-cols-8 gap-2 items-center schedule-slot border border-gray-200 rounded-lg p-2">
-              <div class="text-sm font-medium text-gray-700">{{ time }}</div>
+            <div class="grid grid-cols-8 gap-2 text-xs font-medium text-gray-500 mb-4">
+              <div>Time</div>
               {% for day in days %}
-                {% set entry = timetable | selectattr('day', 'equalto', day) | selectattr('period', 'equalto', time) | list %}
-                {% if entry and entry[0].subject %}
-                  <div class="occupied p-2 rounded text-xs text-center cursor-pointer">{{ entry[0].subject }}</div>
-                {% else %}
-                  <div class="available p-2 rounded text-xs text-center cursor-pointer">Available</div>
-                {% endif %}
+                <div>{{ day }}</div>
               {% endfor %}
             </div>
+            {% for time in times %}
+              <div class="grid grid-cols-8 gap-2 items-center schedule-slot border border-gray-200 rounded-lg p-2">
+                <div class="text-sm font-medium text-gray-700">{{ time }}</div>
+                {% for day in days %}
+                  {% set entry = timetable | selectattr('day', 'equalto', day) | selectattr('period', 'equalto', time) | list %}
+                  {% if entry and entry[0].subject %}
+                    <div class="occupied p-2 rounded text-xs text-center cursor-pointer">{{ entry[0].subject }}</div>
+                  {% else %}
+                    <div class="available p-2 rounded text-xs text-center cursor-pointer">Available</div>
+                  {% endif %}
+                {% endfor %}
+              </div>
             {% endfor %}
           </div>
           <div class="mt-6 flex items-center space-x-4 text-sm">
