@@ -1,5 +1,5 @@
-
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -69,7 +69,7 @@
         
         .card-hover:hover {
             transform: translateY(-2px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.1);
         }
         
         .input-focus {
@@ -199,58 +199,53 @@
     </div>
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <div class="lg:col-span-2">
-        <div class="bg-white rounded-xl shadow-sm p-6">
-          <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-semibold text-gray-900">Today's Schedule</h2>
-            <div class="flex space-x-2">
-              <select class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
-                <option>
-                  Room A101
-                </option>
-                <option>
-                  Room A102
-                </option>
-                <option>
-                  Room B201
-                </option>
-                <option>
-                  Lab C301
-                </option>
-              </select> <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">+ New Booking</button>
-            </div>
-          </div>
-          <div class="space-y-3">
-            {% set times = ['08:00', '10:00', '12:00', '14:00', '16:00'] %}
-            {% set days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
-            <div class="grid grid-cols-8 gap-2 text-xs font-medium text-gray-500 mb-4">
-              <div>Time</div>
-              {% for day in days %}
-                <div>{{ day }}</div>
-              {% endfor %}
-            </div>
-            {% for time in times %}
-              <div class="grid grid-cols-8 gap-2 items-center schedule-slot border border-gray-200 rounded-lg p-2">
-                <div class="text-sm font-medium text-gray-700">{{ time }}</div>
-                {% for day in days %}
-                  {% set entry = timetable | selectattr('day', 'equalto', day) | selectattr('period', 'equalto', time) | list %}
-                  {% if entry and entry[0].subject %}
-                    <div class="occupied p-2 rounded text-xs text-center cursor-pointer">{{ entry[0].subject }}</div>
-                  {% else %}
-                    <div class="available p-2 rounded text-xs text-center cursor-pointer">Available</div>
-                  {% endif %}
-                {% endfor %}
-              </div>
-            {% endfor %}
-          </div>
-          <div class="mt-6 flex items-center space-x-4 text-sm">
-            <div class="flex items-center space-x-2">
-              <div class="w-4 h-4 bg-blue-200 border border-blue-400 rounded"></div><span class="text-gray-600">Occupied</span>
-            </div>
-            <div class="flex items-center space-x-2">
-              <div class="w-4 h-4 bg-green-200 border border-green-400 rounded"></div><span class="text-gray-600">Available</span>
-            </div>
-          </div>
-        </div>
+        <!-- Timetable Section (dynamic with Jinja2) -->
+<div class="bg-white rounded-xl shadow-sm p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-xl font-semibold text-gray-900">Today's Schedule</h2>
+    <div class="flex space-x-2">
+      <select class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+        <option>Room A101</option>
+        <option>Room A102</option>
+        <option>Room B201</option>
+        <option>Lab C301</option>
+      </select>
+      <a href="class booking.html" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">+ New Booking</a>
+    </div>
+  </div>
+  <div class="space-y-3">
+    {% set times = ['08:00', '10:00', '12:00', '14:00', '16:00'] %}
+    {% set days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+    <div class="grid grid-cols-8 gap-2 text-xs font-medium text-gray-500 mb-4">
+      <div>Time</div>
+      {% for day in days %}
+        <div>{{ day }}</div>
+      {% endfor %}
+    </div>
+    {% for time in times %}
+      <div class="grid grid-cols-8 gap-2 items-center schedule-slot border border-gray-200 rounded-lg p-2">
+        <div class="text-sm font-medium text-gray-700">{{ time }}</div>
+        {% for day in days %}
+          {% set entry = timetable | selectattr('day', 'equalto', day) | selectattr('period', 'equalto', time) | list %}
+          {% if entry and entry[0].subject %}
+            <div class="occupied p-2 rounded text-xs text-center cursor-pointer">{{ entry[0].subject }}</div>
+          {% else %}
+            <div class="available p-2 rounded text-xs text-center cursor-pointer">Available</div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+  <div class="mt-6 flex items-center space-x-4 text-sm">
+    <div class="flex items-center space-x-2">
+      <div class="w-4 h-4 bg-blue-200 border border-blue-400 rounded"></div><span class="text-gray-600">Occupied</span>
+    </div>
+    <div class="flex items-center space-x-2">
+      <div class="w-4 h-4 bg-green-200 border border-green-400 rounded"></div><span class="text-gray-600">Available</span>
+    </div>
+  </div>
+</div>
+<!-- End Timetable Section -->
       </div>
       <div class="space-y-6">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 transition-colors duration-300">
@@ -434,5 +429,18 @@
   <script>
     // JavaScript content would go here
   </script>
+  <script>
+// Example JS: Highlight current day column in timetable
+const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const today = new Date();
+const currentDay = days[today.getDay() === 0 ? 6 : today.getDay() - 1]; // JS: Sunday=0, so shift
+const headers = document.querySelectorAll('.grid-cols-8 > div');
+headers.forEach((header, idx) => {
+  if (header.textContent.trim() === currentDay) {
+    header.style.backgroundColor = '#e0e7ff'; // Tailwind blue-100
+    header.style.fontWeight = 'bold';
+  }
+});
+</script>
 </body>
 </html>
