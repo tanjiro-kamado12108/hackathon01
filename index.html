@@ -221,161 +221,30 @@
           </div>
           <div class="space-y-3">
             <div class="grid grid-cols-8 gap-2 text-xs font-medium text-gray-500 mb-4">
-              <div>
-                Time
-              </div>
-              <div>
-                Monday
-              </div>
-              <div>
-                Tuesday
-              </div>
-              <div>
-                Wednesday
-              </div>
-              <div>
-                Thursday
-              </div>
-              <div>
-                Friday
-              </div>
-              <div>
-                Saturday
-              </div>
-              <div>
-                Sunday
-              </div>
+              <div>Time</div>
+              <div>Monday</div>
+              <div>Tuesday</div>
+              <div>Wednesday</div>
+              <div>Thursday</div>
+              <div>Friday</div>
+              <div>Saturday</div>
+              <div>Sunday</div>
             </div>
+            {% set times = ['08:00', '10:00', '12:00', '14:00', '16:00'] %}
+            {% set days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+            {% for time in times %}
             <div class="grid grid-cols-8 gap-2 items-center schedule-slot border border-gray-200 rounded-lg p-2">
-              <div class="text-sm font-medium text-gray-700">
-                08:00
-              </div>
-              <div class="occupied p-2 rounded text-xs text-center cursor-pointer">
-                Math 101
-              </div>
-              <div class="available p-2 rounded text-xs text-center cursor-pointer">
-                Available
-              </div>
-              <div class="occupied p-2 rounded text-xs text-center cursor-pointer">
-                Physics
-              </div>
-              <div class="available p-2 rounded text-xs text-center cursor-pointer">
-                Available
-              </div>
-              <div class="occupied p-2 rounded text-xs text-center cursor-pointer">
-                Chemistry
-              </div>
-              <div class="available p-2 rounded text-xs text-center cursor-pointer">
-                Available
-              </div>
-              <div class="available p-2 rounded text-xs text-center cursor-pointer">
-                Available
-              </div>
+              <div class="text-sm font-medium text-gray-700">{{ time }}</div>
+              {% for day in days %}
+                {% set entry = timetable | selectattr('day', 'equalto', day) | selectattr('period', 'equalto', time) | list %}
+                {% if entry and entry[0].subject %}
+                  <div class="occupied p-2 rounded text-xs text-center cursor-pointer">{{ entry[0].subject }}</div>
+                {% else %}
+                  <div class="available p-2 rounded text-xs text-center cursor-pointer">Available</div>
+                {% endif %}
+              {% endfor %}
             </div>
-            <div class="grid grid-cols-8 gap-2 items-center schedule-slot border border-gray-200 rounded-lg p-2">
-              <div class="text-sm font-medium text-gray-700">
-                10:00
-              </div>
-              <div class="available p-2 rounded text-xs text-center cursor-pointer">
-                Available
-              </div>
-              <div class="occupied p-2 rounded text-xs text-center cursor-pointer">
-                Biology
-              </div>
-              <div class="available p-2 rounded text-xs text-center cursor-pointer">
-                Available
-              </div>
-              <div class="occupied p-2 rounded text-xs text-center cursor-pointer">
-                English
-              </div>
-              <div class="available p-2 rounded text-xs text-center cursor-pointer">
-                Available
-              </div>
-              <div class="occupied p-2 rounded text-xs text-center cursor-pointer">
-                History
-              </div>
-              <div class="available p-2 rounded text-xs text-center cursor-pointer">
-                Available
-              </div>
-            </div>
-            <div class="grid grid-cols-8 gap-2 items-center schedule-slot border border-gray-200 rounded-lg p-2">
-              <div class="text-sm font-medium text-gray-700">
-                12:00
-              </div>
-              <div class="occupied p-2 rounded text-xs text-center cursor-pointer">
-                Lunch Break
-              </div>
-              <div class="occupied p-2 rounded text-xs text-center cursor-pointer">
-                Lunch Break
-              </div>
-              <div class="occupied p-2 rounded text-xs text-center cursor-pointer">
-                Lunch Break
-              </div>
-              <div class="occupied p-2 rounded text-xs text-center cursor-pointer">
-                Lunch Break
-              </div>
-              <div class="occupied p-2 rounded text-xs text-center cursor-pointer">
-                Lunch Break
-              </div>
-              <div class="occupied p-2 rounded text-xs text-center cursor-pointer">
-                Lunch Break
-              </div>
-              <div class="available p-2 rounded text-xs text-center cursor-pointer">
-                Available
-              </div>
-            </div>
-            <div class="grid grid-cols-8 gap-2 items-center schedule-slot border border-gray-200 rounded-lg p-2">
-              <div class="text-sm font-medium text-gray-700">
-                14:00
-              </div>
-              <div class="occupied p-2 rounded text-xs text-center cursor-pointer">
-                Computer Sci
-              </div>
-              <div class="available p-2 rounded text-xs text-center cursor-pointer">
-                Available
-              </div>
-              <div class="occupied p-2 rounded text-xs text-center cursor-pointer">
-                Art Class
-              </div>
-              <div class="available p-2 rounded text-xs text-center cursor-pointer">
-                Available
-              </div>
-              <div class="occupied p-2 rounded text-xs text-center cursor-pointer">
-                Music
-              </div>
-              <div class="available p-2 rounded text-xs text-center cursor-pointer">
-                Available
-              </div>
-              <div class="available p-2 rounded text-xs text-center cursor-pointer">
-                Available
-              </div>
-            </div>
-            <div class="grid grid-cols-8 gap-2 items-center schedule-slot border border-gray-200 rounded-lg p-2">
-              <div class="text-sm font-medium text-gray-700">
-                16:00
-              </div>
-              <div class="available p-2 rounded text-xs text-center cursor-pointer">
-                Available
-              </div>
-              <div class="occupied p-2 rounded text-xs text-center cursor-pointer">
-                Study Hall
-              </div>
-              <div class="available p-2 rounded text-xs text-center cursor-pointer">
-                Available
-              </div>
-              <div class="occupied p-2 rounded text-xs text-center cursor-pointer">
-                Lab Work
-              </div>
-              <div class="available p-2 rounded text-xs text-center cursor-pointer">
-                Available
-              </div>
-              <div class="available p-2 rounded text-xs text-center cursor-pointer">
-                Available
-              </div>
-              <div class="available p-2 rounded text-xs text-center cursor-pointer">
-                Available
-              </div>
-            </div>
+            {% endfor %}
           </div>
           <div class="mt-6 flex items-center space-x-4 text-sm">
             <div class="flex items-center space-x-2">

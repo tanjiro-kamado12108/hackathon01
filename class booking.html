@@ -601,57 +601,59 @@
                 e.preventDefault();
                 
                 // Validate required selections
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
                 if (!selectedTimeSlot) {
                     alert('Please select a time slot.');
                     return;
                 }
-                
                 if (!selectedClassroom) {
                     alert('Please select a classroom.');
                     return;
                 }
-                
                 // Get form data
                 const formData = {
-                    name: document.getElementById('userName').value,
-                    email: document.getElementById('userEmail').value,
-                    department: document.getElementById('department').value,
-                    phone: document.getElementById('phone').value,
                     eventTitle: document.getElementById('eventTitle').value,
-                    eventType: document.getElementById('eventType').value,
-                    attendees: document.getElementById('attendees').value,
-                    description: document.getElementById('description').value,
                     eventDate: document.getElementById('eventDate').value,
-                    duration: document.getElementById('duration').value,
                     timeSlot: selectedTimeSlot,
-                    classroom: selectedClassroom
+                    duration: document.getElementById('duration').value,
+                    classroom: selectedClassroom,
+                    description: document.getElementById('description').value,
+                    equipment: Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.nextElementSibling.textContent.trim())
                 };
-                
-                // Get selected equipment
-                const equipment = [];
-                document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
-                    equipment.push(checkbox.nextElementSibling.textContent.trim());
+                fetch('/book_classroom', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success message with booking details
+                        const bookingSummary = document.getElementById('bookingSummary');
+                        bookingSummary.innerHTML = `
+                            <div class="text-left space-y-2">
+                                <p><strong>Event:</strong> ${formData.eventTitle}</p>
+                                <p><strong>Date:</strong> ${new Date(formData.eventDate).toLocaleDateString()}</p>
+                                <p><strong>Time:</strong> ${formData.timeSlot}</p>
+                                <p><strong>Duration:</strong> ${formData.duration} ${formData.duration === 'full-day' ? '' : 'minutes'}</p>
+                                <p><strong>Classroom:</strong> ${formData.classroom.name} (${formData.classroom.type})</p>
+                                ${formData.equipment.length > 0 ? `<p><strong>Equipment:</strong> ${formData.equipment.join(', ')}</p>` : ''}
+                            </div>
+                        `;
+                        form.parentElement.classList.add('hidden');
+                        successMessage.classList.remove('hidden');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    } else {
+                        alert(data.error || 'Booking failed.');
+                    }
+                })
+                .catch(() => {
+                    alert('Booking failed. Please try again.');
                 });
-                
-                // Show success message with booking details
-                const bookingSummary = document.getElementById('bookingSummary');
-                bookingSummary.innerHTML = `
-                    <div class="text-left space-y-2">
-                        <p><strong>Event:</strong> ${formData.eventTitle}</p>
-                        <p><strong>Date:</strong> ${new Date(formData.eventDate).toLocaleDateString()}</p>
-                        <p><strong>Time:</strong> ${formData.timeSlot}</p>
-                        <p><strong>Duration:</strong> ${formData.duration} ${formData.duration === 'full-day' ? '' : 'minutes'}</p>
-                        <p><strong>Classroom:</strong> ${formData.classroom.name} (${formData.classroom.type})</p>
-                        <p><strong>Capacity:</strong> ${formData.classroom.capacity} people</p>
-                        ${equipment.length > 0 ? `<p><strong>Equipment:</strong> ${equipment.join(', ')}</p>` : ''}
-                        <p><strong>Booking ID:</strong> #BK${Date.now().toString().slice(-6)}</p>
-                    </div>
-                `;
-                
-                // Hide form and show success message
-                form.parentElement.classList.add('hidden');
-                successMessage.classList.remove('hidden');
-                
+            });
                 // Scroll to top
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });

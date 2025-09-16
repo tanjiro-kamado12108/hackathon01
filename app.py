@@ -58,6 +58,53 @@ class Meeting(db.Model):
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
     updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
+# Meetings routes
+@app.route('/meetings')
+def meetings():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    user_id = session['user_id']
+    meetings = Meeting.query.filter((Meeting.organizer_id==user_id) | (Meeting.participants.like(f'%{user_id}%'))).order_by(Meeting.start_time.desc()).all()
+    return render_template('meetings.html', meetings=meetings)
+
+@app.route('/meetings/add', methods=['POST'])
+def add_meeting():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    title = request.form.get('title')
+    description = request.form.get('description')
+    start_time = request.form.get('start_time')
+    end_time = request.form.get('end_time')
+    location = request.form.get('location')
+    participants = request.form.get('participants', '')
+    if not all([title, start_time, end_time]):
+        flash('Title, start time, and end time required.')
+        return redirect(url_for('meetings'))
+    meeting = Meeting(
+        title=title,
+        description=description,
+        organizer_id=session['user_id'],
+        participants=participants,
+        start_time=start_time,
+        end_time=end_time,
+        location=location
+    )
+    db.session.add(meeting)
+    db.session.commit()
+    flash('Meeting scheduled!')
+    return redirect(url_for('meetings'))
+
+@app.route('/meetings/delete/<int:meeting_id>', methods=['POST'])
+def delete_meeting(meeting_id):
+    meeting = Meeting.query.get_or_404(meeting_id)
+    if meeting.organizer_id != session['user_id']:
+        flash('Unauthorized.')
+        return redirect(url_for('meetings'))
+    db.session.delete(meeting)
+    db.session.commit()
+    flash('Meeting deleted!')
+    return redirect(url_for('meetings'))
+
 # Chat message model
 class ChatMessage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -65,6 +112,33 @@ class ChatMessage(db.Model):
     receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     message = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+# Direct chat routes
+@app.route('/chat/<int:receiver_id>')
+def chat(receiver_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    sender_id = session['user_id']
+    messages = ChatMessage.query.filter(
+        ((ChatMessage.sender_id==sender_id) & (ChatMessage.receiver_id==receiver_id)) |
+        ((ChatMessage.sender_id==receiver_id) & (ChatMessage.receiver_id==sender_id))
+    ).order_by(ChatMessage.timestamp.asc()).all()
+    receiver = User.query.get(receiver_id)
+    return render_template('chat.html', messages=messages, receiver=receiver)
+
+@app.route('/chat/send/<int:receiver_id>', methods=['POST'])
+def send_message(receiver_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    sender_id = session['user_id']
+    message = request.form.get('message')
+    if not message:
+        flash('Message required.')
+        return redirect(url_for('chat', receiver_id=receiver_id))
+    chat_msg = ChatMessage(sender_id=sender_id, receiver_id=receiver_id, message=message)
+    db.session.add(chat_msg)
+    db.session.commit()
+    return redirect(url_for('chat', receiver_id=receiver_id))
 
 # Inquiry model
 class Inquiry(db.Model):
@@ -75,6 +149,48 @@ class Inquiry(db.Model):
     status = db.Column(db.String(20), default='open')  # open, in_progress, resolved
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
     updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
+
+# Inquiry routes
+@app.route('/inquiries')
+def inquiries():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    user_id = session['user_id']
+    role = session.get('role')
+    if role == 'student':
+        inquiries = Inquiry.query.filter_by(student_id=user_id).order_by(Inquiry.created_at.desc()).all()
+    elif role == 'teacher':
+        inquiries = Inquiry.query.order_by(Inquiry.created_at.desc()).all()
+    else:
+        inquiries = []
+    return render_template('inquiries.html', inquiries=inquiries)
+
+@app.route('/inquiries/submit', methods=['POST'])
+def submit_inquiry():
+    if session.get('role') != 'student':
+        return redirect(url_for('home'))
+    subject = request.form.get('subject')
+    message = request.form.get('message')
+    if not subject or not message:
+        flash('Subject and message required.')
+        return redirect(url_for('inquiries'))
+    inquiry = Inquiry(student_id=session['user_id'], subject=subject, message=message)
+    db.session.add(inquiry)
+    db.session.commit()
+    flash('Inquiry submitted!')
+    return redirect(url_for('inquiries'))
+
+@app.route('/inquiries/update/<int:inquiry_id>', methods=['POST'])
+def update_inquiry(inquiry_id):
+    inquiry = Inquiry.query.get_or_404(inquiry_id)
+    status = request.form.get('status')
+    if status not in ['open', 'in_progress', 'resolved']:
+        flash('Invalid status.')
+        return redirect(url_for('inquiries'))
+    inquiry.status = status
+    db.session.commit()
+    flash('Inquiry status updated!')
+    return redirect(url_for('inquiries'))
 
 # SubstitutionTeacher model
 class SubstitutionTeacher(db.Model):
@@ -87,6 +203,49 @@ class SubstitutionTeacher(db.Model):
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
     updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
+# Substitution teacher routes (admin only)
+@app.route('/admin/substitutions')
+def admin_substitutions():
+    if session.get('role') != 'admin':
+        return redirect(url_for('home'))
+    subs = SubstitutionTeacher.query.order_by(SubstitutionTeacher.start_date.desc()).all()
+    teachers = User.query.filter_by(role='teacher').all()
+    return render_template('substitutions.html', substitutions=subs, teachers=teachers)
+
+@app.route('/admin/substitutions/add', methods=['POST'])
+def add_substitution():
+    if session.get('role') != 'admin':
+        return redirect(url_for('home'))
+    original_teacher_id = request.form.get('original_teacher_id')
+    substitute_teacher_id = request.form.get('substitute_teacher_id')
+    start_date = request.form.get('start_date')
+    end_date = request.form.get('end_date')
+    reason = request.form.get('reason')
+    if not all([original_teacher_id, substitute_teacher_id, start_date, end_date]):
+        flash('All fields required.')
+        return redirect(url_for('admin_substitutions'))
+    sub = SubstitutionTeacher(
+        original_teacher_id=original_teacher_id,
+        substitute_teacher_id=substitute_teacher_id,
+        start_date=start_date,
+        end_date=end_date,
+        reason=reason
+    )
+    db.session.add(sub)
+    db.session.commit()
+    flash('Substitution added!')
+    return redirect(url_for('admin_substitutions'))
+
+@app.route('/admin/substitutions/delete/<int:sub_id>', methods=['POST'])
+def delete_substitution(sub_id):
+    if session.get('role') != 'admin':
+        return redirect(url_for('home'))
+    sub = SubstitutionTeacher.query.get_or_404(sub_id)
+    db.session.delete(sub)
+    db.session.commit()
+    flash('Substitution deleted!')
+    return redirect(url_for('admin_substitutions'))
+
 # UserSettings model
 class UserSettings(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -97,11 +256,82 @@ class UserSettings(db.Model):
     pdf_viewer_enabled = db.Column(db.Boolean, default=True)
     bookmarks = db.Column(db.Text, nullable=True)  # JSON string of bookmarks
 
+# User settings routes
+@app.route('/settings', methods=['GET', 'POST'])
+def settings():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    user_id = session['user_id']
+    settings = UserSettings.query.filter_by(user_id=user_id).first()
+    if request.method == 'POST':
+        activity_enabled = bool(request.form.get('activity_enabled'))
+        notifications_enabled = bool(request.form.get('notifications_enabled'))
+        dashboard_layout = request.form.get('dashboard_layout', 'default')
+        pdf_viewer_enabled = bool(request.form.get('pdf_viewer_enabled'))
+        bookmarks = request.form.get('bookmarks', '')
+        if not settings:
+            settings = UserSettings(
+                user_id=user_id,
+                activity_enabled=activity_enabled,
+                notifications_enabled=notifications_enabled,
+                dashboard_layout=dashboard_layout,
+                pdf_viewer_enabled=pdf_viewer_enabled,
+                bookmarks=bookmarks
+            )
+            db.session.add(settings)
+        else:
+            settings.activity_enabled = activity_enabled
+            settings.notifications_enabled = notifications_enabled
+            settings.dashboard_layout = dashboard_layout
+            settings.pdf_viewer_enabled = pdf_viewer_enabled
+            settings.bookmarks = bookmarks
+        db.session.commit()
+        flash('Settings updated!')
+        return redirect(url_for('settings'))
+    return render_template('settings.html', settings=settings)
+
 # Routes
 @app.route('/')
 def home():
     timetable = Timetable.query.all()
     return render_template('index.html', timetable=timetable)
+
+# Notes feature routes
+@app.route('/notes')
+def notes():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    user_id = session['user_id']
+    notes = Note.query.filter_by(user_id=user_id).order_by(Note.created_at.desc()).all()
+    return render_template('notes.html', notes=notes)
+
+@app.route('/notes/add', methods=['POST'])
+def add_note():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    title = request.form.get('title')
+    content = request.form.get('content')
+    if not title or not content:
+        flash('Title and content are required.')
+        return redirect(url_for('notes'))
+    new_note = Note(user_id=session['user_id'], title=title, content=content)
+    db.session.add(new_note)
+    db.session.commit()
+    flash('Note added successfully!')
+    return redirect(url_for('notes'))
+
+@app.route('/notes/delete/<int:note_id>', methods=['POST'])
+def delete_note(note_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    note = Note.query.get_or_404(note_id)
+    if note.user_id != session['user_id']:
+        flash('Unauthorized action.')
+        return redirect(url_for('notes'))
+    db.session.delete(note)
+    db.session.commit()
+    flash('Note deleted successfully!')
+    return redirect(url_for('notes'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -179,13 +409,106 @@ def add_timetable():
 def teacher_dashboard():
     if session.get('role') != 'teacher':
         return redirect(url_for('home'))
-    return render_template('manageteachers.html')
+    teachers = User.query.filter_by(role='teacher').all()
+    return render_template('manageteachers.html', teachers=teachers)
+
+# Teacher management routes (admin only)
+@app.route('/admin/teachers')
+def admin_teachers():
+    if session.get('role') != 'admin':
+        return redirect(url_for('home'))
+    teachers = User.query.filter_by(role='teacher').all()
+    return render_template('manageteachers.html', teachers=teachers)
+
+@app.route('/admin/teachers/add', methods=['POST'])
+def add_teacher():
+    if session.get('role') != 'admin':
+        return redirect(url_for('home'))
+    username = request.form.get('username')
+    password = request.form.get('password')
+    if not username or not password:
+        flash('Username and password required.')
+        return redirect(url_for('admin_teachers'))
+    if User.query.filter_by(username=username).first():
+        flash('Username already exists.')
+        return redirect(url_for('admin_teachers'))
+    hashed_password = generate_password_hash(password)
+    new_teacher = User(username=username, password=hashed_password, role='teacher')
+    db.session.add(new_teacher)
+    db.session.commit()
+    flash('Teacher added successfully!')
+    return redirect(url_for('admin_teachers'))
+
+@app.route('/admin/teachers/delete/<int:teacher_id>', methods=['POST'])
+def delete_teacher(teacher_id):
+    if session.get('role') != 'admin':
+        return redirect(url_for('home'))
+    teacher = User.query.get_or_404(teacher_id)
+    if teacher.role != 'teacher':
+        flash('Invalid teacher.')
+        return redirect(url_for('admin_teachers'))
+    db.session.delete(teacher)
+    db.session.commit()
+    flash('Teacher deleted successfully!')
+    return redirect(url_for('admin_teachers'))
 
 @app.route('/student')
 def student_dashboard():
     if session.get('role') != 'student':
         return redirect(url_for('home'))
-    return render_template('student.html')
+    doubts = Doubt.query.filter_by(student_id=session['user_id']).order_by(Doubt.created_at.desc()).all()
+    return render_template('student.html', doubts=doubts)
+
+# Doubt solving routes
+@app.route('/doubts')
+def doubts():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    user_id = session['user_id']
+    role = session.get('role')
+    if role == 'student':
+        doubts = Doubt.query.filter_by(student_id=user_id).order_by(Doubt.created_at.desc()).all()
+    elif role == 'teacher':
+        doubts = Doubt.query.filter_by(teacher_id=user_id).order_by(Doubt.created_at.desc()).all()
+    else:
+        doubts = []
+    return render_template('doubts.html', doubts=doubts)
+
+@app.route('/doubts/submit', methods=['POST'])
+def submit_doubt():
+    if session.get('role') != 'student':
+        return redirect(url_for('home'))
+    question = request.form.get('question')
+    if not question:
+        flash('Question required.')
+        return redirect(url_for('doubts'))
+    doubt = Doubt(student_id=session['user_id'], question=question)
+    db.session.add(doubt)
+    db.session.commit()
+    flash('Doubt submitted!')
+    return redirect(url_for('doubts'))
+
+@app.route('/doubts/answer/<int:doubt_id>', methods=['POST'])
+def answer_doubt(doubt_id):
+    if session.get('role') != 'teacher':
+        return redirect(url_for('home'))
+    answer = request.form.get('answer')
+    doubt = Doubt.query.get_or_404(doubt_id)
+    doubt.answer = answer
+    doubt.status = 'answered'
+    doubt.teacher_id = session['user_id']
+    db.session.commit()
+    flash('Doubt answered!')
+    return redirect(url_for('doubts'))
+
+@app.route('/doubts/close/<int:doubt_id>', methods=['POST'])
+def close_doubt(doubt_id):
+    doubt = Doubt.query.get_or_404(doubt_id)
+    if session.get('role') == 'student' and doubt.student_id == session['user_id']:
+        doubt.status = 'closed'
+        db.session.commit()
+        flash('Doubt closed!')
+    return redirect(url_for('doubts'))
 
 @app.route('/logout')
 def logout():
@@ -216,10 +539,16 @@ def book_classroom():
     if not all([event_title, event_date, time_slot, duration, classroom_name]):
         return jsonify({'error': 'Missing required booking information'}), 400
 
-    # Create timetable entries for the duration (assuming 30 min slots)
-    # For simplicity, create one entry per booking
+    # Convert event_date to weekday name
+    from datetime import datetime
+    try:
+        weekday = datetime.strptime(event_date, "%Y-%m-%d").strftime("%A")
+    except Exception:
+        weekday = event_date  # fallback if already weekday
+
+    # Create timetable entry
     new_entry = Timetable(
-        day=event_date,
+        day=weekday,
         period=time_slot,
         subject=event_title,
         teacher=teacher_name,
