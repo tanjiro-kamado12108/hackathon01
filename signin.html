@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - Smart Classroom</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .signin-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .input-field {
+            transition: all 0.3s ease;
+        }
+        
+        .input-field:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.15);
+        }
+        
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .shape:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .shape:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            top: 60%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+        
+        .shape:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .role-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .role-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.2);
+        }
+        
+        .role-card.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        }
+        
+        .success-message {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            animation: slideDown 0.5s ease-out;
+        }
+        
+        .error-message {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            animation: shake 0.5s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .loading-spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .feature-icon {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+        }
+    </style>
+</head>
+<body class="gradient-bg">
+    <!-- Floating Background Shapes -->
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <div class="min-h-screen flex items-center justify-center p-4 relative z-10">
+        <div class="signin-card rounded-3xl shadow-2xl p-8 w-full max-w-md fade-in">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="bg-gradient-to-r from-indigo-500 to-purple-600 p-4 rounded-2xl inline-block mb-4">
+                    <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
+                <p class="text-gray-600">Sign in to your Smart Classroom account</p>
+            </div>
+
+            <!-- Success/Error Messages -->
+            <div id="successMessage" class="hidden success-message text-white p-4 rounded-xl mb-6 text-center">
+                <div class="flex items-center justify-center mb-2">
+                    <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="font-semibold">Success!</span>
+                </div>
+                <p class="text-sm">Welcome to Smart Classroom. Redirecting...</p>
+            </div>
+
+            <div id="errorMessage" class="hidden error-message text-white p-4 rounded-xl mb-6 text-center">
+                <div class="flex items-center justify-center mb-2">
+                    <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="font-semibold">Sign In Failed</span>
+                </div>
+                <p class="text-sm" id="errorText">Invalid credentials. Please try again.</p>
+            </div>
+
+            <!-- Role Selection -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-3">Select Your Role</label>
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="role-card bg-white border-2 border-gray-200 rounded-xl p-4 text-center" data-role="student">
+                        <div class="feature-icon p-3 rounded-xl inline-block mb-2">
+                            <svg class="w-6 h-6 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3z"/>
+                            </svg>
+                        </div>
+                        <h3 class="font-semibold text-gray-900">Student</h3>
+                        <p class="text-xs text-gray-600 mt-1">Access courses & assignments</p>
+                    </div>
+                    <div class="role-card bg-white border-2 border-gray-200 rounded-xl p-4 text-center" data-role="teacher">
+                        <div class="feature-icon p-3 rounded-xl inline-block mb-2">
+                            <svg class="w-6 h-6 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 3a1 1 0 00-1.447-.894L8.763 6H5a3 3 0 000 6h.28l1.771 5.316A1 1 0 008 18h1a1 1 0 001-1v-4.382l6.553 3.276A1 1 0 0018 15V3z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <h3 class="font-semibold text-gray-900">Teacher</h3>
+                        <p class="text-xs text-gray-600 mt-1">Manage classes & students</p>
+                    </div>
+                    <div class="role-card bg-white border-2 border-gray-200 rounded-xl p-4 text-center" data-role="admin">
+                        <div class="feature-icon p-3 rounded-xl inline-block mb-2">
+                            <svg class="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-4 4-4-4 4-4 .257-.257A6 6 0 1118 8zm-6-2a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <h3 class="font-semibold text-gray-900">Admin</h3>
+                        <p class="text-xs text-gray-600 mt-1">System administration</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sign In Form -->
+            <form id="signinForm" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email or Username</label>
+                    <input type="text" id="username" class="input-field w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Enter your email or username" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <div class="relative">
+                        <input type="password" id="password" class="input-field w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 pr-12" placeholder="Enter your password" required>
+                        <button type="button" id="togglePassword" class="absolute right-3 top-3 text-gray-400 hover:text-gray-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center">
+                        <input type="checkbox" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <span class="ml-2 text-sm text-gray-600">Remember me</span>
+                    </label>
+                    <a href="#" class="text-sm text-indigo-600 hover:text-indigo-500 font-medium">Forgot password?</a>
+                </div>
+
+                <button type="submit" id="signinBtn" class="w-full btn-primary text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center">
+                    <span id="signinText">Sign In</span>
+                    <div id="signinSpinner" class="loading-spinner ml-2 hidden"></div>
+                </button>
+            </form>
+
+            <!-- Divider -->
+            <div class="mt-8 mb-6">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-gray-500">Or continue with</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Login -->
+            <div class="grid grid-cols-2 gap-3 mb-6">
+                <button class="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors">
+                    <svg class="w-5 h-5 text-red-500" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    <span class="ml-2 text-sm font-medium text-gray-700">Google</span>
+                </button>
+                <button class="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors">
+                    <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                    <span class="ml-2 text-sm font-medium text-gray-700">Facebook</span>
+                </button>
+            </div>
+
+            <!-- Sign Up Link -->
+            <div class="text-center">
+                <p class="text-sm text-gray-600">
+                    Don't have an account? 
+                    <a href="#" class="text-indigo-600 hover:text-indigo-500 font-medium">Sign up here</a>
+                </p>
+            </div>
+
+            <!-- Demo Credentials -->
+            <div class="mt-6 p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
+                <div class="flex items-start">
+                    <svg class="w-5 h-5 text-indigo-600 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                    </svg>
+                    <div>
+                        <p class="text-sm font-medium text-indigo-800">Demo Credentials</p>
+                        <div class="text-xs text-indigo-700 mt-1 space-y-1">
+                            <div><strong>Student:</strong> student@school.edu / student123</div>
+                            <div><strong>Teacher:</strong> teacher@school.edu / teacher123</div>
+                            <div><strong>Admin:</strong> admin@school.edu / admin123</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Role selection
+            document.querySelectorAll('.role-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    // Remove selected class from all cards
+                    document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+                    // Add selected class to clicked card
+                    this.classList.add('selected');
+                });
+            });
+
+            // Password toggle
+            document.getElementById('togglePassword').addEventListener('click', function() {
+                const passwordField = document.getElementById('password');
+                const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordField.setAttribute('type', type);
+                
+                // Toggle icon
+                this.innerHTML = type === 'password' ? 
+                    '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>' :
+                    '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"/></svg>';
+            });
+
+            // Form submission
+            document.getElementById('signinForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleSignIn();
+            });
+
+            // Social login buttons
+            document.querySelectorAll('button').forEach(btn => {
+                if (btn.textContent.includes('Google') || btn.textContent.includes('Facebook')) {
+                    btn.addEventListener('click', function() {
+                        const provider = this.textContent.includes('Google') ? 'Google' : 'Facebook';
+                        showMessage('info', `${provider} sign-in would redirect to ${provider} authentication in a real application.`);
+                    });
+                }
+            });
+        }
+
+        async function handleSignIn() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const selectedRole = document.querySelector('.role-card.selected');
+
+            // Validate inputs
+            if (!username || !password) {
+                showMessage('error', 'Please enter both username and password');
+                return;
+            }
+
+            // Validate role selection
+            if (!selectedRole) {
+                showMessage('error', 'Please select your role (Student, Teacher, or Admin)');
+                return;
+            }
+
+            const role = selectedRole.dataset.role;
+
+            // Show loading state
+            showLoading(true);
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Successful login
+                    showMessage('success', `Welcome back, ${data.user.name}!`);
+
+                    // Store user info in localStorage for frontend use
+                    localStorage.setItem('userLoggedIn', 'true');
+                    localStorage.setItem('currentUser', JSON.stringify(data.user));
+
+                    // Redirect after success message
+                    setTimeout(() => {
+                        if (data.user.role === 'student') {
+                            window.location.href = '/student';
+                        } else if (data.user.role === 'teacher') {
+                            window.location.href = '/teacher';
+                        } else if (data.user.role === 'admin') {
+                            window.location.href = '/admin'; // You can create admin dashboard later
+                        }
+                    }, 2000);
+                } else {
+                    // Login failed
+                    showMessage('error', data.error || 'Login failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showMessage('error', 'Network error. Please check your connection and try again.');
+            }
+
+            showLoading(false);
+        }
+
+        function showLoading(show) {
+            const btn = document.getElementById('signinBtn');
+            const text = document.getElementById('signinText');
+            const spinner = document.getElementById('signinSpinner');
+            
+            if (show) {
+                btn.disabled = true;
+                btn.classList.add('opacity-75');
+                text.textContent = 'Signing In...';
+                spinner.classList.remove('hidden');
+            } else {
+                btn.disabled = false;
+                btn.classList.remove('opacity-75');
+                text.textContent = 'Sign In';
+                spinner.classList.add('hidden');
+            }
+        }
+
+        function showMessage(type, message) {
+            const successDiv = document.getElementById('successMessage');
+            const errorDiv = document.getElementById('errorMessage');
+            
+            // Hide both messages first
+            successDiv.classList.add('hidden');
+            errorDiv.classList.add('hidden');
+            
+            if (type === 'success') {
+                successDiv.querySelector('p').textContent = message;
+                successDiv.classList.remove('hidden');
+            } else if (type === 'error') {
+                document.getElementById('errorText').textContent = message;
+                errorDiv.classList.remove('hidden');
+                
+                // Auto-hide error after 5 seconds
+                setTimeout(() => {
+                    errorDiv.classList.add('hidden');
+                }, 5000);
+            }
+        }
+
+        // Auto-select role based on email domain (convenience feature)
+        document.getElementById('username').addEventListener('input', function() {
+            const email = this.value.toLowerCase();
+            if (email.includes('student') || email.includes('pupil')) {
+                document.querySelector('[data-role="student"]').click();
+            } else if (email.includes('teacher') || email.includes('prof') || email.includes('instructor')) {
+                document.querySelector('[data-role="teacher"]').click();
+            } else if (email.includes('admin') || email.includes('administrator')) {
+                document.querySelector('[data-role="admin"]').click();
+            }
+        });
+
+        // Check if user is already logged in
+        if (localStorage.getItem('userLoggedIn') === 'true') {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (user) {
+                showMessage('success', `Welcome back, ${user.name}! Redirecting to your dashboard...`);
+                setTimeout(() => {
+                    if (user.role === 'student') {
+                        window.location.href = '/student';
+                    } else if (user.role === 'teacher') {
+                        window.location.href = '/teacher';
+                    } else if (user.role === 'admin') {
+                        window.location.href = '/admin';
+                    }
+                }, 2000);
+            }
+        }
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97c8829522d8f655',t:'MTc1NzQ0MDAzOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

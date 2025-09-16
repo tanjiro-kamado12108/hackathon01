@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Smart Classroom</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .signin-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .input-field {
+            transition: all 0.3s ease;
+        }
+        
+        .input-field:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.15);
+        }
+        
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .shape:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .shape:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            top: 60%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+        
+        .shape:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .role-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .role-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.2);
+        }
+        
+        .role-card.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        }
+        
+        .success-message {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            animation: slideDown 0.5s ease-out;
+        }
+        
+        .error-message {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            animation: shake 0.5s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .loading-spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .feature-icon {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+        }
+    </style>
+</head>
+<body class="gradient-bg">
+    <!-- Floating Background Shapes -->
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <!-- Navigation Header -->
+    <nav class="bg-white shadow-lg border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo and Brand -->
+                <div class="flex items-center">
+                    <div class="bg-gradient-to-r from-indigo-500 to-purple-600 p-2 rounded-lg">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3z"/>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h1 class="text-xl font-bold text-gray-900">Smart Classroom</h1>
+                        <p class="text-sm text-gray-600">Student Portal</p>
+                    </div>
+                </div>
+
+                <!-- User Profile -->
+                <div class="flex items-center space-x-4">
+                    <div class="text-right">
+                        <p class="text-sm font-medium text-gray-900" id="studentName">Alex Johnson</p>
+                        <p class="text-xs text-gray-600" id="studentId">STU001</p>
+                    </div>
+                    <div class="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+                        <span class="text-white font-semibold text-sm" id="studentInitials">AJ</span>
+                    </div>
+                    <button id="logoutBtn" class="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-100">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Dashboard Content -->
+    <div class="min-h-screen bg-gray-50 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Welcome Section -->
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Welcome back, <span id="welcomeName">Alex</span>! 👋</h2>
+                <p class="text-gray-600">Here's what's happening in your classes today.</p>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-blue-100 rounded-lg">
+                            <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Completed</p>
+                            <p class="text-2xl font-bold text-gray-900">12</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-yellow-100 rounded-lg">
+                            <svg class="w-6 h-6 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Pending</p>
+                            <p class="text-2xl font-bold text-gray-900">5</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-green-100 rounded-lg">
+                            <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Average Grade</p>
+                            <p class="text-2xl font-bold text-gray-900">87%</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-purple-100 rounded-lg">
+                            <svg class="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3z"/>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Courses</p>
+                            <p class="text-2xl font-bold text-gray-900">6</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Column - Assignments & Courses -->
+                <div class="lg:col-span-2 space-y-8">
+                    <!-- Upcoming Assignments -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                        <div class="p-6 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900">Upcoming Assignments</h3>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between p-4 bg-red-50 border border-red-200 rounded-lg">
+                                    <div class="flex items-center">
+                                        <div class="w-3 h-3 bg-red-500 rounded-full mr-3"></div>
+                                        <div>
+                                            <h4 class="font-medium text-gray-900">Mathematics Quiz</h4>
+                                            <p class="text-sm text-gray-600">Due: Tomorrow, 11:59 PM</p>
+                                        </div>
+                                    </div>
+                                    <span class="px-3 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">Urgent</span>
+                                </div>
+
+                                <div class="flex items-center justify-between p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                    <div class="flex items-center">
+                                        <div class="w-3 h-3 bg-yellow-500 rounded-full mr-3"></div>
+                                        <div>
+                                            <h4 class="font-medium text-gray-900">History Essay</h4>
+                                            <p class="text-sm text-gray-600">Due: Friday, 11:59 PM</p>
+                                        </div>
+                                    </div>
+                                    <span class="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full">Due Soon</span>
+                                </div>
+
+                                <div class="flex items-center justify-between p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                                    <div class="flex items-center">
+                                        <div class="w-3 h-3 bg-gray-400 rounded-full mr-3"></div>
+                                        <div>
+                                            <h4 class="font-medium text-gray-900">Science Lab Report</h4>
+                                            <p class="text-sm text-gray-600">Due: Next Monday, 11:59 PM</p>
+                                        </div>
+                                    </div>
+                                    <span class="px-3 py-1 bg-gray-100 text-gray-800 text-xs font-medium rounded-full">Upcoming</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- My Courses -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                        <div class="p-6 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900">My Courses</h3>
+                        </div>
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+                                    <div class="flex items-center mb-3">
+                                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                            <span class="text-blue-600 font-semibold">M</span>
+                                        </div>
+                                        <div class="ml-3">
+                                            <h4 class="font-medium text-gray-900">Mathematics</h4>
+                                            <p class="text-sm text-gray-600">Mrs. Johnson</p>
+                                        </div>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-blue-600 h-2 rounded-full" style="width: 75%"></div>
+                                    </div>
+                                    <p class="text-xs text-gray-600 mt-2">75% Complete</p>
+                                </div>
+
+                                <div class="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+                                    <div class="flex items-center mb-3">
+                                        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                            <span class="text-green-600 font-semibold">S</span>
+                                        </div>
+                                        <div class="ml-3">
+                                            <h4 class="font-medium text-gray-900">Science</h4>
+                                            <p class="text-sm text-gray-600">Dr. Smith</p>
+                                        </div>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-green-600 h-2 rounded-full" style="width: 60%"></div>
+                                    </div>
+                                    <p class="text-xs text-gray-600 mt-2">60% Complete</p>
+                                </div>
+
+                                <div class="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+                                    <div class="flex items-center mb-3">
+                                        <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                                            <span class="text-purple-600 font-semibold">H</span>
+                                        </div>
+                                        <div class="ml-3">
+                                            <h4 class="font-medium text-gray-900">History</h4>
+                                            <p class="text-sm text-gray-600">Mr. Davis</p>
+                                        </div>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-purple-600 h-2 rounded-full" style="width: 85%"></div>
+                                    </div>
+                                    <p class="text-xs text-gray-600 mt-2">85% Complete</p>
+                                </div>
+
+                                <div class="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+                                    <div class="flex items-center mb-3">
+                                        <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                                            <span class="text-red-600 font-semibold">E</span>
+                                        </div>
+                                        <div class="ml-3">
+                                            <h4 class="font-medium text-gray-900">English</h4>
+                                            <p class="text-sm text-gray-600">Ms. Wilson</p>
+                                        </div>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-red-600 h-2 rounded-full" style="width: 90%"></div>
+                                    </div>
+                                    <p class="text-xs text-gray-600 mt-2">90% Complete</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Schedule & Announcements -->
+                <div class="space-y-8">
+                    <!-- Today's Schedule -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                        <div class="p-6 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900">Today's Schedule</h3>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-4">
+                                <div class="flex items-center p-3 bg-blue-50 border-l-4 border-blue-500 rounded-r-lg">
+                                    <div class="text-center mr-4">
+                                        <p class="text-sm font-medium text-blue-600">9:00</p>
+                                        <p class="text-xs text-blue-500">AM</p>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-gray-900">Mathematics</h4>
+                                        <p class="text-sm text-gray-600">Room 101</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center p-3 bg-green-50 border-l-4 border-green-500 rounded-r-lg">
+                                    <div class="text-center mr-4">
+                                        <p class="text-sm font-medium text-green-600">10:30</p>
+                                        <p class="text-xs text-green-500">AM</p>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-gray-900">Science</h4>
+                                        <p class="text-sm text-gray-600">Lab 205</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center p-3 bg-purple-50 border-l-4 border-purple-500 rounded-r-lg">
+                                    <div class="text-center mr-4">
+                                        <p class="text-sm font-medium text-purple-600">1:00</p>
+                                        <p class="text-xs text-purple-500">PM</p>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-gray-900">History</h4>
+                                        <p class="text-sm text-gray-600">Room 203</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center p-3 bg-red-50 border-l-4 border-red-500 rounded-r-lg">
+                                    <div class="text-center mr-4">
+                                        <p class="text-sm font-medium text-red-600">2:30</p>
+                                        <p class="text-xs text-red-500">PM</p>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-gray-900">English</h4>
+                                        <p class="text-sm text-gray-600">Room 105</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Announcements -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                        <div class="p-6 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900">Announcements</h3>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-4">
+                                <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                    <div class="flex items-start">
+                                        <div class="p-2 bg-blue-100 rounded-lg mr-3">
+                                            <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-medium text-gray-900">Library Hours Extended</h4>
+                                            <p class="text-sm text-gray-600 mt-1">The library will be open until 10 PM during exam week.</p>
+                                            <p class="text-xs text-gray-500 mt-2">2 hours ago</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                    <div class="flex items-start">
+                                        <div class="p-2 bg-yellow-100 rounded-lg mr-3">
+                                            <svg class="w-4 h-4 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-medium text-gray-900">Exam Schedule Released</h4>
+                                            <p class="text-sm text-gray-600 mt-1">Final exam schedules are now available in your student portal.</p>
+                                            <p class="text-xs text-gray-500 mt-2">1 day ago</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                        <div class="p-6 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900">Quick Actions</h3>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-3">
+                                <button class="w-full flex items-center justify-between p-3 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg transition-colors">
+                                    <div class="flex items-center">
+                                        <svg class="w-5 h-5 text-indigo-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        <span class="font-medium text-gray-900">Submit Assignment</span>
+                                    </div>
+                                    <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                                    </svg>
+                                </button>
+
+                                <button class="w-full flex items-center justify-between p-3 bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg transition-colors">
+                                    <div class="flex items-center">
+                                        <svg class="w-5 h-5 text-green-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                                        </svg>
+                                        <span class="font-medium text-gray-900">View Calendar</span>
+                                    </div>
+                                    <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                                    </svg>
+                                </button>
+
+                                <button class="w-full flex items-center justify-between p-3 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg transition-colors">
+                                    <div class="flex items-center">
+                                        <svg class="w-5 h-5 text-purple-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" clip-rule="evenodd"/>
+                                        </svg>
+                                        <span class="font-medium text-gray-900">Message Teacher</span>
+                                    </div>
+                                    <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthentication();
+            setupEventListeners();
+        });
+
+        async function checkAuthentication() {
+            try {
+                const response = await fetch('/api/auth/status', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    currentUser = data.user;
+                    initializeDashboard();
+                    loadDashboardData();
+                } else {
+                    // Not authenticated, redirect to login
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                window.location.href = '/';
+            }
+        }
+
+        function initializeDashboard() {
+            if (!currentUser) return;
+
+            // Update user information in the UI
+            document.getElementById('studentName').textContent = currentUser.name;
+            document.getElementById('studentId').textContent = currentUser.email;
+            document.getElementById('welcomeName').textContent = currentUser.name.split(' ')[0];
+
+            // Update initials
+            const initials = currentUser.name.split(' ').map(n => n[0]).join('');
+            document.getElementById('studentInitials').textContent = initials;
+        }
+
+        async function loadDashboardData() {
+            try {
+                // Load assignments
+                const assignmentsResponse = await fetch('/api/student/assignments', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                if (assignmentsResponse.ok) {
+                    const assignments = await assignmentsResponse.json();
+                    updateAssignments(assignments);
+                }
+
+                // Load courses
+                const coursesResponse = await fetch('/api/student/courses', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                if (coursesResponse.ok) {
+                    const courses = await coursesResponse.json();
+                    updateCourses(courses);
+                }
+
+                // Load stats
+                const statsResponse = await fetch('/api/student/stats', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                if (statsResponse.ok) {
+                    const stats = await statsResponse.json();
+                    updateStats(stats);
+                }
+
+                // Load schedule
+                const scheduleResponse = await fetch('/api/student/schedule', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                if (scheduleResponse.ok) {
+                    const schedule = await scheduleResponse.json();
+                    updateSchedule(schedule);
+                }
+
+                // Load announcements
+                const announcementsResponse = await fetch('/api/student/announcements', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                if (announcementsResponse.ok) {
+                    const announcements = await announcementsResponse.json();
+                    updateAnnouncements(announcements);
+                }
+
+            } catch (error) {
+                console.error('Failed to load dashboard data:', error);
+                showNotification('Failed to load dashboard data. Please refresh the page.', 'error');
+            }
+        }
+
+        function updateAssignments(assignments) {
+            const container = document.querySelector('.space-y-4');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            assignments.forEach(assignment => {
+                const dueDate = new Date(assignment.due_date);
+                const now = new Date();
+                const daysDiff = Math.ceil((dueDate - now) / (1000 * 60 * 60 * 24));
+
+                let bgColor = 'bg-gray-50';
+                let borderColor = 'border-gray-200';
+                let statusColor = 'bg-gray-100 text-gray-800';
+                let statusText = 'Upcoming';
+
+                if (daysDiff <= 1) {
+                    bgColor = 'bg-red-50';
+                    borderColor = 'border-red-200';
+                    statusColor = 'bg-red-100 text-red-800';
+                    statusText = 'Urgent';
+                } else if (daysDiff <= 3) {
+                    bgColor = 'bg-yellow-50';
+                    borderColor = 'border-yellow-200';
+                    statusColor = 'bg-yellow-100 text-yellow-800';
+                    statusText = 'Due Soon';
+                }
+
+                const assignmentHTML = `
+                    <div class="flex items-center justify-between p-4 ${bgColor} border ${borderColor} rounded-lg cursor-pointer" onclick="openAssignment('${assignment.id}')">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 ${statusText === 'Urgent' ? 'bg-red-500' : statusText === 'Due Soon' ? 'bg-yellow-500' : 'bg-gray-400'} rounded-full mr-3"></div>
+                            <div>
+                                <h4 class="font-medium text-gray-900">${assignment.title}</h4>
+                                <p class="text-sm text-gray-600">Due: ${dueDate.toLocaleDateString()} at ${dueDate.toLocaleTimeString()}</p>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 ${statusColor} text-xs font-medium rounded-full">${statusText}</span>
+                    </div>
+                `;
+                container.innerHTML += assignmentHTML;
+            });
+        }
+
+        function updateCourses(courses) {
+            const container = document.querySelector('.grid.grid-cols-1.md\\:grid-cols-2.gap-4');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            courses.forEach(course => {
+                const progressPercent = Math.round(course.progress || 0);
+                const courseHTML = `
+                    <div class="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer" onclick="openCourse('${course.id}')">
+                        <div class="flex items-center mb-3">
+                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <span class="text-blue-600 font-semibold">${course.name.charAt(0)}</span>
+                            </div>
+                            <div class="ml-3">
+                                <h4 class="font-medium text-gray-900">${course.name}</h4>
+                                <p class="text-sm text-gray-600">${course.teacher_name || 'Teacher'}</p>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-600 h-2 rounded-full" style="width: ${progressPercent}%"></div>
+                        </div>
+                        <p class="text-xs text-gray-600 mt-2">${progressPercent}% Complete</p>
+                    </div>
+                `;
+                container.innerHTML += courseHTML;
+            });
+        }
+
+        function updateStats(stats) {
+            document.querySelector('[data-stat="completed"]').textContent = stats.completed_assignments || 0;
+            document.querySelector('[data-stat="pending"]').textContent = stats.pending_assignments || 0;
+            document.querySelector('[data-stat="grade"]').textContent = `${stats.average_grade || 0}%`;
+            document.querySelector('[data-stat="courses"]').textContent = stats.total_courses || 0;
+        }
+
+        function updateSchedule(schedule) {
+            const container = document.querySelector('.space-y-4');
+            if (!container || !container.parentElement.querySelector('h3')?.textContent.includes('Schedule')) return;
+
+            const scheduleContainer = container;
+            scheduleContainer.innerHTML = '';
+
+            schedule.forEach(item => {
+                const time = new Date(item.start_time);
+                const colors = ['blue', 'green', 'purple', 'red', 'indigo'];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+
+                const scheduleHTML = `
+                    <div class="flex items-center p-3 bg-${color}-50 border-l-4 border-${color}-500 rounded-r-lg">
+                        <div class="text-center mr-4">
+                            <p class="text-sm font-medium text-${color}-600">${time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                            <p class="text-xs text-${color}-500">${time.toLocaleDateString([], {month: 'short', day: 'numeric'})}</p>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-900">${item.title}</h4>
+                            <p class="text-sm text-gray-600">${item.location || 'Classroom'}</p>
+                        </div>
+                    </div>
+                `;
+                scheduleContainer.innerHTML += scheduleHTML;
+            });
+        }
+
+        function updateAnnouncements(announcements) {
+            const container = document.querySelector('.space-y-4');
+            if (!container || !container.parentElement.querySelector('h3')?.textContent.includes('Announcements')) return;
+
+            const announcementsContainer = container;
+            announcementsContainer.innerHTML = '';
+
+            announcements.forEach(announcement => {
+                const createdDate = new Date(announcement.created_at);
+                const timeAgo = getTimeAgo(createdDate);
+
+                const announcementHTML = `
+                    <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div class="flex items-start">
+                            <div class="p-2 bg-blue-100 rounded-lg mr-3">
+                                <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-900">${announcement.title}</h4>
+                                <p class="text-sm text-gray-600 mt-1">${announcement.content}</p>
+                                <p class="text-xs text-gray-500 mt-2">${timeAgo}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                announcementsContainer.innerHTML += announcementHTML;
+            });
+        }
+
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diffInSeconds = Math.floor((now - date) / 1000);
+
+            if (diffInSeconds < 60) return 'Just now';
+            if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+            if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+            return `${Math.floor(diffInSeconds / 86400)} days ago`;
+        }
+
+        function openAssignment(assignmentId) {
+            showNotification(`Opening assignment ${assignmentId}...`, 'info');
+        }
+
+        function openCourse(courseId) {
+            showNotification(`Opening course ${courseId}...`, 'info');
+        }
+
+        function setupEventListeners() {
+            // Logout button
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                if (confirm('Are you sure you want to log out?')) {
+                    localStorage.removeItem('userLoggedIn');
+                    localStorage.removeItem('currentUser');
+                    window.location.href = '/';
+                }
+            });
+
+            // Course cards - make them clickable
+            document.querySelectorAll('.cursor-pointer').forEach(card => {
+                card.addEventListener('click', function() {
+                    const courseName = this.querySelector('h4').textContent;
+                    showNotification(`Opening ${courseName} course...`, 'info');
+                });
+            });
+
+            // Quick action buttons
+            document.querySelectorAll('button').forEach(btn => {
+                const text = btn.textContent.trim();
+                if (text.includes('Submit Assignment')) {
+                    btn.addEventListener('click', () => showNotification('Assignment submission portal opened!', 'success'));
+                } else if (text.includes('View Calendar')) {
+                    btn.addEventListener('click', () => showNotification('Calendar view opened!', 'info'));
+                } else if (text.includes('Message Teacher')) {
+                    btn.addEventListener('click', () => showNotification('Messaging system opened!', 'info'));
+                }
+            });
+
+            // Assignment cards - make them interactive
+            document.querySelectorAll('.bg-red-50, .bg-yellow-50, .bg-gray-50').forEach(assignment => {
+                if (assignment.querySelector('h4')) {
+                    assignment.style.cursor = 'pointer';
+                    assignment.addEventListener('click', function() {
+                        const assignmentName = this.querySelector('h4').textContent;
+                        showNotification(`Opening ${assignmentName}...`, 'info');
+                    });
+                }
+            });
+        }
+
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm transform transition-all duration-300 translate-x-full`;
+            
+            // Set colors based on type
+            if (type === 'success') {
+                notification.className += ' bg-green-500 text-white';
+            } else if (type === 'error') {
+                notification.className += ' bg-red-500 text-white';
+            } else {
+                notification.className += ' bg-blue-500 text-white';
+            }
+            
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <div class="flex-1">
+                        <p class="text-sm font-medium">${message}</p>
+                    </div>
+                    <button class="ml-3 text-white hover:text-gray-200" onclick="this.parentElement.parentElement.remove()">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => {
+                notification.classList.remove('translate-x-full');
+            }, 100);
+            
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => {
+                    if (notification.parentElement) {
+                        notification.remove();
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Update time-based greetings
+        function updateGreeting() {
+            const hour = new Date().getHours();
+            const welcomeElement = document.querySelector('h2');
+            const name = document.getElementById('welcomeName').textContent;
+            
+            let greeting = 'Welcome back';
+            if (hour < 12) {
+                greeting = 'Good morning';
+            } else if (hour < 17) {
+                greeting = 'Good afternoon';
+            } else {
+                greeting = 'Good evening';
+            }
+            
+            welcomeElement.innerHTML = `${greeting}, <span id="welcomeName">${name}</span>! 👋`;
+        }
+
+        // Initialize greeting
+        updateGreeting();
+
+        // Simulate real-time updates for stats
+        function updateStats() {
+            const stats = [
+                { id: 'completed', current: 12, increment: 1 },
+                { id: 'pending', current: 5, increment: -1 },
+                { id: 'grade', current: 87, increment: 1 },
+                { id: 'courses', current: 6, increment: 0 }
+            ];
+            
+            // Randomly update one stat every 30 seconds
+            setInterval(() => {
+                const randomStat = stats[Math.floor(Math.random() * stats.length)];
+                if (randomStat.increment !== 0) {
+                    const element = document.querySelector(`[data-stat="${randomStat.id}"]`);
+                    if (element) {
+                        const newValue = randomStat.current + (Math.random() > 0.5 ? randomStat.increment : -randomStat.increment);
+                        element.textContent = randomStat.id === 'grade' ? `${newValue}%` : newValue;
+                        randomStat.current = newValue;
+                    }
+                }
+            }, 30000);
+        }
+
+        // Add data attributes to stats for updates
+        document.addEventListener('DOMContentLoaded', function() {
+            const statElements = document.querySelectorAll('.text-2xl.font-bold');
+            const statTypes = ['completed', 'pending', 'grade', 'courses'];
+            statElements.forEach((el, index) => {
+                if (statTypes[index]) {
+                    el.setAttribute('data-stat', statTypes[index]);
+                }
+            });
+            updateStats();
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97c892f357ebf655',t:'MTc1NzQ0MDcxMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

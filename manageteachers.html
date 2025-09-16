@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Teachers - Smart Classroom</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+        
+        .teacher-card {
+            transition: all 0.3s ease;
+        }
+        
+        .teacher-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        
+        .status-badge {
+            transition: all 0.2s ease;
+        }
+        
+        .search-highlight {
+            background-color: #fef3c7;
+            padding: 1px 2px;
+            border-radius: 2px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #10b981;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .stats-card-2 {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .stats-card-3 {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .stats-card-4 {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <div class="bg-blue-600 p-2 rounded-lg mr-3">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3z"/>
+                            </svg>
+                        </div>
+                        <span class="text-xl font-bold text-gray-900">Smart Classroom</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Dashboard</a>
+                    <a href="booking.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Bookings</a>
+                    <a href="manage-teachers.html" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium">Manage Teachers</a>
+                    <a href="signin.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Sign Out</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900 flex items-center">
+                        <span class="bg-blue-100 p-3 rounded-xl mr-4">
+                            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                            </svg>
+                        </span>
+                        Teacher Management
+                    </h1>
+                    <p class="text-gray-600 mt-2">Manage your teaching staff, departments, and assignments</p>
+                </div>
+                <button id="addTeacherBtn" class="btn-primary text-white px-6 py-3 rounded-xl font-semibold flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    </svg>
+                    Add New Teacher
+                </button>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="stats-card text-white p-6 rounded-2xl card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-blue-100 text-sm font-medium">Total Teachers</p>
+                        <p class="text-3xl font-bold" id="totalTeachers">24</p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 p-3 rounded-xl">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-card-2 text-white p-6 rounded-2xl card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-pink-100 text-sm font-medium">Departments</p>
+                        <p class="text-3xl font-bold">8</p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 p-3 rounded-xl">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"/>
+                            <path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-card-3 text-white p-6 rounded-2xl card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-blue-100 text-sm font-medium">Active Teachers</p>
+                        <p class="text-3xl font-bold" id="activeTeachers">22</p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 p-3 rounded-xl">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-card-4 text-white p-6 rounded-2xl card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-green-100 text-sm font-medium">New This Month</p>
+                        <p class="text-3xl font-bold">3</p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 p-3 rounded-xl">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and Filters -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4">
+                <div class="flex-1">
+                    <div class="relative">
+                        <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        <input type="text" id="searchInput" placeholder="Search teachers by name, email, or subject..." class="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors">
+                    </div>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+                    <select id="departmentFilter" class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
+                        <option value="">All Departments</option>
+                        <option value="mathematics">Mathematics</option>
+                        <option value="science">Science</option>
+                        <option value="english">English</option>
+                        <option value="history">History</option>
+                        <option value="computer">Computer Science</option>
+                        <option value="arts">Arts</option>
+                        <option value="physical-education">Physical Education</option>
+                        <option value="music">Music</option>
+                    </select>
+                    
+                    <select id="statusFilter" class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                        <option value="on-leave">On Leave</option>
+                    </select>
+                    
+                    <div class="flex space-x-2">
+                        <button id="gridViewBtn" class="p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+                            <svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                            </svg>
+                        </button>
+                        <button id="listViewBtn" class="p-3 border-2 border-blue-500 bg-blue-50 rounded-xl transition-colors">
+                            <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bulk Actions -->
+            <div id="bulkActions" class="hidden mt-4 p-4 bg-blue-50 rounded-xl border border-blue-200">
+                <div class="flex items-center justify-between">
+                    <span class="text-blue-800 font-medium">
+                        <span id="selectedCount">0</span> teachers selected
+                    </span>
+                    <div class="space-x-2">
+                        <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                            Activate Selected
+                        </button>
+                        <button class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                            Deactivate Selected
+                        </button>
+                        <button class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                            Delete Selected
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teachers List -->
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-gray-900">Teachers Directory</h2>
+                    <div class="flex items-center space-x-4">
+                        <button class="text-gray-600 hover:text-blue-600 flex items-center text-sm font-medium">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            Export CSV
+                        </button>
+                        <button class="text-gray-600 hover:text-blue-600 flex items-center text-sm font-medium">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                            </svg>
+                            Print List
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- List View -->
+            <div id="listView" class="divide-y divide-gray-200">
+                <!-- Teachers will be populated by JavaScript -->
+            </div>
+
+            <!-- Grid View -->
+            <div id="gridView" class="hidden p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="teacherGrid">
+                    <!-- Teacher cards will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="p-6 border-t border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div class="text-sm text-gray-600">
+                        Showing <span id="showingStart">1</span> to <span id="showingEnd">10</span> of <span id="totalResults">24</span> teachers
+                    </div>
+                    <div class="flex space-x-2">
+                        <button id="prevPage" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                            Previous
+                        </button>
+                        <div id="pageNumbers" class="flex space-x-1">
+                            <!-- Page numbers will be generated by JavaScript -->
+                        </div>
+                        <button id="nextPage" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                            Next
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Teacher Modal -->
+    <div id="addTeacherModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-2xl font-bold text-gray-900">Add New Teacher</h3>
+                    <button id="closeAddModal" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <form id="addTeacherForm" class="p-6 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">First Name</label>
+                        <input type="text" id="firstName" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Last Name</label>
+                        <input type="text" id="lastName" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
+                        <input type="email" id="email" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Phone Number</label>
+                        <input type="tel" id="phone" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Department</label>
+                        <select id="department" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none" required>
+                            <option value="">Select Department</option>
+                            <option value="mathematics">Mathematics</option>
+                            <option value="science">Science</option>
+                            <option value="english">English</option>
+                            <option value="history">History</option>
+                            <option value="computer">Computer Science</option>
+                            <option value="arts">Arts</option>
+                            <option value="physical-education">Physical Education</option>
+                            <option value="music">Music</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Subject Specialization</label>
+                        <input type="text" id="subject" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none" placeholder="e.g., Algebra, Biology" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Hire Date</label>
+                        <input type="date" id="hireDate" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Employee ID</label>
+                        <input type="text" id="employeeId" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none" placeholder="EMP001" required>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Qualifications</label>
+                    <textarea id="qualifications" rows="3" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none" placeholder="List degrees, certifications, and relevant qualifications..."></textarea>
+                </div>
+
+                <div class="flex space-x-4">
+                    <button type="button" id="cancelAdd" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-6 rounded-xl font-semibold transition-all">
+                        Cancel
+                    </button>
+                    <button type="submit" class="flex-1 btn-primary text-white py-3 px-6 rounded-xl font-semibold">
+                        Add Teacher
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sample teacher data
+            let teachers = [
+                {
+                    id: 1,
+                    firstName: 'Sarah',
+                    lastName: 'Johnson',
+                    email: 'sarah.johnson@school.edu',
+                    phone: '+1 (555) 123-4567',
+                    department: 'mathematics',
+                    subject: 'Algebra & Calculus',
+                    hireDate: '2020-08-15',
+                    employeeId: 'EMP001',
+                    status: 'active',
+                    qualifications: 'M.S. Mathematics, B.Ed.',
+                    avatar: '👩‍🏫'
+                },
+                {
+                    id: 2,
+                    firstName: 'Michael',
+                    lastName: 'Chen',
+                    email: 'michael.chen@school.edu',
+                    phone: '+1 (555) 234-5678',
+                    department: 'science',
+                    subject: 'Physics & Chemistry',
+                    hireDate: '2019-09-01',
+                    employeeId: 'EMP002',
+                    status: 'active',
+                    qualifications: 'Ph.D. Physics, M.S. Chemistry',
+                    avatar: '👨‍🔬'
+                },
+                {
+                    id: 3,
+                    firstName: 'Emily',
+                    lastName: 'Rodriguez',
+                    email: 'emily.rodriguez@school.edu',
+                    phone: '+1 (555) 345-6789',
+                    department: 'english',
+                    subject: 'Literature & Writing',
+                    hireDate: '2021-01-10',
+                    employeeId: 'EMP003',
+                    status: 'active',
+                    qualifications: 'M.A. English Literature, B.Ed.',
+                    avatar: '👩‍💼'
+                },
+                {
+                    id: 4,
+                    firstName: 'David',
+                    lastName: 'Thompson',
+                    email: 'david.thompson@school.edu',
+                    phone: '+1 (555) 456-7890',
+                    department: 'computer',
+                    subject: 'Programming & Web Development',
+                    hireDate: '2018-03-20',
+                    employeeId: 'EMP004',
+                    status: 'active',
+                    qualifications: 'M.S. Computer Science, Industry Certifications',
+                    avatar: '👨‍💻'
+                },
+                {
+                    id: 5,
+                    firstName: 'Lisa',
+                    lastName: 'Anderson',
+                    email: 'lisa.anderson@school.edu',
+                    phone: '+1 (555) 567-8901',
+                    department: 'arts',
+                    subject: 'Visual Arts & Design',
+                    hireDate: '2022-06-15',
+                    employeeId: 'EMP005',
+                    status: 'on-leave',
+                    qualifications: 'M.F.A. Fine Arts, B.A. Art History',
+                    avatar: '👩‍🎨'
+                }
+            ];
+
+            let filteredTeachers = [...teachers];
+            let currentView = 'list';
+            let currentPage = 1;
+            let itemsPerPage = 10;
+            let selectedTeachers = new Set();
+
+            // DOM elements
+            const searchInput = document.getElementById('searchInput');
+            const departmentFilter = document.getElementById('departmentFilter');
+            const statusFilter = document.getElementById('statusFilter');
+            const listView = document.getElementById('listView');
+            const gridView = document.getElementById('gridView');
+            const gridViewBtn = document.getElementById('gridViewBtn');
+            const listViewBtn = document.getElementById('listViewBtn');
+            const addTeacherBtn = document.getElementById('addTeacherBtn');
+            const addTeacherModal = document.getElementById('addTeacherModal');
+            const addTeacherForm = document.getElementById('addTeacherForm');
+            const bulkActions = document.getElementById('bulkActions');
+            const selectedCount = document.getElementById('selectedCount');
+
+            // Initialize
+            updateStats();
+            renderTeachers();
+            setupEventListeners();
+
+            function updateStats() {
+                const totalTeachers = teachers.length;
+                const activeTeachers = teachers.filter(t => t.status === 'active').length;
+                
+                document.getElementById('totalTeachers').textContent = totalTeachers;
+                document.getElementById('activeTeachers').textContent = activeTeachers;
+            }
+
+            function setupEventListeners() {
+                // Search and filters
+                searchInput.addEventListener('input', filterTeachers);
+                departmentFilter.addEventListener('change', filterTeachers);
+                statusFilter.addEventListener('change', filterTeachers);
+
+                // View toggles
+                gridViewBtn.addEventListener('click', () => switchView('grid'));
+                listViewBtn.addEventListener('click', () => switchView('list'));
+
+                // Modal controls
+                addTeacherBtn.addEventListener('click', () => addTeacherModal.classList.remove('hidden'));
+                document.getElementById('closeAddModal').addEventListener('click', closeModal);
+                document.getElementById('cancelAdd').addEventListener('click', closeModal);
+                addTeacherForm.addEventListener('submit', handleAddTeacher);
+
+                // Close modal on backdrop click
+                addTeacherModal.addEventListener('click', (e) => {
+                    if (e.target === addTeacherModal) closeModal();
+                });
+            }
+
+            function filterTeachers() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const departmentValue = departmentFilter.value;
+                const statusValue = statusFilter.value;
+
+                filteredTeachers = teachers.filter(teacher => {
+                    const matchesSearch = !searchTerm || 
+                        teacher.firstName.toLowerCase().includes(searchTerm) ||
+                        teacher.lastName.toLowerCase().includes(searchTerm) ||
+                        teacher.email.toLowerCase().includes(searchTerm) ||
+                        teacher.subject.toLowerCase().includes(searchTerm);
+
+                    const matchesDepartment = !departmentValue || teacher.department === departmentValue;
+                    const matchesStatus = !statusValue || teacher.status === statusValue;
+
+                    return matchesSearch && matchesDepartment && matchesStatus;
+                });
+
+                currentPage = 1;
+                renderTeachers();
+            }
+
+            function switchView(view) {
+                currentView = view;
+                
+                if (view === 'grid') {
+                    listView.classList.add('hidden');
+                    gridView.classList.remove('hidden');
+                    gridViewBtn.classList.add('border-blue-500', 'bg-blue-50');
+                    gridViewBtn.querySelector('svg').classList.add('text-blue-600');
+                    listViewBtn.classList.remove('border-blue-500', 'bg-blue-50');
+                    listViewBtn.querySelector('svg').classList.remove('text-blue-600');
+                } else {
+                    gridView.classList.add('hidden');
+                    listView.classList.remove('hidden');
+                    listViewBtn.classList.add('border-blue-500', 'bg-blue-50');
+                    listViewBtn.querySelector('svg').classList.add('text-blue-600');
+                    gridViewBtn.classList.remove('border-blue-500', 'bg-blue-50');
+                    gridViewBtn.querySelector('svg').classList.remove('text-blue-600');
+                }
+                
+                renderTeachers();
+            }
+
+            function renderTeachers() {
+                const startIndex = (currentPage - 1) * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
+                const paginatedTeachers = filteredTeachers.slice(startIndex, endIndex);
+
+                if (currentView === 'list') {
+                    renderListView(paginatedTeachers);
+                } else {
+                    renderGridView(paginatedTeachers);
+                }
+
+                updatePagination();
+            }
+
+            function renderListView(teachersToRender) {
+                listView.innerHTML = teachersToRender.map(teacher => `
+                    <div class="p-6 hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <input type="checkbox" class="teacher-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500" data-teacher-id="${teacher.id}">
+                                <div class="text-4xl">${teacher.avatar}</div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900">${teacher.firstName} ${teacher.lastName}</h3>
+                                    <p class="text-gray-600">${teacher.email}</p>
+                                    <div class="flex items-center space-x-4 mt-1">
+                                        <span class="text-sm text-gray-500">${getDepartmentName(teacher.department)}</span>
+                                        <span class="text-sm text-gray-500">•</span>
+                                        <span class="text-sm text-gray-500">${teacher.subject}</span>
+                                        <span class="text-sm text-gray-500">•</span>
+                                        <span class="text-sm text-gray-500">ID: ${teacher.employeeId}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <div class="text-right">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-sm text-gray-500">Status:</span>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" ${teacher.status === 'active' ? 'checked' : ''} onchange="toggleTeacherStatus(${teacher.id})">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                    <p class="text-sm text-gray-500 mt-1">Hired: ${new Date(teacher.hireDate).toLocaleDateString()}</p>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button onclick="editTeacher(${teacher.id})" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                        </svg>
+                                    </button>
+                                    <button onclick="deleteTeacher(${teacher.id})" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Add event listeners for checkboxes
+                document.querySelectorAll('.teacher-checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', handleCheckboxChange);
+                });
+            }
+
+            function renderGridView(teachersToRender) {
+                const teacherGrid = document.getElementById('teacherGrid');
+                teacherGrid.innerHTML = teachersToRender.map(teacher => `
+                    <div class="teacher-card bg-white border-2 border-gray-200 rounded-xl p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <input type="checkbox" class="teacher-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500" data-teacher-id="${teacher.id}">
+                            <span class="status-badge px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeClass(teacher.status)}">
+                                ${teacher.status.charAt(0).toUpperCase() + teacher.status.slice(1)}
+                            </span>
+                        </div>
+                        
+                        <div class="text-center mb-4">
+                            <div class="text-5xl mb-3">${teacher.avatar}</div>
+                            <h3 class="text-lg font-bold text-gray-900">${teacher.firstName} ${teacher.lastName}</h3>
+                            <p class="text-sm text-gray-600">${getDepartmentName(teacher.department)}</p>
+                        </div>
+                        
+                        <div class="space-y-2 text-sm">
+                            <div class="flex items-center text-gray-600">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/>
+                                </svg>
+                                ${teacher.email}
+                            </div>
+                            <div class="flex items-center text-gray-600">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                </svg>
+                                ${teacher.subject}
+                            </div>
+                            <div class="flex items-center text-gray-600">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V4a2 2 0 114 0v2m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"/>
+                                </svg>
+                                ${teacher.employeeId}
+                            </div>
+                        </div>
+                        
+                        <div class="flex space-x-2 mt-4">
+                            <button onclick="editTeacher(${teacher.id})" class="flex-1 bg-blue-50 text-blue-600 py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors">
+                                Edit
+                            </button>
+                            <button onclick="deleteTeacher(${teacher.id})" class="flex-1 bg-red-50 text-red-600 py-2 px-3 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Add event listeners for checkboxes
+                document.querySelectorAll('.teacher-checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', handleCheckboxChange);
+                });
+            }
+
+            function handleCheckboxChange(e) {
+                const teacherId = parseInt(e.target.dataset.teacherId);
+                
+                if (e.target.checked) {
+                    selectedTeachers.add(teacherId);
+                } else {
+                    selectedTeachers.delete(teacherId);
+                }
+                
+                updateBulkActions();
+            }
+
+            function updateBulkActions() {
+                const count = selectedTeachers.size;
+                selectedCount.textContent = count;
+                
+                if (count > 0) {
+                    bulkActions.classList.remove('hidden');
+                } else {
+                    bulkActions.classList.add('hidden');
+                }
+            }
+
+            function updatePagination() {
+                const totalItems = filteredTeachers.length;
+                const totalPages = Math.ceil(totalItems / itemsPerPage);
+                const startItem = (currentPage - 1) * itemsPerPage + 1;
+                const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+
+                document.getElementById('showingStart').textContent = startItem;
+                document.getElementById('showingEnd').textContent = endItem;
+                document.getElementById('totalResults').textContent = totalItems;
+
+                // Update page numbers
+                const pageNumbers = document.getElementById('pageNumbers');
+                pageNumbers.innerHTML = '';
+                
+                for (let i = 1; i <= totalPages; i++) {
+                    const button = document.createElement('button');
+                    button.textContent = i;
+                    button.className = `px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                        i === currentPage 
+                            ? 'bg-blue-600 text-white' 
+                            : 'text-gray-700 hover:bg-gray-100'
+                    }`;
+                    button.addEventListener('click', () => {
+                        currentPage = i;
+                        renderTeachers();
+                    });
+                    pageNumbers.appendChild(button);
+                }
+
+                // Update prev/next buttons
+                document.getElementById('prevPage').disabled = currentPage === 1;
+                document.getElementById('nextPage').disabled = currentPage === totalPages;
+            }
+
+            function getDepartmentName(dept) {
+                const departments = {
+                    'mathematics': 'Mathematics',
+                    'science': 'Science',
+                    'english': 'English',
+                    'history': 'History',
+                    'computer': 'Computer Science',
+                    'arts': 'Arts',
+                    'physical-education': 'Physical Education',
+                    'music': 'Music'
+                };
+                return departments[dept] || dept;
+            }
+
+            function getStatusBadgeClass(status) {
+                const classes = {
+                    'active': 'bg-green-100 text-green-800',
+                    'inactive': 'bg-red-100 text-red-800',
+                    'on-leave': 'bg-yellow-100 text-yellow-800'
+                };
+                return classes[status] || 'bg-gray-100 text-gray-800';
+            }
+
+            function closeModal() {
+                addTeacherModal.classList.add('hidden');
+                addTeacherForm.reset();
+            }
+
+            function handleAddTeacher(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(e.target);
+                const newTeacher = {
+                    id: teachers.length + 1,
+                    firstName: document.getElementById('firstName').value,
+                    lastName: document.getElementById('lastName').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value,
+                    department: document.getElementById('department').value,
+                    subject: document.getElementById('subject').value,
+                    hireDate: document.getElementById('hireDate').value,
+                    employeeId: document.getElementById('employeeId').value,
+                    qualifications: document.getElementById('qualifications').value,
+                    status: 'active',
+                    avatar: '👨‍🏫'
+                };
+
+                teachers.push(newTeacher);
+                filteredTeachers = [...teachers];
+                updateStats();
+                renderTeachers();
+                closeModal();
+
+                // Show success message
+                alert('Teacher added successfully!');
+            }
+
+            // Global functions for button actions
+            window.toggleTeacherStatus = function(teacherId) {
+                const teacher = teachers.find(t => t.id === teacherId);
+                if (teacher) {
+                    teacher.status = teacher.status === 'active' ? 'inactive' : 'active';
+                    updateStats();
+                    renderTeachers();
+                }
+            };
+
+            window.editTeacher = function(teacherId) {
+                const teacher = teachers.find(t => t.id === teacherId);
+                if (teacher) {
+                    // Pre-fill form with teacher data
+                    document.getElementById('firstName').value = teacher.firstName;
+                    document.getElementById('lastName').value = teacher.lastName;
+                    document.getElementById('email').value = teacher.email;
+                    document.getElementById('phone').value = teacher.phone;
+                    document.getElementById('department').value = teacher.department;
+                    document.getElementById('subject').value = teacher.subject;
+                    document.getElementById('hireDate').value = teacher.hireDate;
+                    document.getElementById('employeeId').value = teacher.employeeId;
+                    document.getElementById('qualifications').value = teacher.qualifications;
+                    
+                    addTeacherModal.classList.remove('hidden');
+                }
+            };
+
+            window.deleteTeacher = function(teacherId) {
+                if (confirm('Are you sure you want to delete this teacher?')) {
+                    teachers = teachers.filter(t => t.id !== teacherId);
+                    filteredTeachers = [...teachers];
+                    selectedTeachers.delete(teacherId);
+                    updateStats();
+                    updateBulkActions();
+                    renderTeachers();
+                }
+            };
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97c82a027617f655',t:'MTc1NzQzNjQxMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

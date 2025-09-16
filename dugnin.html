@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - Smart Classroom</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+        }
+        
+        .input-focus {
+            transition: all 0.2s ease;
+        }
+        
+        .input-focus:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(16, 185, 129, 0.4);
+        }
+        
+        .btn-secondary {
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 8s ease-in-out infinite;
+        }
+        
+        .shape:nth-child(1) {
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .shape:nth-child(2) {
+            top: 20%;
+            right: 15%;
+            animation-delay: 2s;
+        }
+        
+        .shape:nth-child(3) {
+            bottom: 15%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+        
+        .shape:nth-child(4) {
+            top: 60%;
+            right: 25%;
+            animation-delay: 6s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(15deg); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+        
+        .social-btn {
+            transition: all 0.2s ease;
+        }
+        
+        .social-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen gradient-bg flex items-center justify-center p-4">
+    <!-- Floating Background Shapes -->
+    <div class="floating-shapes">
+        <div class="shape w-32 h-32 bg-white rounded-full"></div>
+        <div class="shape w-24 h-24 bg-white rounded-lg transform rotate-45"></div>
+        <div class="shape w-40 h-40 bg-white rounded-full"></div>
+        <div class="shape w-28 h-28 bg-white rounded-lg"></div>
+    </div>
+
+    <div class="w-full max-w-md relative z-10">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="bg-white bg-opacity-20 p-4 rounded-2xl inline-block mb-4 backdrop-blur-sm">
+                <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
+                </svg>
+            </div>
+            <h1 class="text-4xl font-bold text-white mb-2">Welcome Back</h1>
+            <p class="text-blue-100 text-lg">Sign in to your Smart Classroom account</p>
+        </div>
+
+        <!-- Sign In Form Container -->
+        <div class="bg-white rounded-2xl shadow-2xl p-8 card-hover backdrop-blur-sm fade-in">
+            <!-- Role Selection -->
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    <span class="flex items-center">
+                        <span class="mr-2">👤</span>
+                        Sign in as
+                    </span>
+                </label>
+                <select id="userRole" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus outline-none">
+                    <option value="student">🎓 Student</option>
+                    <option value="teacher">👨‍🏫 Teacher</option>
+                    <option value="admin">👑 Administrator</option>
+                    <option value="staff">👥 Staff Member</option>
+                </select>
+            </div>
+
+            <form id="signinForm" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <span class="flex items-center">
+                            <span class="mr-2">📧</span>
+                            Email Address
+                        </span>
+                    </label>
+                    <input type="email" id="email" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus outline-none" placeholder="your.email@school.edu" required>
+                    <div id="emailError" class="hidden text-red-500 text-sm mt-1"></div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <span class="flex items-center">
+                            <span class="mr-2">🔒</span>
+                            Password
+                        </span>
+                    </label>
+                    <div class="relative">
+                        <input type="password" id="password" class="w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-xl input-focus outline-none" placeholder="Enter your password" required>
+                        <button type="button" id="togglePassword" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                            <svg id="eyeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="passwordError" class="hidden text-red-500 text-sm mt-1"></div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center">
+                        <input type="checkbox" id="rememberMe" class="rounded border-gray-300 text-green-600 focus:ring-green-500">
+                        <span class="ml-2 text-sm text-gray-700">Remember me</span>
+                    </label>
+                    <button type="button" id="forgotPassword" class="text-sm text-green-600 hover:text-green-800 font-medium">
+                        Forgot password?
+                    </button>
+                </div>
+
+                <button type="submit" id="signinBtn" class="w-full btn-primary text-white py-4 px-6 rounded-xl font-semibold text-lg">
+                    Sign In
+                </button>
+            </form>
+
+            <!-- Divider -->
+            <div class="my-6 flex items-center">
+                <div class="flex-1 border-t border-gray-300"></div>
+                <span class="px-4 text-sm text-gray-500">Or continue with</span>
+                <div class="flex-1 border-t border-gray-300"></div>
+            </div>
+
+            <!-- Social Login Options -->
+            <div class="space-y-3">
+                <button class="social-btn w-full flex items-center justify-center px-4 py-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-all">
+                    <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    <span class="text-gray-700 font-medium">Continue with Google</span>
+                </button>
+
+                <button class="social-btn w-full flex items-center justify-center px-4 py-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-all">
+                    <svg class="w-5 h-5 mr-3" fill="#00A4EF" viewBox="0 0 24 24">
+                        <path d="M11.4 24H0V12.6h11.4V24zM24 24H12.6V12.6H24V24zM11.4 11.4H0V0h11.4v11.4zM24 11.4H12.6V0H24v11.4z"/>
+                    </svg>
+                    <span class="text-gray-700 font-medium">Continue with Microsoft</span>
+                </button>
+
+                <button class="social-btn w-full flex items-center justify-center px-4 py-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-all">
+                    <svg class="w-5 h-5 mr-3" fill="#000000" viewBox="0 0 24 24">
+                        <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/>
+                    </svg>
+                    <span class="text-gray-700 font-medium">Continue with Apple</span>
+                </button>
+            </div>
+
+            <!-- Sign Up Link -->
+            <div class="mt-8 text-center">
+                <p class="text-gray-600">
+                    Don't have an account? 
+                    <a href="signup.html" class="text-green-600 font-semibold hover:text-green-800 transition-colors">Sign up here</a>
+                </p>
+            </div>
+
+            <!-- Additional Links -->
+            <div class="mt-6 text-center space-y-2">
+                <a href="index.html" class="block text-sm text-gray-500 hover:text-gray-700 transition-colors">← Back to Homepage</a>
+                <div class="flex justify-center space-x-4 text-xs text-gray-400">
+                    <a href="#" class="hover:text-gray-600">Privacy Policy</a>
+                    <span>•</span>
+                    <a href="#" class="hover:text-gray-600">Terms of Service</a>
+                    <span>•</span>
+                    <a href="#" class="hover:text-gray-600">Help</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Notice -->
+        <div class="mt-6 bg-white bg-opacity-20 backdrop-blur-sm rounded-xl p-4 text-center">
+            <div class="flex items-center justify-center text-white text-sm">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+                <span>Your connection is secure and encrypted</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div id="forgotPasswordModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 fade-in">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-2">Reset Password</h3>
+                <p class="text-gray-600">Enter your email address and we'll send you a link to reset your password.</p>
+            </div>
+
+            <form id="resetPasswordForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
+                    <input type="email" id="resetEmail" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus outline-none" placeholder="your.email@school.edu" required>
+                </div>
+
+                <div class="flex space-x-3">
+                    <button type="button" id="cancelReset" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-4 rounded-xl font-semibold transition-all">
+                        Cancel
+                    </button>
+                    <button type="submit" class="flex-1 btn-primary text-white py-3 px-4 rounded-xl font-semibold">
+                        Send Reset Link
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Message -->
+    <div id="successMessage" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 text-center fade-in">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-2">Welcome Back!</h3>
+            <p class="text-gray-600 mb-6">You have successfully signed in to your Smart Classroom account.</p>
+            <button onclick="location.href='index.html'" class="w-full btn-primary text-white py-3 px-6 rounded-xl font-semibold">
+                Continue to Dashboard
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const signinForm = document.getElementById('signinForm');
+            const signinBtn = document.getElementById('signinBtn');
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+            const forgotPasswordBtn = document.getElementById('forgotPassword');
+            const forgotPasswordModal = document.getElementById('forgotPasswordModal');
+            const resetPasswordForm = document.getElementById('resetPasswordForm');
+            const cancelReset = document.getElementById('cancelReset');
+            const successMessage = document.getElementById('successMessage');
+            
+            // Password visibility toggle
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                if (type === 'text') {
+                    eyeIcon.innerHTML = `
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"/>
+                    `;
+                } else {
+                    eyeIcon.innerHTML = `
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    `;
+                }
+            });
+            
+            // Form validation
+            function validateEmail(email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return emailRegex.test(email);
+            }
+            
+            function showError(inputId, message) {
+                const errorElement = document.getElementById(inputId + 'Error');
+                const inputElement = document.getElementById(inputId);
+                
+                errorElement.textContent = message;
+                errorElement.classList.remove('hidden');
+                inputElement.style.borderColor = '#ef4444';
+            }
+            
+            function clearError(inputId) {
+                const errorElement = document.getElementById(inputId + 'Error');
+                const inputElement = document.getElementById(inputId);
+                
+                errorElement.classList.add('hidden');
+                inputElement.style.borderColor = '#e5e7eb';
+            }
+            
+            // Real-time validation
+            document.getElementById('email').addEventListener('input', function() {
+                clearError('email');
+                if (this.value && !validateEmail(this.value)) {
+                    showError('email', 'Please enter a valid email address');
+                }
+            });
+            
+            document.getElementById('password').addEventListener('input', function() {
+                clearError('password');
+            });
+            
+            // Handle sign in form submission
+            signinForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                const userRole = document.getElementById('userRole').value;
+                
+                // Clear previous errors
+                clearError('email');
+                clearError('password');
+                
+                let hasErrors = false;
+                
+                // Validate email
+                if (!email) {
+                    showError('email', 'Email is required');
+                    hasErrors = true;
+                } else if (!validateEmail(email)) {
+                    showError('email', 'Please enter a valid email address');
+                    hasErrors = true;
+                }
+                
+                // Validate password
+                if (!password) {
+                    showError('password', 'Password is required');
+                    hasErrors = true;
+                } else if (password.length < 6) {
+                    showError('password', 'Password must be at least 6 characters');
+                    hasErrors = true;
+                }
+                
+                if (hasErrors) return;
+                
+                // Simulate login process
+                signinBtn.innerHTML = '🔄 Signing In...';
+                signinBtn.disabled = true;
+                
+                setTimeout(() => {
+                    // Simulate successful login
+                    successMessage.classList.remove('hidden');
+                    
+                    // Reset button
+                    signinBtn.innerHTML = 'Sign In';
+                    signinBtn.disabled = false;
+                    
+                    // Store user session (in real app, this would be handled by backend)
+                    localStorage.setItem('userSession', JSON.stringify({
+                        email: email,
+                        role: userRole,
+                        loginTime: new Date().toISOString()
+                    }));
+                }, 2000);
+            });
+            
+            // Forgot password functionality
+            forgotPasswordBtn.addEventListener('click', function() {
+                forgotPasswordModal.classList.remove('hidden');
+            });
+            
+            cancelReset.addEventListener('click', function() {
+                forgotPasswordModal.classList.add('hidden');
+                document.getElementById('resetEmail').value = '';
+            });
+            
+            // Handle password reset
+            resetPasswordForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const resetEmail = document.getElementById('resetEmail').value.trim();
+                
+                if (!resetEmail || !validateEmail(resetEmail)) {
+                    alert('Please enter a valid email address');
+                    return;
+                }
+                
+                // Simulate sending reset email
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                
+                submitBtn.innerHTML = '🔄 Sending...';
+                submitBtn.disabled = true;
+                
+                setTimeout(() => {
+                    alert('Password reset link has been sent to your email address!');
+                    forgotPasswordModal.classList.add('hidden');
+                    document.getElementById('resetEmail').value = '';
+                    
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }, 2000);
+            });
+            
+            // Close modals when clicking outside
+            [forgotPasswordModal, successMessage].forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.classList.add('hidden');
+                    }
+                });
+            });
+            
+            // Social login handlers (demo purposes)
+            document.querySelectorAll('.social-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const provider = this.textContent.includes('Google') ? 'Google' : 
+                                   this.textContent.includes('Microsoft') ? 'Microsoft' : 'Apple';
+                    
+                    this.innerHTML = `🔄 Connecting to ${provider}...`;
+                    this.disabled = true;
+                    
+                    setTimeout(() => {
+                        alert(`${provider} login is not available in this demo. Please use email/password login.`);
+                        this.innerHTML = this.innerHTML.replace('🔄 Connecting to', 'Continue with');
+                        this.disabled = false;
+                    }, 2000);
+                });
+            });
+            
+            // Auto-fill email if coming from signup
+            const urlParams = new URLSearchParams(window.location.search);
+            const emailParam = urlParams.get('email');
+            if (emailParam) {
+                document.getElementById('email').value = emailParam;
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97b8c980f238f655',t:'MTc1NzI3NTE3Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

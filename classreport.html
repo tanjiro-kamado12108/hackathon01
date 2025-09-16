@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Reports - Smart Classroom</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .stats-card-1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .stats-card-2 {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .stats-card-3 {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .stats-card-4 {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        
+        .report-tab {
+            transition: all 0.3s ease;
+        }
+        
+        .report-tab.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        
+        .trend-up {
+            color: #10b981;
+        }
+        
+        .trend-down {
+            color: #ef4444;
+        }
+        
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+        
+        .export-btn {
+            transition: all 0.2s ease;
+        }
+        
+        .export-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <div class="bg-blue-600 p-2 rounded-lg mr-3">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3z"/>
+                            </svg>
+                        </div>
+                        <span class="text-xl font-bold text-gray-900">Smart Classroom</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Dashboard</a>
+                    <a href="booking.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Bookings</a>
+                    <a href="manage-teachers.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Teachers</a>
+                    <a href="view-reports.html" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium">Reports</a>
+                    <a href="signin.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Sign Out</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900 flex items-center">
+                        <span class="bg-purple-100 p-3 rounded-xl mr-4">
+                            <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
+                        </span>
+                        Reports & Analytics
+                    </h1>
+                    <p class="text-gray-600 mt-2">Comprehensive insights and performance metrics for your Smart Classroom</p>
+                </div>
+                <div class="flex space-x-3">
+                    <button id="scheduleReportBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl font-medium flex items-center transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Schedule Report
+                    </button>
+                    <button id="exportReportBtn" class="btn-primary text-white px-4 py-2 rounded-xl font-medium flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        Export Report
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Date Range Filter -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+                <div class="flex flex-wrap items-center space-x-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Date Range:</h3>
+                    <div class="flex space-x-2">
+                        <button class="date-preset px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium" data-range="today">Today</button>
+                        <button class="date-preset px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300" data-range="week">This Week</button>
+                        <button class="date-preset px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300" data-range="month">This Month</button>
+                        <button class="date-preset px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300" data-range="year">This Year</button>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <label class="text-sm font-medium text-gray-700">From:</label>
+                        <input type="date" id="startDate" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <label class="text-sm font-medium text-gray-700">To:</label>
+                        <input type="date" id="endDate" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <button id="applyDateRange" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                        Apply
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Metrics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="stats-card-1 text-white p-6 rounded-2xl card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-blue-100 text-sm font-medium">Total Bookings</p>
+                        <p class="text-3xl font-bold">1,247</p>
+                        <div class="flex items-center mt-2">
+                            <svg class="w-4 h-4 mr-1 trend-up" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-sm text-green-300">+12.5%</span>
+                        </div>
+                    </div>
+                    <div class="bg-white bg-opacity-20 p-3 rounded-xl">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-card-2 text-white p-6 rounded-2xl card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-pink-100 text-sm font-medium">Classroom Utilization</p>
+                        <p class="text-3xl font-bold">87.3%</p>
+                        <div class="flex items-center mt-2">
+                            <svg class="w-4 h-4 mr-1 trend-up" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-sm text-green-300">+5.2%</span>
+                        </div>
+                    </div>
+                    <div class="bg-white bg-opacity-20 p-3 rounded-xl">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"/>
+                            <path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-card-3 text-white p-6 rounded-2xl card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-blue-100 text-sm font-medium">Average Rating</p>
+                        <p class="text-3xl font-bold">4.8</p>
+                        <div class="flex items-center mt-2">
+                            <svg class="w-4 h-4 mr-1 trend-up" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-sm text-green-300">+0.3</span>
+                        </div>
+                    </div>
+                    <div class="bg-white bg-opacity-20 p-3 rounded-xl">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-card-4 text-white p-6 rounded-2xl card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-green-100 text-sm font-medium">Revenue</p>
+                        <p class="text-3xl font-bold">$24.8K</p>
+                        <div class="flex items-center mt-2">
+                            <svg class="w-4 h-4 mr-1 trend-down" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-sm text-red-300">-2.1%</span>
+                        </div>
+                    </div>
+                    <div class="bg-white bg-opacity-20 p-3 rounded-xl">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report Tabs -->
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
+            <div class="border-b border-gray-200">
+                <nav class="flex space-x-8 px-6" aria-label="Tabs">
+                    <button class="report-tab active py-4 px-1 border-b-2 border-transparent font-medium text-sm" data-tab="overview">
+                        📊 Overview
+                    </button>
+                    <button class="report-tab py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700" data-tab="classrooms">
+                        🏫 Classrooms
+                    </button>
+                    <button class="report-tab py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700" data-tab="teachers">
+                        👨‍🏫 Teachers
+                    </button>
+                    <button class="report-tab py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700" data-tab="students">
+                        🎓 Students
+                    </button>
+                    <button class="report-tab py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700" data-tab="financial">
+                        💰 Financial
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Overview Tab -->
+            <div id="overview-tab" class="tab-content p-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-gray-50 rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Booking Trends</h3>
+                        <div class="chart-container">
+                            <canvas id="bookingTrendsChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Popular Time Slots</h3>
+                        <div class="chart-container">
+                            <canvas id="timeSlotChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Department Usage</h3>
+                        <div class="chart-container">
+                            <canvas id="departmentChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Monthly Performance</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-700">Bookings Completed</span>
+                                <div class="flex items-center">
+                                    <div class="w-32 bg-gray-200 rounded-full h-2 mr-3">
+                                        <div class="bg-green-600 h-2 rounded-full" style="width: 92%"></div>
+                                    </div>
+                                    <span class="text-sm font-semibold text-gray-900">92%</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-700">Cancellation Rate</span>
+                                <div class="flex items-center">
+                                    <div class="w-32 bg-gray-200 rounded-full h-2 mr-3">
+                                        <div class="bg-red-500 h-2 rounded-full" style="width: 8%"></div>
+                                    </div>
+                                    <span class="text-sm font-semibold text-gray-900">8%</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-700">User Satisfaction</span>
+                                <div class="flex items-center">
+                                    <div class="w-32 bg-gray-200 rounded-full h-2 mr-3">
+                                        <div class="bg-blue-600 h-2 rounded-full" style="width: 96%"></div>
+                                    </div>
+                                    <span class="text-sm font-semibold text-gray-900">96%</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-700">Resource Utilization</span>
+                                <div class="flex items-center">
+                                    <div class="w-32 bg-gray-200 rounded-full h-2 mr-3">
+                                        <div class="bg-purple-600 h-2 rounded-full" style="width: 87%"></div>
+                                    </div>
+                                    <span class="text-sm font-semibold text-gray-900">87%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Classrooms Tab -->
+            <div id="classrooms-tab" class="tab-content hidden p-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-gray-50 rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Room Utilization</h3>
+                        <div class="chart-container">
+                            <canvas id="roomUtilizationChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Most Popular Rooms</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-3 bg-white rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                        <span class="text-blue-600 font-semibold text-sm">1</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-900">Conference Room A</p>
+                                        <p class="text-sm text-gray-500">245 bookings</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm font-semibold text-green-600">94% utilization</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-white rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                        <span class="text-blue-600 font-semibold text-sm">2</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-900">Lab 101</p>
+                                        <p class="text-sm text-gray-500">198 bookings</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm font-semibold text-green-600">89% utilization</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-white rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                        <span class="text-blue-600 font-semibold text-sm">3</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-900">Lecture Hall B</p>
+                                        <p class="text-sm text-gray-500">176 bookings</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm font-semibold text-green-600">82% utilization</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Teachers Tab -->
+            <div id="teachers-tab" class="tab-content hidden p-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-gray-50 rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Teacher Performance</h3>
+                        <div class="chart-container">
+                            <canvas id="teacherPerformanceChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Top Rated Teachers</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-3 bg-white rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center mr-3">
+                                        <span class="text-white font-semibold">SJ</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-900">Sarah Johnson</p>
+                                        <p class="text-sm text-gray-500">Mathematics</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="flex items-center">
+                                        <svg class="w-4 h-4 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                        <span class="text-sm font-semibold text-gray-900">4.9</span>
+                                    </div>
+                                    <p class="text-xs text-gray-500">156 reviews</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-white rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full flex items-center justify-center mr-3">
+                                        <span class="text-white font-semibold">MC</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-900">Michael Chen</p>
+                                        <p class="text-sm text-gray-500">Physics</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="flex items-center">
+                                        <svg class="w-4 h-4 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                        <span class="text-sm font-semibold text-gray-900">4.8</span>
+                                    </div>
+                                    <p class="text-xs text-gray-500">142 reviews</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Students Tab -->
+            <div id="students-tab" class="tab-content hidden p-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-gray-50 rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Student Engagement</h3>
+                        <div class="chart-container">
+                            <canvas id="studentEngagementChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Attendance Patterns</h3>
+                        <div class="chart-container">
+                            <canvas id="attendanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Tab -->
+            <div id="financial-tab" class="tab-content hidden p-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-gray-50 rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Revenue Trends</h3>
+                        <div class="chart-container">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Cost Analysis</h3>
+                        <div class="chart-container">
+                            <canvas id="costChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+            <h3 class="text-xl font-bold text-gray-900 mb-6">Recent Activity</h3>
+            <div class="space-y-4">
+                <div class="flex items-center p-4 bg-blue-50 rounded-xl">
+                    <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center mr-4">
+                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-medium text-gray-900">New booking created</p>
+                        <p class="text-sm text-gray-600">Conference Room A booked by Sarah Johnson for tomorrow 2:00 PM</p>
+                    </div>
+                    <span class="text-sm text-gray-500">2 min ago</span>
+                </div>
+                
+                <div class="flex items-center p-4 bg-green-50 rounded-xl">
+                    <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center mr-4">
+                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-medium text-gray-900">Class completed successfully</p>
+                        <p class="text-sm text-gray-600">Physics Lab session in Lab 101 completed with 95% attendance</p>
+                    </div>
+                    <span class="text-sm text-gray-500">15 min ago</span>
+                </div>
+                
+                <div class="flex items-center p-4 bg-yellow-50 rounded-xl">
+                    <div class="w-10 h-10 bg-yellow-600 rounded-full flex items-center justify-center mr-4">
+                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-medium text-gray-900">Equipment maintenance required</p>
+                        <p class="text-sm text-gray-600">Projector in Lecture Hall B needs attention - reported by maintenance team</p>
+                    </div>
+                    <span class="text-sm text-gray-500">1 hour ago</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div id="exportModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-2">Export Report</h3>
+                <p class="text-gray-600">Choose your preferred export format</p>
+            </div>
+
+            <div class="space-y-3">
+                <button class="export-btn w-full flex items-center justify-between p-4 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mr-3">
+                            <span class="text-red-600 font-bold text-sm">PDF</span>
+                        </div>
+                        <div class="text-left">
+                            <p class="font-medium text-gray-900">PDF Report</p>
+                            <p class="text-sm text-gray-500">Formatted for printing and sharing</p>
+                        </div>
+                    </div>
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </button>
+
+                <button class="export-btn w-full flex items-center justify-between p-4 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                            <span class="text-green-600 font-bold text-sm">XLS</span>
+                        </div>
+                        <div class="text-left">
+                            <p class="font-medium text-gray-900">Excel Spreadsheet</p>
+                            <p class="text-sm text-gray-500">Editable data for analysis</p>
+                        </div>
+                    </div>
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </button>
+
+                <button class="export-btn w-full flex items-center justify-between p-4 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                            <span class="text-blue-600 font-bold text-sm">CSV</span>
+                        </div>
+                        <div class="text-left">
+                            <p class="font-medium text-gray-900">CSV File</p>
+                            <p class="text-sm text-gray-500">Raw data for import</p>
+                        </div>
+                    </div>
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="flex space-x-3 mt-6">
+                <button id="cancelExport" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-4 rounded-xl font-semibold transition-all">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize charts
+            initializeCharts();
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Set default date range
+            setDefaultDateRange();
+        });
+
+        function setupEventListeners() {
+            // Tab switching
+            document.querySelectorAll('.report-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.dataset.tab;
+                    switchTab(tabName);
+                });
+            });
+
+            // Date presets
+            document.querySelectorAll('.date-preset').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const range = this.dataset.range;
+                    setDateRange(range);
+                    
+                    // Update active state
+                    document.querySelectorAll('.date-preset').forEach(b => {
+                        b.classList.remove('bg-blue-600', 'text-white');
+                        b.classList.add('bg-gray-200', 'text-gray-700');
+                    });
+                    this.classList.remove('bg-gray-200', 'text-gray-700');
+                    this.classList.add('bg-blue-600', 'text-white');
+                });
+            });
+
+            // Export modal
+            document.getElementById('exportReportBtn').addEventListener('click', function() {
+                document.getElementById('exportModal').classList.remove('hidden');
+            });
+
+            document.getElementById('cancelExport').addEventListener('click', function() {
+                document.getElementById('exportModal').classList.add('hidden');
+            });
+
+            // Export buttons
+            document.querySelectorAll('.export-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const format = this.querySelector('.font-bold').textContent;
+                    exportReport(format);
+                });
+            });
+
+            // Schedule report
+            document.getElementById('scheduleReportBtn').addEventListener('click', function() {
+                alert('Schedule Report feature coming soon! You\'ll be able to set up automatic report generation and email delivery.');
+            });
+
+            // Apply date range
+            document.getElementById('applyDateRange').addEventListener('click', function() {
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                
+                if (startDate && endDate) {
+                    // Update charts with new date range
+                    updateChartsWithDateRange(startDate, endDate);
+                    alert(`Reports updated for ${startDate} to ${endDate}`);
+                } else {
+                    alert('Please select both start and end dates');
+                }
+            });
+        }
+
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + '-tab').classList.remove('hidden');
+            
+            // Update tab buttons
+            document.querySelectorAll('.report-tab').forEach(tab => {
+                tab.classList.remove('active');
+                tab.classList.add('text-gray-500', 'hover:text-gray-700');
+            });
+            
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            document.querySelector(`[data-tab="${tabName}"]`).classList.remove('text-gray-500', 'hover:text-gray-700');
+        }
+
+        function setDefaultDateRange() {
+            const today = new Date();
+            const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+            
+            document.getElementById('startDate').value = lastMonth.toISOString().split('T')[0];
+            document.getElementById('endDate').value = today.toISOString().split('T')[0];
+        }
+
+        function setDateRange(range) {
+            const today = new Date();
+            let startDate, endDate = today;
+            
+            switch(range) {
+                case 'today':
+                    startDate = today;
+                    break;
+                case 'week':
+                    startDate = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+                    break;
+                case 'month':
+                    startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+                    break;
+                case 'year':
+                    startDate = new Date(today.getFullYear(), 0, 1);
+                    break;
+            }
+            
+            document.getElementById('startDate').value = startDate.toISOString().split('T')[0];
+            document.getElementById('endDate').value = endDate.toISOString().split('T')[0];
+        }
+
+        function exportReport(format) {
+            document.getElementById('exportModal').classList.add('hidden');
+            
+            // Simulate export process
+            const exportBtn = document.getElementById('exportReportBtn');
+            const originalText = exportBtn.innerHTML;
+            
+            exportBtn.innerHTML = `
+                <svg class="w-4 h-4 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                Exporting...
+            `;
+            exportBtn.disabled = true;
+            
+            setTimeout(() => {
+                exportBtn.innerHTML = originalText;
+                exportBtn.disabled = false;
+                alert(`Report exported as ${format} successfully! Download will start shortly.`);
+            }, 2000);
+        }
+
+        function updateChartsWithDateRange(startDate, endDate) {
+            // This would typically update all charts with new data
+            // For demo purposes, we'll just show a message
+            console.log(`Updating charts for date range: ${startDate} to ${endDate}`);
+        }
+
+        function initializeCharts() {
+            // Booking Trends Chart
+            const bookingCtx = document.getElementById('bookingTrendsChart').getContext('2d');
+            new Chart(bookingCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Bookings',
+                        data: [120, 150, 180, 220, 190, 240],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Time Slot Chart
+            const timeCtx = document.getElementById('timeSlotChart').getContext('2d');
+            new Chart(timeCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['8-10 AM', '10-12 PM', '12-2 PM', '2-4 PM', '4-6 PM'],
+                    datasets: [{
+                        label: 'Bookings',
+                        data: [45, 78, 65, 89, 52],
+                        backgroundColor: [
+                            '#ef4444',
+                            '#f59e0b',
+                            '#10b981',
+                            '#3b82f6',
+                            '#8b5cf6'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // Department Chart
+            const deptCtx = document.getElementById('departmentChart').getContext('2d');
+            new Chart(deptCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Mathematics', 'Science', 'English', 'Computer Science', 'Arts'],
+                    datasets: [{
+                        data: [25, 20, 18, 22, 15],
+                        backgroundColor: [
+                            '#3b82f6',
+                            '#10b981',
+                            '#f59e0b',
+                            '#ef4444',
+                            '#8b5cf6'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            // Room Utilization Chart
+            const roomCtx = document.getElementById('roomUtilizationChart').getContext('2d');
+            new Chart(roomCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Room A', 'Room B', 'Lab 101', 'Lab 102', 'Hall A'],
+                    datasets: [{
+                        label: 'Utilization %',
+                        data: [94, 87, 92, 78, 85],
+                        backgroundColor: '#10b981'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+
+            // Teacher Performance Chart
+            const teacherCtx = document.getElementById('teacherPerformanceChart').getContext('2d');
+            new Chart(teacherCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Punctuality', 'Student Feedback', 'Resource Usage', 'Engagement', 'Innovation'],
+                    datasets: [{
+                        label: 'Average Score',
+                        data: [4.5, 4.7, 4.2, 4.6, 4.3],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 5
+                        }
+                    }
+                }
+            });
+
+            // Student Engagement Chart
+            const engagementCtx = document.getElementById('studentEngagementChart').getContext('2d');
+            new Chart(engagementCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+                    datasets: [{
+                        label: 'Engagement Score',
+                        data: [78, 82, 85, 88, 86, 90],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // Attendance Chart
+            const attendanceCtx = document.getElementById('attendanceChart').getContext('2d');
+            new Chart(attendanceCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+                    datasets: [{
+                        label: 'Attendance %',
+                        data: [92, 88, 94, 90, 85],
+                        backgroundColor: '#f59e0b'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+
+            // Revenue Chart
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Revenue ($)',
+                        data: [18500, 22000, 25500, 23000, 26800, 24800],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // Cost Chart
+            const costCtx = document.getElementById('costChart').getContext('2d');
+            new Chart(costCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Staff Salaries', 'Utilities', 'Maintenance', 'Equipment', 'Other'],
+                    datasets: [{
+                        data: [45, 20, 15, 12, 8],
+                        backgroundColor: [
+                            '#ef4444',
+                            '#f59e0b',
+                            '#10b981',
+                            '#3b82f6',
+                            '#8b5cf6'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97c83c45f18ff655',t:'MTc1NzQzNzE1OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

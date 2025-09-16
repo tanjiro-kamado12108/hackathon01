@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book a Classroom - Smart Classroom</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+        }
+        
+        .input-focus {
+            transition: all 0.2s ease;
+        }
+        
+        .input-focus:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(59, 130, 246, 0.4);
+        }
+        
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 8s ease-in-out infinite;
+        }
+        
+        .shape:nth-child(1) {
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .shape:nth-child(2) {
+            top: 20%;
+            right: 15%;
+            animation-delay: 2s;
+        }
+        
+        .shape:nth-child(3) {
+            bottom: 15%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(15deg); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .classroom-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .classroom-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .classroom-card.selected {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        
+        .time-slot {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .time-slot:hover {
+            background-color: #dbeafe;
+        }
+        
+        .time-slot.selected {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .time-slot.unavailable {
+            background-color: #fee2e2;
+            color: #dc2626;
+            cursor: not-allowed;
+        }
+        
+        .success-animation {
+            animation: successPulse 0.6s ease-in-out;
+        }
+        
+        @keyframes successPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <div class="bg-blue-600 p-2 rounded-lg mr-3">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3z"/>
+                            </svg>
+                        </div>
+                        <span class="text-xl font-bold text-gray-900">Smart Classroom</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</a>
+                    <a href="booking.html" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">Book Now</a>
+                    <a href="signupandlogin.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Login</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Floating Background Shapes -->
+    <div class="floating-shapes">
+        <div class="shape w-32 h-32 bg-blue-200 rounded-full"></div>
+        <div class="shape w-24 h-24 bg-purple-200 rounded-lg transform rotate-45"></div>
+        <div class="shape w-40 h-40 bg-indigo-200 rounded-full"></div>
+    </div>
+
+    <div class="relative z-10 max-w-6xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <div class="bg-blue-100 p-4 rounded-2xl inline-block mb-6">
+                <svg class="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+            </div>
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Book a Classroom</h1>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">Reserve the perfect space for your classes, meetings, or events. Choose from our modern, well-equipped classrooms.</p>
+        </div>
+
+        <!-- Booking Form -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 card-hover fade-in">
+<form id="bookingForm" class="space-y-8" method="POST" action="/book_classroom" onsubmit="return submitBookingForm(event)">
+                <!-- Step 1: Basic Information -->
+                <div class="border-b border-gray-200 pb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                        <span class="bg-blue-100 text-blue-600 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mr-3">1</span>
+                        Basic Information
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="flex items-center">
+                                    <span class="mr-2">👤</span>
+                                    Your Name
+                                </span>
+                            </label>
+                            <input type="text" id="userName" name="userName" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus outline-none" placeholder="Enter your full name" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="flex items-center">
+                                    <span class="mr-2">📧</span>
+                                    Email Address
+                                </span>
+                            </label>
+                            <input type="email" id="userEmail" name="userEmail" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus outline-none" placeholder="your.email@school.edu" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="flex items-center">
+                                    <span class="mr-2">🏢</span>
+                                    Department
+                                </span>
+                            </label>
+                            <select id="department" name="department" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus outline-none" required>
+                                <option value="">Select your department</option>
+                                <option value="mathematics">📊 Mathematics</option>
+                                <option value="science">🔬 Science</option>
+                                <option value="english">📚 English</option>
+                                <option value="history">🏛️ History</option>
+                                <option value="computer">💻 Computer Science</option>
+                                <option value="arts">🎨 Arts</option>
+                                <option value="physical-education">⚽ Physical Education</option>
+                                <option value="music">🎵 Music</option>
+                                <option value="admin">⚙️ Administration</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="flex items-center">
+                                    <span class="mr-2">📱</span>
+                                    Phone Number
+                                </span>
+                            </label>
+                            <input type="tel" id="phone" name="phone" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus outline-none" placeholder="+1 (555) 123-4567" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Event Details -->
+                <div class="border-b border-gray-200 pb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                        <span class="bg-blue-100 text-blue-600 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mr-3">2</span>
+                        Event Details
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="flex items-center">
+                                    <span class="mr-2">📝</span>
+                                    Event Title
+                                </span>
+                            </label>
+                            <input type="text" id="eventTitle" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus outline-none" placeholder="e.g., Advanced Mathematics Lecture" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="flex items-center">
+                                    <span class="mr-2">🎯</span>
+                                    Event Type
+                                </span>
+                            </label>
+                            <select id="eventType" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus outline-none" required>
+                                <option value="">Select event type</option>
+                                <option value="lecture">📚 Lecture</option>
+                                <option value="seminar">🎤 Seminar</option>
+                                <option value="workshop">🔧 Workshop</option>
+                                <option value="meeting">👥 Meeting</option>
+                                <option value="exam">📝 Examination</option>
+                                <option value="presentation">📊 Presentation</option>
+                                <option value="training">🎓 Training Session</option>
+                                <option value="conference">🏛️ Conference</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="flex items-center">
+                                    <span class="mr-2">👥</span>
+                                    Expected Attendees
+                                </span>
+                            </label>
+                            <select id="attendees" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus outline-none" required>
+                                <option value="">Select number of attendees</option>
+                                <option value="1-10">1-10 people</option>
+                                <option value="11-25">11-25 people</option>
+                                <option value="26-50">26-50 people</option>
+                                <option value="51-100">51-100 people</option>
+                                <option value="100+">100+ people</option>
+                            </select>
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="flex items-center">
+                                    <span class="mr-2">📄</span>
+                                    Description (Optional)
+                                </span>
+                            </label>
+                            <textarea id="description" rows="3" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus outline-none" placeholder="Brief description of your event or special requirements..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Date & Time -->
+                <div class="border-b border-gray-200 pb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                        <span class="bg-blue-100 text-blue-600 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mr-3">3</span>
+                        Date & Time
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="flex items-center">
+                                    <span class="mr-2">📅</span>
+                                    Event Date
+                                </span>
+                            </label>
+                            <input type="date" id="eventDate" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus outline-none" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="flex items-center">
+                                    <span class="mr-2">⏱️</span>
+                                    Duration
+                                </span>
+                            </label>
+                            <select id="duration" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus outline-none" required>
+                                <option value="">Select duration</option>
+                                <option value="30">30 minutes</option>
+                                <option value="60">1 hour</option>
+                                <option value="90">1.5 hours</option>
+                                <option value="120">2 hours</option>
+                                <option value="180">3 hours</option>
+                                <option value="240">4 hours</option>
+                                <option value="full-day">Full day (8 hours)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-4">
+                            <span class="flex items-center">
+                                <span class="mr-2">🕐</span>
+                                Available Time Slots
+                            </span>
+                        </label>
+                        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3" id="timeSlots">
+                            <!-- Time slots will be generated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Classroom Selection -->
+                <div class="pb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                        <span class="bg-blue-100 text-blue-600 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mr-3">4</span>
+                        Choose Classroom
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="classroomOptions">
+                        <!-- Classroom cards will be generated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Equipment Requirements -->
+                <div class="border-t border-gray-200 pt-8">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <span class="mr-2">🔧</span>
+                        Equipment Requirements
+                    </h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="projector" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2">
+                            <span class="text-sm text-gray-700">📽️ Projector</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="microphone" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2">
+                            <span class="text-sm text-gray-700">🎤 Microphone</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="whiteboard" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2">
+                            <span class="text-sm text-gray-700">📋 Whiteboard</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="computer" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2">
+                            <span class="text-sm text-gray-700">💻 Computer</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="speakers" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2">
+                            <span class="text-sm text-gray-700">🔊 Speakers</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="camera" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2">
+                            <span class="text-sm text-gray-700">📹 Camera</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="flipchart" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2">
+                            <span class="text-sm text-gray-700">📊 Flip Chart</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="wifi" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2">
+                            <span class="text-sm text-gray-700">📶 High-Speed WiFi</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-8">
+                    <button type="submit" class="w-full btn-primary text-white py-4 px-8 rounded-xl font-semibold text-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        Book Classroom
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Success Message -->
+        <div id="successMessage" class="hidden bg-white rounded-2xl shadow-xl p-8 text-center success-animation">
+            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Booking Confirmed! 🎉</h2>
+            <p class="text-gray-600 mb-6">Your classroom has been successfully reserved. You'll receive a confirmation email shortly.</p>
+            <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+                <div id="bookingSummary" class="text-sm text-blue-800">
+                    <!-- Booking details will be inserted here -->
+                </div>
+            </div>
+            <div class="space-y-3">
+                <button onclick="location.reload()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-xl font-semibold transition-all">
+                    Book Another Classroom
+                </button>
+                <a href="index.html" class="block w-full bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-6 rounded-xl font-semibold transition-all">
+                    Return to Homepage
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('bookingForm');
+            const successMessage = document.getElementById('successMessage');
+            const eventDateInput = document.getElementById('eventDate');
+            const timeSlotsContainer = document.getElementById('timeSlots');
+            const classroomContainer = document.getElementById('classroomOptions');
+            
+            let selectedTimeSlot = null;
+            let selectedClassroom = null;
+            
+            // Set minimum date to today
+            const today = new Date().toISOString().split('T')[0];
+            eventDateInput.min = today;
+            
+            // Generate time slots
+            function generateTimeSlots() {
+                const slots = [
+                    '08:00', '08:30', '09:00', '09:30', '10:00', '10:30',
+                    '11:00', '11:30', '12:00', '12:30', '13:00', '13:30',
+                    '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
+                    '17:00', '17:30', '18:00', '18:30'
+                ];
+                
+                timeSlotsContainer.innerHTML = '';
+                
+                slots.forEach(time => {
+                    const isUnavailable = Math.random() < 0.2; // 20% chance of being unavailable
+                    const slot = document.createElement('div');
+                    slot.className = `time-slot p-3 border-2 border-gray-200 rounded-lg text-center text-sm font-medium ${isUnavailable ? 'unavailable' : ''}`;
+                    slot.textContent = time;
+                    slot.dataset.time = time;
+                    
+                    if (!isUnavailable) {
+                        slot.addEventListener('click', function() {
+                            // Remove previous selection
+                            document.querySelectorAll('.time-slot.selected').forEach(s => {
+                                s.classList.remove('selected');
+                            });
+                            
+                            // Add selection to clicked slot
+                            this.classList.add('selected');
+                            selectedTimeSlot = time;
+                        });
+                    }
+                    
+                    timeSlotsContainer.appendChild(slot);
+                });
+            }
+            
+            // Generate classroom options
+            function generateClassrooms() {
+                const classrooms = [
+                    {
+                        id: 'room-101',
+                        name: 'Room 101',
+                        capacity: 30,
+                        features: ['Projector', 'Whiteboard', 'AC'],
+                        type: 'Standard Classroom',
+                        image: '🏫'
+                    },
+                    {
+                        id: 'room-205',
+                        name: 'Room 205',
+                        capacity: 50,
+                        features: ['Smart Board', 'Microphone', 'Computer'],
+                        type: 'Smart Classroom',
+                        image: '💻'
+                    },
+                    {
+                        id: 'lab-301',
+                        name: 'Lab 301',
+                        capacity: 25,
+                        features: ['Computers', 'Projector', 'Lab Equipment'],
+                        type: 'Computer Lab',
+                        image: '🔬'
+                    },
+                    {
+                        id: 'hall-a',
+                        name: 'Hall A',
+                        capacity: 150,
+                        features: ['Stage', 'Sound System', 'Lighting'],
+                        type: 'Auditorium',
+                        image: '🎭'
+                    },
+                    {
+                        id: 'room-102',
+                        name: 'Room 102',
+                        capacity: 20,
+                        features: ['Round Table', 'TV Screen', 'Coffee Machine'],
+                        type: 'Meeting Room',
+                        image: '👥'
+                    },
+                    {
+                        id: 'studio-b',
+                        name: 'Studio B',
+                        capacity: 15,
+                        features: ['Recording Equipment', 'Soundproof', 'Cameras'],
+                        type: 'Media Studio',
+                        image: '🎬'
+                    }
+                ];
+                
+                classroomContainer.innerHTML = '';
+                
+                classrooms.forEach(room => {
+                    const card = document.createElement('div');
+                    card.className = 'classroom-card bg-white border-2 border-gray-200 rounded-xl p-6 cursor-pointer';
+                    card.dataset.roomId = room.id;
+                    
+                    card.innerHTML = `
+                        <div class="text-center mb-4">
+                            <div class="text-4xl mb-2">${room.image}</div>
+                            <h3 class="text-lg font-bold text-gray-900">${room.name}</h3>
+                            <p class="text-sm text-gray-600">${room.type}</p>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="text-gray-600">Capacity:</span>
+                                <span class="font-medium">${room.capacity} people</span>
+                            </div>
+                            <div class="text-sm">
+                                <span class="text-gray-600">Features:</span>
+                                <div class="flex flex-wrap gap-1 mt-1">
+                                    ${room.features.map(feature => `<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">${feature}</span>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    card.addEventListener('click', function() {
+                        // Remove previous selection
+                        document.querySelectorAll('.classroom-card.selected').forEach(c => {
+                            c.classList.remove('selected');
+                        });
+                        
+                        // Add selection to clicked card
+                        this.classList.add('selected');
+                        selectedClassroom = room;
+                    });
+                    
+                    classroomContainer.appendChild(card);
+                });
+            }
+            
+            // Handle form submission
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Validate required selections
+                if (!selectedTimeSlot) {
+                    alert('Please select a time slot.');
+                    return;
+                }
+                
+                if (!selectedClassroom) {
+                    alert('Please select a classroom.');
+                    return;
+                }
+                
+                // Get form data
+                const formData = {
+                    name: document.getElementById('userName').value,
+                    email: document.getElementById('userEmail').value,
+                    department: document.getElementById('department').value,
+                    phone: document.getElementById('phone').value,
+                    eventTitle: document.getElementById('eventTitle').value,
+                    eventType: document.getElementById('eventType').value,
+                    attendees: document.getElementById('attendees').value,
+                    description: document.getElementById('description').value,
+                    eventDate: document.getElementById('eventDate').value,
+                    duration: document.getElementById('duration').value,
+                    timeSlot: selectedTimeSlot,
+                    classroom: selectedClassroom
+                };
+                
+                // Get selected equipment
+                const equipment = [];
+                document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+                    equipment.push(checkbox.nextElementSibling.textContent.trim());
+                });
+                
+                // Show success message with booking details
+                const bookingSummary = document.getElementById('bookingSummary');
+                bookingSummary.innerHTML = `
+                    <div class="text-left space-y-2">
+                        <p><strong>Event:</strong> ${formData.eventTitle}</p>
+                        <p><strong>Date:</strong> ${new Date(formData.eventDate).toLocaleDateString()}</p>
+                        <p><strong>Time:</strong> ${formData.timeSlot}</p>
+                        <p><strong>Duration:</strong> ${formData.duration} ${formData.duration === 'full-day' ? '' : 'minutes'}</p>
+                        <p><strong>Classroom:</strong> ${formData.classroom.name} (${formData.classroom.type})</p>
+                        <p><strong>Capacity:</strong> ${formData.classroom.capacity} people</p>
+                        ${equipment.length > 0 ? `<p><strong>Equipment:</strong> ${equipment.join(', ')}</p>` : ''}
+                        <p><strong>Booking ID:</strong> #BK${Date.now().toString().slice(-6)}</p>
+                    </div>
+                `;
+                
+                // Hide form and show success message
+                form.parentElement.classList.add('hidden');
+                successMessage.classList.remove('hidden');
+                
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+            
+            // Initialize
+            generateTimeSlots();
+            generateClassrooms();
+            
+            // Regenerate time slots when date changes
+            eventDateInput.addEventListener('change', generateTimeSlots);
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97b8a530c0fef655',t:'MTc1NzI3MzY4NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

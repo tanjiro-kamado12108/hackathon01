@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Smart Classroom</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+        }
+        
+        .input-focus {
+            transition: all 0.2s ease;
+        }
+        
+        .input-focus:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(16, 185, 129, 0.4);
+        }
+        
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 8s ease-in-out infinite;
+        }
+        
+        .shape:nth-child(1) {
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .shape:nth-child(2) {
+            top: 20%;
+            right: 15%;
+            animation-delay: 2s;
+        }
+        
+        .shape:nth-child(3) {
+            bottom: 15%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+        
+        .shape:nth-child(4) {
+            top: 60%;
+            right: 25%;
+            animation-delay: 6s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(15deg); }
+        }
+        
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+        
+        .step-indicator {
+            transition: all 0.3s ease;
+        }
+        
+        .step-active {
+            background-color: #10b981;
+            color: white;
+        }
+        
+        .step-completed {
+            background-color: #059669;
+            color: white;
+        }
+        
+        .step-pending {
+            background-color: #e5e7eb;
+            color: #6b7280;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .success-animation {
+            animation: successPulse 0.6s ease-in-out;
+        }
+        
+        @keyframes successPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="min-h-screen gradient-bg flex items-center justify-center p-4">
+    <!-- Floating Background Shapes -->
+    <div class="floating-shapes">
+        <div class="shape w-32 h-32 bg-white rounded-full"></div>
+        <div class="shape w-24 h-24 bg-white rounded-lg transform rotate-45"></div>
+        <div class="shape w-40 h-40 bg-white rounded-full"></div>
+        <div class="shape w-28 h-28 bg-white rounded-lg"></div>
+    </div>
+
+    <div class="w-full max-w-2xl relative z-10">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="bg-white bg-opacity-20 p-4 rounded-2xl inline-block mb-4 backdrop-blur-sm">
+                <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
+                </svg>
+            </div>
+            <h1 class="text-4xl font-bold text-white mb-2">Join Smart Classroom</h1>
+            <p class="text-blue-100 text-lg">Create your account to get started</p>
+        </div>
+
+        <!-- Progress Indicator -->
+        <div class="mb-8">
+            <div class="flex items-center justify-center mb-4">
+                <div class="flex items-center space-x-4">
+                    <div class="flex flex-col items-center">
+                        <div id="step1" class="step-indicator step-active w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold mb-2">
+                            1
+                        </div>
+                        <span class="text-white text-sm font-medium">Personal Info</span>
+                    </div>
+                    <div class="w-16 h-1 bg-white bg-opacity-30 rounded mt-[-20px]">
+                        <div id="progress1" class="progress-bar h-full bg-white rounded" style="width: 100%"></div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div id="step2" class="step-indicator step-pending w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold mb-2">
+                            2
+                        </div>
+                        <span class="text-white text-sm font-medium">Account Details</span>
+                    </div>
+                    <div class="w-16 h-1 bg-white bg-opacity-30 rounded mt-[-20px]">
+                        <div id="progress2" class="progress-bar h-full bg-white rounded" style="width: 0%"></div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div id="step3" class="step-indicator step-pending w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold mb-2">
+                            3
+                        </div>
+                        <span class="text-white text-sm font-medium">Verification</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Signup Form Container -->
+        <div class="bg-white rounded-2xl shadow-2xl p-8 card-hover backdrop-blur-sm">
+            <!-- Step 1: Personal Information -->
+            <div id="step1Form" class="fade-in">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Personal Information</h2>
+                    <p class="text-gray-600">Tell us about yourself</p>
+                </div>
+
+                <form class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="flex items-center">
+                                    <span class="mr-2">👤</span>
+                                    First Name
+                                </span>
+                            </label>
+                            <input type="text" id="firstName" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus outline-none" placeholder="Enter your first name" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="flex items-center">
+                                    <span class="mr-2">👤</span>
+                                    Last Name
+                                </span>
+                            </label>
+                            <input type="text" id="lastName" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus outline-none" placeholder="Enter your last name" required>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <span class="flex items-center">
+                                <span class="mr-2">📧</span>
+                                Email Address
+                            </span>
+                        </label>
+                        <input type="email" id="email" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus outline-none" placeholder="your.email@school.edu" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <span class="flex items-center">
+                                <span class="mr-2">📱</span>
+                                Phone Number
+                            </span>
+                        </label>
+                        <input type="tel" id="phone" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus outline-none" placeholder="+1 (555) 123-4567" required>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="flex items-center">
+                                    <span class="mr-2">🎂</span>
+                                    Date of Birth
+                                </span>
+                            </label>
+                            <input type="date" id="dob" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus outline-none" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="flex items-center">
+                                    <span class="mr-2">⚧</span>
+                                    Gender
+                                </span>
+                            </label>
+                            <select id="gender" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus outline-none" required>
+                                <option value="">Select gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                                <option value="prefer-not-to-say">Prefer not to say</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="button" id="nextStep1" class="w-full btn-primary text-white py-4 px-6 rounded-xl font-semibold text-lg">
+                        Continue to Account Details →
+                    </button>
+                </form>
+            </div>
+
+            <!-- Step 2: Account Details -->
+            <div id="step2Form" class="hidden">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Account Details</h2>
+                    <p class="text-gray-600">Set up your account credentials</p>
+                </div>
+
+                <form class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="flex items-center">
+                                    <span class="mr-2">🎭</span>
+                                    Role
+                                </span>
+                            </label>
+                            <select id="role" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus outline-none" required>
+                                <option value="">Select your role</option>
+                                <option value="admin">👑 Administrator</option>
+                                <option value="teacher">👨‍🏫 Teacher</option>
+                                <option value="staff">👥 Staff Member</option>
+                                <option value="student">🎓 Student</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="flex items-center">
+                                    <span class="mr-2">🏢</span>
+                                    Department
+                                </span>
+                            </label>
+                            <select id="department" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus outline-none" required>
+                                <option value="">Select department</option>
+                                <option value="mathematics">📊 Mathematics</option>
+                                <option value="science">🔬 Science</option>
+                                <option value="english">📚 English</option>
+                                <option value="history">🏛️ History</option>
+                                <option value="computer">💻 Computer Science</option>
+                                <option value="arts">🎨 Arts</option>
+                                <option value="physical-education">⚽ Physical Education</option>
+                                <option value="music">🎵 Music</option>
+                                <option value="admin">⚙️ Administration</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <span class="flex items-center">
+                                <span class="mr-2">🆔</span>
+                                Employee/Student ID
+                            </span>
+                        </label>
+                        <input type="text" id="employeeId" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus outline-none" placeholder="Enter your ID number" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <span class="flex items-center">
+                                <span class="mr-2">🔒</span>
+                                Password
+                            </span>
+                        </label>
+                        <input type="password" id="password" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus outline-none" placeholder="Create a strong password" required>
+                        <div class="mt-2">
+                            <div class="flex items-center space-x-2 text-xs">
+                                <div id="lengthCheck" class="flex items-center text-gray-400">
+                                    <span class="w-4 h-4 rounded-full border-2 border-gray-300 mr-1"></span>
+                                    At least 8 characters
+                                </div>
+                                <div id="upperCheck" class="flex items-center text-gray-400">
+                                    <span class="w-4 h-4 rounded-full border-2 border-gray-300 mr-1"></span>
+                                    Uppercase letter
+                                </div>
+                                <div id="numberCheck" class="flex items-center text-gray-400">
+                                    <span class="w-4 h-4 rounded-full border-2 border-gray-300 mr-1"></span>
+                                    Number
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <span class="flex items-center">
+                                <span class="mr-2">🔒</span>
+                                Confirm Password
+                            </span>
+                        </label>
+                        <input type="password" id="confirmPassword" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl input-focus outline-none" placeholder="Confirm your password" required>
+                    </div>
+
+                    <div class="flex space-x-4">
+                        <button type="button" id="backStep1" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-4 px-6 rounded-xl font-semibold text-lg transition-all">
+                            ← Back
+                        </button>
+                        <button type="button" id="nextStep2" class="flex-1 btn-primary text-white py-4 px-6 rounded-xl font-semibold text-lg">
+                            Continue to Verification →
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Step 3: Verification -->
+            <div id="step3Form" class="hidden">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Account Verification</h2>
+                    <p class="text-gray-600">Review your information and agree to terms</p>
+                </div>
+
+                <!-- Summary Card -->
+                <div class="bg-gray-50 rounded-xl p-6 mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Account Summary</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <span class="text-gray-600">Name:</span>
+                            <span id="summaryName" class="font-medium text-gray-900 ml-2"></span>
+                        </div>
+                        <div>
+                            <span class="text-gray-600">Email:</span>
+                            <span id="summaryEmail" class="font-medium text-gray-900 ml-2"></span>
+                        </div>
+                        <div>
+                            <span class="text-gray-600">Role:</span>
+                            <span id="summaryRole" class="font-medium text-gray-900 ml-2"></span>
+                        </div>
+                        <div>
+                            <span class="text-gray-600">Department:</span>
+                            <span id="summaryDepartment" class="font-medium text-gray-900 ml-2"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <form class="space-y-6">
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <input type="checkbox" id="agreeTerms" class="mt-1 rounded border-gray-300 text-green-600 focus:ring-green-500" required>
+                            <span class="ml-3 text-sm text-gray-700">
+                                I agree to the <a href="#" class="text-green-600 hover:text-green-800 font-medium">Terms of Service</a> and 
+                                <a href="#" class="text-green-600 hover:text-green-800 font-medium">Privacy Policy</a>
+                            </span>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <input type="checkbox" id="agreeNotifications" class="mt-1 rounded border-gray-300 text-green-600 focus:ring-green-500">
+                            <span class="ml-3 text-sm text-gray-700">
+                                I would like to receive email notifications about schedule updates and important announcements
+                            </span>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <input type="checkbox" id="agreeMarketing" class="mt-1 rounded border-gray-300 text-green-600 focus:ring-green-500">
+                            <span class="ml-3 text-sm text-gray-700">
+                                I would like to receive newsletters and product updates (optional)
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                        <div class="flex items-start">
+                            <div class="text-blue-600 mr-3 mt-1">ℹ️</div>
+                            <div class="text-sm text-blue-800">
+                                <p class="font-medium mb-1">Account Approval Process</p>
+                                <p>Your account will be reviewed by an administrator within 24 hours. You'll receive an email confirmation once approved.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-4">
+                        <button type="button" id="backStep2" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-4 px-6 rounded-xl font-semibold text-lg transition-all">
+                            ← Back
+                        </button>
+                        <button type="submit" id="createAccount" class="flex-1 btn-primary text-white py-4 px-6 rounded-xl font-semibold text-lg">
+                            🎉 Create Account
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Success Message -->
+            <div id="successMessage" class="hidden text-center">
+                <div class="success-animation">
+                    <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900 mb-4">Account Created Successfully! 🎉</h2>
+                    <p class="text-gray-600 mb-6">Welcome to Smart Classroom! Your account has been submitted for approval.</p>
+                    <div class="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
+                        <p class="text-green-800 text-sm">
+                            <strong>What's next?</strong><br>
+                            • Check your email for a confirmation message<br>
+                            • Wait for administrator approval (usually within 24 hours)<br>
+                            • You'll receive login credentials once approved
+                        </p>
+                    </div>
+                    <div class="space-y-3">
+                        <a href="index.html" class="block w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-xl font-semibold transition-all">
+                            Return to Homepage
+                        </a>
+                        <a href="signupandlogin.html" class="block w-full bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-6 rounded-xl font-semibold transition-all">
+                            Already have an account? Sign In
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Links -->
+        <div class="text-center mt-8 space-y-2">
+            <p class="text-blue-100">
+                Already have an account? 
+                <a href="signupandlogin.html" class="text-white font-semibold hover:underline">Sign In</a>
+            </p>
+            <p class="text-blue-200 text-sm">
+                Need help? <a href="#" class="hover:underline">Contact Support</a> | 
+                <a href="#" class="hover:underline">FAQ</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let currentStep = 1;
+            
+            // Form elements
+            const step1Form = document.getElementById('step1Form');
+            const step2Form = document.getElementById('step2Form');
+            const step3Form = document.getElementById('step3Form');
+            const successMessage = document.getElementById('successMessage');
+            
+            // Navigation buttons
+            const nextStep1 = document.getElementById('nextStep1');
+            const nextStep2 = document.getElementById('nextStep2');
+            const backStep1 = document.getElementById('backStep1');
+            const backStep2 = document.getElementById('backStep2');
+            const createAccount = document.getElementById('createAccount');
+            
+            // Step indicators
+            const step1Indicator = document.getElementById('step1');
+            const step2Indicator = document.getElementById('step2');
+            const step3Indicator = document.getElementById('step3');
+            const progress1 = document.getElementById('progress1');
+            const progress2 = document.getElementById('progress2');
+            
+            // Form inputs
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            
+            // Password strength indicators
+            const lengthCheck = document.getElementById('lengthCheck');
+            const upperCheck = document.getElementById('upperCheck');
+            const numberCheck = document.getElementById('numberCheck');
+            
+            // Step navigation functions
+            function showStep(step) {
+                // Hide all steps
+                step1Form.classList.add('hidden');
+                step2Form.classList.add('hidden');
+                step3Form.classList.add('hidden');
+                successMessage.classList.add('hidden');
+                
+                // Show current step
+                if (step === 1) {
+                    step1Form.classList.remove('hidden');
+                    step1Form.classList.add('fade-in');
+                } else if (step === 2) {
+                    step2Form.classList.remove('hidden');
+                    step2Form.classList.add('fade-in');
+                } else if (step === 3) {
+                    step3Form.classList.remove('hidden');
+                    step3Form.classList.add('fade-in');
+                    updateSummary();
+                } else if (step === 4) {
+                    successMessage.classList.remove('hidden');
+                    successMessage.classList.add('fade-in');
+                }
+                
+                updateStepIndicators(step);
+                currentStep = step;
+            }
+            
+            function updateStepIndicators(step) {
+                // Reset all indicators
+                [step1Indicator, step2Indicator, step3Indicator].forEach(indicator => {
+                    indicator.className = 'step-indicator step-pending w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold';
+                });
+                
+                // Update based on current step
+                if (step >= 1) {
+                    step1Indicator.className = 'step-indicator step-completed w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold';
+                    progress1.style.width = '100%';
+                }
+                if (step >= 2) {
+                    step2Indicator.className = 'step-indicator step-completed w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold';
+                    progress2.style.width = '100%';
+                }
+                if (step >= 3) {
+                    step3Indicator.className = 'step-indicator step-completed w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold';
+                }
+                
+                // Set active step
+                if (step === 1) {
+                    step1Indicator.className = 'step-indicator step-active w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold';
+                } else if (step === 2) {
+                    step2Indicator.className = 'step-indicator step-active w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold';
+                } else if (step === 3) {
+                    step3Indicator.className = 'step-indicator step-active w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold';
+                }
+            }
+            
+            function validateStep1() {
+                const firstName = document.getElementById('firstName').value.trim();
+                const lastName = document.getElementById('lastName').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const phone = document.getElementById('phone').value.trim();
+                const dob = document.getElementById('dob').value;
+                const gender = document.getElementById('gender').value;
+                
+                if (!firstName || !lastName || !email || !phone || !dob || !gender) {
+                    alert('Please fill in all required fields in Step 1.');
+                    return false;
+                }
+                
+                // Email validation
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    alert('Please enter a valid email address.');
+                    return false;
+                }
+                
+                return true;
+            }
+            
+            function validateStep2() {
+                const role = document.getElementById('role').value;
+                const department = document.getElementById('department').value;
+                const employeeId = document.getElementById('employeeId').value.trim();
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                if (!role || !department || !employeeId || !password || !confirmPassword) {
+                    alert('Please fill in all required fields in Step 2.');
+                    return false;
+                }
+                
+                if (password !== confirmPassword) {
+                    alert('Passwords do not match. Please check and try again.');
+                    return false;
+                }
+                
+                if (password.length < 8) {
+                    alert('Password must be at least 8 characters long.');
+                    return false;
+                }
+                
+                return true;
+            }
+            
+            function updatePasswordStrength() {
+                const password = passwordInput.value;
+                
+                // Length check
+                if (password.length >= 8) {
+                    lengthCheck.innerHTML = '<span class="w-4 h-4 rounded-full bg-green-500 mr-1 flex items-center justify-center"><svg class="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg></span>At least 8 characters';
+                    lengthCheck.className = 'flex items-center text-green-600';
+                } else {
+                    lengthCheck.innerHTML = '<span class="w-4 h-4 rounded-full border-2 border-gray-300 mr-1"></span>At least 8 characters';
+                    lengthCheck.className = 'flex items-center text-gray-400';
+                }
+                
+                // Uppercase check
+                if (/[A-Z]/.test(password)) {
+                    upperCheck.innerHTML = '<span class="w-4 h-4 rounded-full bg-green-500 mr-1 flex items-center justify-center"><svg class="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg></span>Uppercase letter';
+                    upperCheck.className = 'flex items-center text-green-600';
+                } else {
+                    upperCheck.innerHTML = '<span class="w-4 h-4 rounded-full border-2 border-gray-300 mr-1"></span>Uppercase letter';
+                    upperCheck.className = 'flex items-center text-gray-400';
+                }
+                
+                // Number check
+                if (/[0-9]/.test(password)) {
+                    numberCheck.innerHTML = '<span class="w-4 h-4 rounded-full bg-green-500 mr-1 flex items-center justify-center"><svg class="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg></span>Number';
+                    numberCheck.className = 'flex items-center text-green-600';
+                } else {
+                    numberCheck.innerHTML = '<span class="w-4 h-4 rounded-full border-2 border-gray-300 mr-1"></span>Number';
+                    numberCheck.className = 'flex items-center text-gray-400';
+                }
+            }
+            
+            function updateSummary() {
+                const firstName = document.getElementById('firstName').value;
+                const lastName = document.getElementById('lastName').value;
+                const email = document.getElementById('email').value;
+                const role = document.getElementById('role').value;
+                const department = document.getElementById('department').value;
+                
+                document.getElementById('summaryName').textContent = `${firstName} ${lastName}`;
+                document.getElementById('summaryEmail').textContent = email;
+                document.getElementById('summaryRole').textContent = role.charAt(0).toUpperCase() + role.slice(1);
+                document.getElementById('summaryDepartment').textContent = department.charAt(0).toUpperCase() + department.slice(1);
+            }
+            
+            // Event listeners
+            nextStep1.addEventListener('click', function() {
+                if (validateStep1()) {
+                    showStep(2);
+                }
+            });
+            
+            nextStep2.addEventListener('click', function() {
+                if (validateStep2()) {
+                    showStep(3);
+                }
+            });
+            
+            backStep1.addEventListener('click', function() {
+                showStep(1);
+            });
+            
+            backStep2.addEventListener('click', function() {
+                showStep(2);
+            });
+            
+            passwordInput.addEventListener('input', updatePasswordStrength);
+            
+            // Handle form submission
+            createAccount.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const agreeTerms = document.getElementById('agreeTerms').checked;
+                
+                if (!agreeTerms) {
+                    alert('Please agree to the Terms of Service and Privacy Policy to continue.');
+                    return;
+                }
+                
+                // Simulate account creation
+                createAccount.innerHTML = '🔄 Creating Account...';
+                createAccount.disabled = true;
+                
+                setTimeout(() => {
+                    showStep(4);
+                    
+                    // Reset button
+                    createAccount.innerHTML = '🎉 Create Account';
+                    createAccount.disabled = false;
+                }, 2000);
+            });
+            
+            // Password confirmation validation
+            confirmPasswordInput.addEventListener('input', function() {
+                const password = passwordInput.value;
+                const confirmPassword = this.value;
+                
+                if (confirmPassword && password !== confirmPassword) {
+                    this.style.borderColor = '#ef4444';
+                } else if (confirmPassword && password === confirmPassword) {
+                    this.style.borderColor = '#10b981';
+                } else {
+                    this.style.borderColor = '#e5e7eb';
+                }
+            });
+            
+            // Initialize
+            showStep(1);
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97b88394f3f7f655',t:'MTc1NzI3MjMwOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
