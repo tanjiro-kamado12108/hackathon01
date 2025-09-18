@@ -630,4 +630,20 @@ def api_auth_status():
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
+        # Add demo users if not present
+        from werkzeug.security import generate_password_hash
+        demo_users = [
+            {"username": "student@school.edu", "password": "student123", "role": "student"},
+            {"username": "teacher@school.edu", "password": "teacher123", "role": "teacher"},
+            {"username": "admin@school.edu", "password": "admin123", "role": "admin"}
+        ]
+        for user in demo_users:
+            if not User.query.filter_by(username=user["username"]).first():
+                new_user = User(
+                    username=user["username"],
+                    password=generate_password_hash(user["password"]),
+                    role=user["role"]
+                )
+                db.session.add(new_user)
+        db.session.commit()
     app.run(debug=True)
