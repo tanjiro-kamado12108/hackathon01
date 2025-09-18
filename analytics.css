@@ -1,0 +1,13 @@
+body { font-family: 'Inter', sans-serif; }
+.gradient-bg {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+.card {
+    background: rgba(255,255,255,0.95);
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 30px rgba(102,126,234,0.1);
+}
+.icon-bg {
+    background: linear-gradient(135deg, #a5b4fc 0%, #c4b5fd 100%);
+}

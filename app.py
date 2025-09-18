@@ -1,3 +1,4 @@
+# ...existing code...
 
 # ...existing code...
 
@@ -33,12 +34,22 @@ def book():
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///school.db'
 db = SQLAlchemy(app)
 
+
 # User model
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     role = db.Column(db.String(10), nullable=False)  # 'admin', 'teacher', 'student'
+    is_absent = db.Column(db.Boolean, default=False)  # True if teacher is absent
+
+# Notification model
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    message = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    read = db.Column(db.Boolean, default=False)
 
 # Timetable model
 class Timetable(db.Model):
@@ -317,8 +328,35 @@ def settings():
 # Routes
 @app.route('/')
 def home():
-    timetable = Timetable.query.all()
-    return render_template('index.html', timetable=timetable)
+    # AI-generated timetable for today
+    from datetime import datetime
+    import random
+    days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    times = ['08:00', '10:00', '12:00', '14:00', '16:00']
+    subjects = ['Math', 'Science', 'English', 'History', 'Art', 'PE', 'Music']
+    teachers = ['Mr. Smith', 'Ms. Johnson', 'Dr. Lee', 'Mrs. Brown', 'Coach Carter', 'Ms. Green', 'Mr. White']
+    today = datetime.now().strftime('%A')
+    timetable = []
+    for day in days:
+        for time in times:
+            # AI logic: random subject/teacher, but change seed daily for consistency
+            seed = hash(f"{day}-{time}-{datetime.now().date()}")
+            random.seed(seed)
+            subject = random.choice(subjects)
+            teacher = random.choice(teachers)
+            timetable.append(type('TimetableEntry', (), {
+                'day': day,
+                'period': time,
+                'subject': subject,
+                'teacher': teacher,
+                'classroom': f"Room {random.randint(1,10)}"
+            }))
+    notifications = []
+    if 'user_id' in session:
+        user = User.query.get(session['user_id'])
+        if user and user.role == 'student':
+            notifications = Notification.query.filter_by(user_id=user.id, read=False).order_by(Notification.created_at.desc()).all()
+    return render_template('index.html', timetable=timetable, notifications=notifications)
 
 # Notes feature routes
 @app.route('/notes')

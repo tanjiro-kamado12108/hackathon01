@@ -130,6 +130,16 @@
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
+  {% if notifications %}
+    <div class="max-w-2xl mx-auto mt-6">
+      {% for notif in notifications %}
+        <div class="bg-yellow-400 text-white px-6 py-4 rounded-lg shadow mb-4 flex items-center">
+          <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01"/></svg>
+          <span class="font-semibold">{{ notif.message }}</span>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
   {% with messages = get_flashed_messages() %}
     {% if messages %}
       <div class="max-w-2xl mx-auto mt-6">
@@ -215,7 +225,7 @@
       <div class="lg:col-span-2">
         <!-- Timetable Section (dynamic with Jinja2) -->
 {% set times = ['08:00', '10:00', '12:00', '14:00', '16:00'] %}
-{% set days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+{% set days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] %}
 <div class="overflow-x-auto">
   <table class="min-w-full border border-gray-200 rounded-lg">
     <thead>

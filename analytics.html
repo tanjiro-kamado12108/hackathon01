@@ -4,23 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analytics Dashboard - Smart Classroom</title>
+    <link rel="stylesheet" href="analytics.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        .card {
-            background: rgba(255,255,255,0.95);
-            border-radius: 1.5rem;
-            box-shadow: 0 10px 30px rgba(102,126,234,0.1);
-        }
-        .icon-bg {
-            background: linear-gradient(135deg, #a5b4fc 0%, #c4b5fd 100%);
-        }
-    </style>
 </head>
 <body class="gradient-bg">
     <div class="min-h-screen flex flex-col items-center justify-center p-4">
@@ -45,44 +31,6 @@
         </div>
         <a href="index.html" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-all">Back to Dashboard</a>
     </div>
-    <script>
-        // Booking Trends Chart
-        new Chart(document.getElementById('bookingTrendsChart').getContext('2d'), {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                datasets: [{
-                    label: 'Bookings',
-                    data: [120, 150, 180, 220, 190, 240],
-                    borderColor: '#667eea',
-                    backgroundColor: 'rgba(102,126,234,0.1)',
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: false } },
-                scales: { y: { beginAtZero: true } }
-            }
-        });
-        // Classroom Utilization Chart
-        new Chart(document.getElementById('utilizationChart').getContext('2d'), {
-            type: 'bar',
-            data: {
-                labels: ['Room A', 'Room B', 'Lab 101', 'Lab 102', 'Hall A'],
-                datasets: [{
-                    label: 'Utilization %',
-                    data: [94, 87, 92, 78, 85],
-                    backgroundColor: '#a5b4fc'
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: false } },
-                scales: { y: { beginAtZero: true, max: 100 } }
-            }
-        });
-    </script>
+    <script src="analytics.js"></script>
 </body>
 </html>
