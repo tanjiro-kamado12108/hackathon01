@@ -1,9 +1,15 @@
+
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__, template_folder='.')
 app.secret_key = "supersecretkey"
+
+# Route for booking page
+@app.route('/book')
+def book():
+    return render_template('class booking.html')
 
 # Database setup
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///school.db'
