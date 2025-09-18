@@ -1,4 +1,21 @@
 
+# ...existing code...
+
+# User profile page
+@app.route('/profile', methods=['GET', 'POST'])
+def profile():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
+    if request.method == 'POST':
+        # Update user info
+        user.username = request.form.get('username', user.username)
+        # Add more fields as needed (e.g., email, phone)
+        db.session.commit()
+        flash('Profile updated successfully!')
+        return redirect(url_for('profile'))
+    return render_template('profile.html', user=user)
+
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
