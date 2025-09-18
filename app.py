@@ -537,10 +537,12 @@ def logout():
     return redirect(url_for('home'))
 
 # API route to handle classroom booking submission
+
 @app.route('/book_classroom', methods=['POST'])
 def book_classroom():
     if 'user_id' not in session:
-        return jsonify({'error': 'Unauthorized'}), 401
+        # Redirect to login page if not authenticated
+        return redirect(url_for('login'))
 
     data = request.get_json()
     if not data:
