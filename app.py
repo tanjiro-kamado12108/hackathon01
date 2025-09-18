@@ -7,9 +7,24 @@ app = Flask(__name__, template_folder='.')
 app.secret_key = "supersecretkey"
 
 # Route for booking page
+
+# Dynamic booking page: shows unavailable slots for selected classroom/date
 @app.route('/book')
 def book():
-    return render_template('class booking.html')
+    from datetime import datetime
+    classroom = request.args.get('classroom', None)
+    event_date = request.args.get('date', None)
+    unavailable_slots = []
+    if classroom and event_date:
+        # Convert date to weekday name
+        try:
+            weekday = datetime.strptime(event_date, "%Y-%m-%d").strftime("%A")
+        except Exception:
+            weekday = event_date
+        # Query timetable for booked slots
+        entries = Timetable.query.filter_by(classroom=classroom, day=weekday).all()
+        unavailable_slots = [e.period for e in entries]
+    return render_template('class booking.html', unavailable_slots=unavailable_slots)
 
 # Database setup
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///school.db'
