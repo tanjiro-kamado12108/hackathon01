@@ -148,9 +148,9 @@
                         {% set days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
                         {% for time in slots %}
                         <tr>
-                            <td class="px-4 py-2 text-sm font-medium text-gray-700">{{ time }}</td>
+                            <td class="px-4 py-2 text-sm font-medium text-gray-700">{{ time | replace(":00", " am") | replace(":30", ":30 am") }}</td>
                             {% for day in days %}
-                                <td class="px-4 py-2 text-xs text-center">-</td>
+                                <td class="px-4 py-2 text-xs text-center">Available</td>
                             {% endfor %}
                         </tr>
                         {% endfor %}
