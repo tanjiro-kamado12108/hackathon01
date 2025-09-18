@@ -130,6 +130,18 @@
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class="max-w-2xl mx-auto mt-6">
+        {% for message in messages %}
+          <div class="bg-green-500 text-white px-6 py-4 rounded-lg shadow mb-4 flex items-center">
+            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span class="font-semibold">{{ message }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
   <header class="gradient-bg text-white shadow-lg">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center py-6">

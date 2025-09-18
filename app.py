@@ -531,9 +531,11 @@ def close_doubt(doubt_id):
         flash('Doubt closed!')
     return redirect(url_for('doubts'))
 
+
 @app.route('/logout')
 def logout():
     session.clear()
+    flash('You have been logged out!')
     return redirect(url_for('home'))
 
 # API route to handle classroom booking submission
