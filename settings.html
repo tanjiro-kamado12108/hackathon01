@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Maintenance & Settings</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="max-w-2xl mx-auto mt-12 p-8 bg-white rounded-xl shadow">
+        <h1 class="text-3xl font-bold mb-6 text-gray-900">Maintenance & Settings</h1>
+        <p class="mb-4 text-gray-700">This page is for system maintenance and user settings. You can update your preferences or report any issues below.</p>
+        <form method="POST">
+            <div class="mb-4">
+                <label class="block text-gray-700 font-semibold mb-2">Enable Notifications</label>
+                <input type="checkbox" name="notifications_enabled" class="mr-2"> Receive system notifications
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-semibold mb-2">Enable Activity Tracking</label>
+                <input type="checkbox" name="activity_enabled" class="mr-2"> Track my activity
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-semibold mb-2">Dashboard Layout</label>
+                <select name="dashboard_layout" class="border rounded px-3 py-2">
+                    <option value="default">Default</option>
+                    <option value="compact">Compact</option>
+                    <option value="expanded">Expanded</option>
+                </select>
+            </div>
+            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold">Save Settings</button>
+        </form>
+        <hr class="my-8">
+        <h2 class="text-xl font-bold mb-4 text-gray-900">Report an Issue</h2>
+        <form method="POST">
+            <textarea name="issue" rows="4" class="w-full border rounded px-3 py-2 mb-4" placeholder="Describe your issue..."></textarea>
+            <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded-lg font-semibold">Submit Issue</button>
+        </form>
+    </div>
+</body>
+</html>
