@@ -600,7 +600,8 @@ def api_login():
     if not username or not password:
         return jsonify({'error': 'Email and password are required'}), 400
 
-    user = User.query.filter_by(username=username).first()
+    # Try to find user by username or email, case-insensitive
+    user = User.query.filter(db.func.lower(User.username) == username.lower()).first()
     if user and check_password_hash(user.password, password):
         session['user_id'] = user.id
         session['role'] = user.role
@@ -608,8 +609,8 @@ def api_login():
             'success': True,
             'user': {
                 'id': user.id,
-                'name': username,  # Using username as name for now
-                'email': username,
+                'name': user.username,
+                'email': user.username,
                 'role': user.role
             }
         })
