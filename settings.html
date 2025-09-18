@@ -6,7 +6,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 min-h-screen">
-    <div class="max-w-2xl mx-auto mt-12 p-8 bg-white rounded-xl shadow">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="max-w-2xl mx-auto mt-6">
+                    <div class="bg-green-500 text-white px-6 py-4 rounded-lg shadow mb-4 flex items-center">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        <span class="font-semibold">{{ messages[0] }}</span>
+                    </div>
+                </div>
+            {% endif %}
+        {% endwith %}
+        <div class="max-w-2xl mx-auto mt-12 p-8 bg-white rounded-xl shadow">
         <h1 class="text-3xl font-bold mb-6 text-gray-900">Maintenance & Settings</h1>
         <p class="mb-4 text-gray-700">This page is for system maintenance and user settings. You can update your preferences or report any issues below.</p>
         <form method="POST">
