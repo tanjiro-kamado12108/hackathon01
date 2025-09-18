@@ -635,7 +635,8 @@ if __name__ == "__main__":
         demo_users = [
             {"username": "student@school.edu", "password": "student123", "role": "student"},
             {"username": "teacher@school.edu", "password": "teacher123", "role": "teacher"},
-            {"username": "admin@school.edu", "password": "admin123", "role": "admin"}
+            {"username": "admin@school.edu", "password": "admin123", "role": "admin"},
+            {"username": "admin001", "password": "SecureAdmin123", "role": "admin"}
         ]
         for user in demo_users:
             if not User.query.filter_by(username=user["username"]).first():
