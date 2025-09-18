@@ -7,11 +7,18 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
+
 app = Flask(__name__, template_folder='.')
 app.secret_key = "supersecretkey"
 
-# Route for booking page
+# Database setup
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///school.db'
+db = SQLAlchemy(app)
+# Ensure tables are created before any queries
+with app.app_context():
+    db.create_all()
 
+# Route for booking page
 # Dynamic booking page: shows unavailable slots for selected classroom/date
 @app.route('/book')
 def book():
@@ -30,10 +37,6 @@ def book():
         unavailable_slots = [e.period for e in entries]
     return render_template('class booking.html', unavailable_slots=unavailable_slots)
 
-# Database setup
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///school.db'
-db = SQLAlchemy(app)
-
 
 # User model
 class User(db.Model):
@@ -51,6 +54,7 @@ class Notification(db.Model):
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
     read = db.Column(db.Boolean, default=False)
 
+
 # Timetable model
 class Timetable(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -59,6 +63,10 @@ class Timetable(db.Model):
     subject = db.Column(db.String(100), nullable=False)
     teacher = db.Column(db.String(100), nullable=True)
     classroom = db.Column(db.String(50), nullable=True)
+
+# Ensure tables are created before any queries
+with app.app_context():
+    db.create_all()
 
 # Notes model
 class Note(db.Model):
@@ -695,4 +703,6 @@ if __name__ == "__main__":
                 )
                 db.session.add(new_user)
         db.session.commit()
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)
