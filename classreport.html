@@ -121,6 +121,43 @@
     </nav>
 
     <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Timetable Grid (matches class booking.html) -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Classroom Timetable</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full border border-gray-200 rounded-lg">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Time</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Monday</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Tuesday</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Wednesday</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Thursday</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Friday</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Saturday</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Sunday</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set slots = [
+                            '08:00', '08:30', '09:00', '09:30', '10:00', '10:30',
+                            '11:00', '11:30', '12:00', '12:30', '13:00', '13:30',
+                            '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
+                            '17:00', '17:30', '18:00', '18:30'
+                        ] %}
+                        {% set days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+                        {% for time in slots %}
+                        <tr>
+                            <td class="px-4 py-2 text-sm font-medium text-gray-700">{{ time }}</td>
+                            {% for day in days %}
+                                <td class="px-4 py-2 text-xs text-center">-</td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
         <!-- Header -->
         <div class="mb-8">
             <div class="flex items-center justify-between">
