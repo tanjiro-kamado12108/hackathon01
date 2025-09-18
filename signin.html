@@ -192,39 +192,7 @@
                 <p class="text-sm" id="errorText">Invalid credentials. Please try again.</p>
             </div>
 
-            <!-- Role Selection -->
-            <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-3">Select Your Role</label>
-                <div class="grid grid-cols-3 gap-3">
-                    <div class="role-card bg-white border-2 border-gray-200 rounded-xl p-4 text-center" data-role="student">
-                        <div class="feature-icon p-3 rounded-xl inline-block mb-2">
-                            <svg class="w-6 h-6 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3z"/>
-                            </svg>
-                        </div>
-                        <h3 class="font-semibold text-gray-900">Student</h3>
-                        <p class="text-xs text-gray-600 mt-1">Access courses & assignments</p>
-                    </div>
-                    <div class="role-card bg-white border-2 border-gray-200 rounded-xl p-4 text-center" data-role="teacher">
-                        <div class="feature-icon p-3 rounded-xl inline-block mb-2">
-                            <svg class="w-6 h-6 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M18 3a1 1 0 00-1.447-.894L8.763 6H5a3 3 0 000 6h.28l1.771 5.316A1 1 0 008 18h1a1 1 0 001-1v-4.382l6.553 3.276A1 1 0 0018 15V3z" clip-rule="evenodd"/>
-                            </svg>
-                        </div>
-                        <h3 class="font-semibold text-gray-900">Teacher</h3>
-                        <p class="text-xs text-gray-600 mt-1">Manage classes & students</p>
-                    </div>
-                    <div class="role-card bg-white border-2 border-gray-200 rounded-xl p-4 text-center" data-role="admin">
-                        <div class="feature-icon p-3 rounded-xl inline-block mb-2">
-                            <svg class="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-4 4-4-4 4-4 .257-.257A6 6 0 1118 8zm-6-2a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
-                            </svg>
-                        </div>
-                        <h3 class="font-semibold text-gray-900">Admin</h3>
-                        <p class="text-xs text-gray-600 mt-1">System administration</p>
-                    </div>
-                </div>
-            </div>
+            <!-- ...existing code... -->
 
             <!-- Sign In Form -->
             <form id="signinForm" class="space-y-6">
@@ -324,16 +292,6 @@
         });
 
         function setupEventListeners() {
-            // Role selection
-            document.querySelectorAll('.role-card').forEach(card => {
-                card.addEventListener('click', function() {
-                    // Remove selected class from all cards
-                    document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
-                    // Add selected class to clicked card
-                    this.classList.add('selected');
-                });
-            });
-
             // Password toggle
             document.getElementById('togglePassword').addEventListener('click', function() {
                 const passwordField = document.getElementById('password');
@@ -366,21 +324,12 @@
         async function handleSignIn() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-            const selectedRole = document.querySelector('.role-card.selected');
 
             // Validate inputs
             if (!username || !password) {
                 showMessage('error', 'Please enter both username and password');
                 return;
             }
-
-            // Validate role selection
-            if (!selectedRole) {
-                showMessage('error', 'Please select your role (Student, Teacher, or Admin)');
-                return;
-            }
-
-            const role = selectedRole.dataset.role;
 
             // Show loading state
             showLoading(true);
@@ -469,17 +418,7 @@
             }
         }
 
-        // Auto-select role based on email domain (convenience feature)
-        document.getElementById('username').addEventListener('input', function() {
-            const email = this.value.toLowerCase();
-            if (email.includes('student') || email.includes('pupil')) {
-                document.querySelector('[data-role="student"]').click();
-            } else if (email.includes('teacher') || email.includes('prof') || email.includes('instructor')) {
-                document.querySelector('[data-role="teacher"]').click();
-            } else if (email.includes('admin') || email.includes('administrator')) {
-                document.querySelector('[data-role="admin"]').click();
-            }
-        });
+        // ...existing code...
 
         // Check if user is already logged in
         if (localStorage.getItem('userLoggedIn') === 'true') {
