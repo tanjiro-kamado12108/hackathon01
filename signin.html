@@ -425,6 +425,18 @@
             const user = JSON.parse(localStorage.getItem('currentUser'));
             if (user) {
                 showMessage('success', `Welcome back, ${user.name}! Redirecting to your dashboard...`);
+                // Show sign out button
+                const signoutDiv = document.createElement('div');
+                signoutDiv.className = 'mt-6 flex justify-center';
+                signoutDiv.innerHTML = `<button id="signoutBtn" class="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-xl font-semibold flex items-center justify-center">🚪 Sign Out</button>`;
+                document.querySelector('.signin-card').appendChild(signoutDiv);
+                document.getElementById('signoutBtn').addEventListener('click', async function() {
+                    // Call backend logout route
+                    await fetch('/logout');
+                    localStorage.removeItem('userLoggedIn');
+                    localStorage.removeItem('currentUser');
+                    window.location.href = '/';
+                });
                 setTimeout(() => {
                     if (user.role === 'student') {
                         window.location.href = '/student';
