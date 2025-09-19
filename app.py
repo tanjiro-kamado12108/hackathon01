@@ -136,13 +136,17 @@ def signup():
 def student_dashboard():
     if session.get('role') != 'student':
         return redirect(url_for('home'))
-    return redirect(url_for('home'))
+    user = next((u for u in users if u["id"] == session['user_id']), None)
+    user_notifications = [n for n in notifications if user and n["user_id"] == user["id"] and not n["read"]]
+    return render_template('student.html', user=user, notifications=user_notifications)
 
 @app.route('/teacher_dashboard')
 def teacher_dashboard():
     if session.get('role') != 'teacher':
         return redirect(url_for('home'))
-    return redirect(url_for('home'))
+    user = next((u for u in users if u["id"] == session['user_id']), None)
+    user_notifications = [n for n in notifications if user and n["user_id"] == user["id"] and not n["read"]]
+    return render_template('teacher.html', user=user, notifications=user_notifications)
 
 @app.route('/admin_dashboard')
 def admin_dashboard():
