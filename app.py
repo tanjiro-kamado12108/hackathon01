@@ -53,6 +53,12 @@ users = [
 timetable = []
 notifications = []
 
+# Demo credentials for sign-in (update to match backend users)
+# Student: student1 / studpass
+# Teacher: teacher1 / teachpass
+# Admin: admin / adminpass
+# You can also sign up new users via the signup page.
+
 # Helper functions
 
 def get_user(username):
