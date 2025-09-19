@@ -98,12 +98,7 @@ def login():
         if user and user["password"] == password:
             session['user_id'] = user["id"]
             session['role'] = user["role"]
-            if user["role"] == 'admin':
-                return redirect(url_for('admin_dashboard'))
-            elif user["role"] == 'teacher':
-                return redirect(url_for('teacher_dashboard'))
-            else:
-                return redirect(url_for('student_dashboard'))
+            return redirect(url_for('home'))
         else:
             flash("Invalid credentials")
     return render_template('signin.html')
@@ -126,7 +121,19 @@ def signup():
         return redirect(url_for('login'))
     return render_template('signup.html')
 
-@app.route('/admin')
+@app.route('/student_dashboard')
+def student_dashboard():
+    if session.get('role') != 'student':
+        return redirect(url_for('home'))
+    return redirect(url_for('home'))
+
+@app.route('/teacher_dashboard')
+def teacher_dashboard():
+    if session.get('role') != 'teacher':
+        return redirect(url_for('home'))
+    return redirect(url_for('home'))
+
+@app.route('/admin_dashboard')
 def admin_dashboard():
     if session.get('role') != 'admin':
         return redirect(url_for('home'))
@@ -209,6 +216,30 @@ def book_classroom():
     timetable.append(new_entry)
     flash('Classroom booked successfully!')
     return redirect(url_for('home'))
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('You have been logged out.')
+    return redirect(url_for('home'))
+
+@app.route('/settings')
+def settings():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    return render_template('settings.html')
+
+@app.route('/classreport')
+def classreport():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    return render_template('classreport.html')
+
+@app.route('/analytics')
+def analytics():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    return render_template('analytics.html')
 
 if __name__ == "__main__":
     app.run(debug=True)
