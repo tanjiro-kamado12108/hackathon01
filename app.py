@@ -108,6 +108,24 @@ def login():
             flash("Invalid credentials")
     return render_template('signin.html')
 
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        role = request.form.get('role', 'student')
+        if not username or not password:
+            flash('All fields are required')
+            return redirect(url_for('signup'))
+        if get_user(username):
+            flash('Username already exists')
+            return redirect(url_for('signup'))
+        new_id = max([u['id'] for u in users]) + 1 if users else 1
+        users.append({"id": new_id, "username": username, "password": password, "role": role, "is_absent": False})
+        flash('Account created successfully! Please log in.')
+        return redirect(url_for('login'))
+    return render_template('signup.html')
+
 @app.route('/admin')
 def admin_dashboard():
     if session.get('role') != 'admin':
