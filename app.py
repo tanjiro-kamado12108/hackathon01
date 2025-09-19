@@ -98,7 +98,12 @@ def login():
         if user and user["password"] == password:
             session['user_id'] = user["id"]
             session['role'] = user["role"]
-            return redirect(url_for('home'))
+            if user["role"] == 'admin':
+                return redirect(url_for('admin_dashboard'))
+            elif user["role"] == 'teacher':
+                return redirect(url_for('teacher_dashboard'))
+            else:
+                return redirect(url_for('student_dashboard'))
         else:
             flash("Invalid credentials")
     return render_template('signin.html')
