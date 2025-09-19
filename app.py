@@ -147,17 +147,14 @@ def book():
         unavailable_slots = [e["period"] for e in entries]
     return render_template('class booking.html', unavailable_slots=unavailable_slots)
 
-# API route to handle classroom booking submission
 @app.route('/book_classroom', methods=['POST'])
 def book_classroom():
     if 'user_id' not in session:
-        # Redirect to login page if not authenticated
         return redirect(url_for('login'))
-
     data = request.get_json()
     if not data:
-        return jsonify({'error': 'Invalid request'}), 400
-
+        flash('Invalid request')
+        return redirect(url_for('home'))
     # Extract booking details
     user_id = session['user_id']
     event_title = data.get('eventTitle')
@@ -165,21 +162,17 @@ def book_classroom():
     time_slot = data.get('timeSlot')
     duration = data.get('duration')
     classroom_name = data.get('classroom', {}).get('name')
-    teacher_name = data.get('classroom', {}).get('type')  # Assuming teacher info not provided here
+    teacher_name = data.get('classroom', {}).get('type')
     description = data.get('description')
     equipment = data.get('equipment', [])
-
     if not all([event_title, event_date, time_slot, duration, classroom_name]):
-        return jsonify({'error': 'Missing required booking information'}), 400
-
-    # Convert event_date to weekday name
+        flash('Missing required booking information')
+        return redirect(url_for('home'))
     from datetime import datetime
     try:
         weekday = datetime.strptime(event_date, "%Y-%m-%d").strftime("%A")
     except Exception:
-        weekday = event_date  # fallback if already weekday
-
-    # Create timetable entry
+        weekday = event_date
     new_entry = {
         "day": weekday,
         "period": time_slot,
@@ -188,54 +181,8 @@ def book_classroom():
         "classroom": classroom_name
     }
     timetable.append(new_entry)
-
-    return jsonify({'success': True, 'message': 'Classroom booked successfully'})
-
-@app.route('/api/login', methods=['POST'])
-def api_login():
-    data = request.get_json()
-    if not data:
-        return jsonify({'error': 'Invalid request'}), 400
-
-    username = data.get('username')
-    password = data.get('password')
-
-    if not username or not password:
-        return jsonify({'error': 'Email and password are required'}), 400
-
-    # Try to find user by username or email, case-insensitive
-    user = next((u for u in users if u["username"].lower() == username.lower()), None)
-    if user and user["password"] == password:
-        session['user_id'] = user["id"]
-        session['role'] = user["role"]
-        return jsonify({
-            'success': True,
-            'user': {
-                'id': user["id"],
-                'name': user["username"],
-                'email': user["username"],
-                'role': user["role"]
-            }
-        })
-    else:
-        return jsonify({'error': 'Invalid credentials'}), 401
-
-@app.route('/api/auth/status')
-def api_auth_status():
-    if 'user_id' in session:
-        user = next((u for u in users if u["id"] == session['user_id']), None)
-        if user:
-            return jsonify({
-                'authenticated': True,
-                'user': {
-                    'id': user["id"],
-                    'name': user["username"],
-                    'email': user["username"],
-                    'role': user["role"]
-                }
-            })
-    return jsonify({'authenticated': False}), 401
-
+    flash('Classroom booked successfully!')
+    return redirect(url_for('home'))
 
 if __name__ == "__main__":
     app.run(debug=True)
