@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard - Smart Classroom</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="gradient-bg min-h-screen flex items-center justify-center">
+    <div class="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8">
+        <h1 class="text-3xl font-bold text-indigo-700 mb-4">Welcome, Teacher!</h1>
+        <p class="mb-6 text-gray-700">This is your dashboard. Here you can view your schedule, notifications, and manage your classes.</p>
+        <div class="mb-4">
+            <h2 class="text-xl font-semibold text-indigo-600 mb-2">Notifications</h2>
+            {% if notifications %}
+                <ul class="list-disc pl-6">
+                {% for notif in notifications %}
+                    <li class="mb-2 text-gray-800">{{ notif.message }}</li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-gray-500">No notifications.</p>
+            {% endif %}
+        </div>
+        <div>
+            <a href="/logout" class="btn-primary px-4 py-2 rounded text-white">Logout</a>
+        </div>
+    </div>
+</body>
+</html>
