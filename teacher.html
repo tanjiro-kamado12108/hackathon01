@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Smart Classroom</title>
+    <title>Teacher Dashboard - Smart Classroom</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
         
         .card-hover {
             transition: all 0.3s ease;
@@ -16,22 +19,22 @@
         
         .card-hover:hover {
             transform: translateY(-2px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             transition: all 0.3s ease;
         }
         
         .btn-primary:hover {
-            background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%);
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
             transform: translateY(-1px);
-            box-shadow: 0 10px 20px rgba(220, 38, 38, 0.3);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
         
         .fade-in {
-            animation: fadeIn 0.5s ease-in;
+            animation: fadeIn 0.6s ease-out;
         }
         
         @keyframes fadeIn {
@@ -39,788 +42,878 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        .stats-card-1 {
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-        }
-        
-        .stats-card-2 {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-        }
-        
-        .stats-card-3 {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        }
-        
-        .stats-card-4 {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-        }
-        
-        .modal-backdrop {
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-        }
-        
-        .tab-button {
-            transition: all 0.3s ease;
-        }
-        
-        .tab-button.active {
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(220, 38, 38, 0.3);
-        }
-        
-        .login-container {
-            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-            min-height: 100vh;
-        }
-        
-        .login-card {
-            background: rgba(255, 255, 255, 0.95);
+        .modal {
             backdrop-filter: blur(10px);
         }
         
-        .access-denied {
+        .progress-bar {
+            transition: width 0.5s ease;
+        }
+        
+        .notification {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .tab-active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .student-avatar {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .assignment-urgent {
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
         }
         
-        .user-row {
-            transition: all 0.2s ease;
+        .assignment-pending {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         }
         
-        .user-row:hover {
-            background-color: #f8fafc;
-            transform: scale(1.01);
-        }
-        
-        .notification-badge {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        
-        .security-alert {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            animation: securityPulse 1s infinite;
-        }
-        
-        @keyframes securityPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
+        .assignment-completed {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         }
     </style>
 </head>
 <body class="bg-gray-50">
-    <!-- Login Screen -->
-    <div id="loginScreen" class="login-container flex items-center justify-center p-4">
-        <div class="login-card rounded-2xl shadow-2xl p-8 w-full max-w-md">
-            <div class="text-center mb-8">
-                <div class="bg-red-600 p-4 rounded-xl inline-block mb-4">
-                    <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-4 4-4-4 4-4 .257-.257A6 6 0 1118 8zm-6-2a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
-                    </svg>
+    <!-- Navigation Header -->
+    <nav class="bg-white shadow-lg border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo and Brand -->
+                <div class="flex items-center">
+                    <div class="bg-gradient-to-r from-indigo-500 to-purple-600 p-2 rounded-lg">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 3a1 1 0 00-1.447-.894L8.763 6H5a3 3 0 000 6h.28l1.771 5.316A1 1 0 008 18h1a1 1 0 001-1v-4.382l6.553 3.276A1 1 0 0018 15V3z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h1 class="text-xl font-bold text-gray-900">Smart Classroom</h1>
+                        <p class="text-sm text-gray-600">Teacher Portal</p>
+                    </div>
                 </div>
-                <h1 class="text-3xl font-bold text-gray-900 mb-2">Admin Access</h1>
-                <p class="text-gray-600">Restricted Area - Authorized Personnel Only</p>
+
+                <!-- Navigation Tabs -->
+                <div class="hidden md:flex space-x-1">
+                    <button class="tab-btn tab-active px-4 py-2 rounded-lg font-medium text-sm transition-all" data-tab="overview">
+                        Overview
+                    </button>
+                    <button class="tab-btn px-4 py-2 rounded-lg font-medium text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all" data-tab="classes">
+                        My Classes
+                    </button>
+                    <button class="tab-btn px-4 py-2 rounded-lg font-medium text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all" data-tab="students">
+                        Students
+                    </button>
+                    <button class="tab-btn px-4 py-2 rounded-lg font-medium text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all" data-tab="assignments">
+                        Assignments
+                    </button>
+                    <button class="tab-btn px-4 py-2 rounded-lg font-medium text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all" data-tab="grades">
+                        Grades
+                    </button>
+                </div>
+
+                <!-- User Profile -->
+                <div class="flex items-center space-x-4">
+                    <div class="text-right">
+                        <p class="text-sm font-medium text-gray-900" id="teacherName">Dr. Sarah Wilson</p>
+                        <p class="text-xs text-gray-600">Mathematics Teacher</p>
+                    </div>
+                    <div class="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+                        <span class="text-white font-semibold text-sm" id="teacherInitials">SW</span>
+                    </div>
+                    <button id="logoutBtn" class="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-100">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Dashboard Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Overview Tab -->
+        <div id="overview-tab" class="tab-content fade-in">
+            <!-- Welcome Section -->
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Good morning, Dr. Wilson! 👋</h2>
+                <p class="text-gray-600">Here's what's happening in your classes today.</p>
             </div>
 
-            <form id="adminLoginForm" class="space-y-6">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Admin ID</label>
-                    <input type="text" id="adminId" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500" placeholder="Enter your admin ID" required>
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                    <input type="password" id="adminPassword" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500" placeholder="Enter your password" required>
-                </div>
-
-                <div id="loginError" class="hidden access-denied text-white p-4 rounded-xl text-center">
-                    <div class="flex items-center justify-center mb-2">
-                        <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                        </svg>
-                        <span class="font-semibold">Access Denied</span>
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 card-hover">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-blue-100 rounded-lg">
+                            <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3z"/>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Total Classes</p>
+                            <p class="text-2xl font-bold text-gray-900">6</p>
+                        </div>
                     </div>
-                    <p class="text-sm">Invalid credentials. This incident has been logged.</p>
                 </div>
 
-                <button type="submit" class="w-full btn-primary text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 card-hover">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-green-100 rounded-lg">
+                            <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Total Students</p>
+                            <p class="text-2xl font-bold text-gray-900">142</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 card-hover">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-yellow-100 rounded-lg">
+                            <svg class="w-6 h-6 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Pending Grades</p>
+                            <p class="text-2xl font-bold text-gray-900">23</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 card-hover">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-purple-100 rounded-lg">
+                            <svg class="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">This Week</p>
+                            <p class="text-2xl font-bold text-gray-900">18</p>
+                            <p class="text-xs text-gray-500">Classes</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Today's Schedule -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-8">
+                        <div class="p-6 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900">Today's Schedule</h3>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-4">
+                                <div class="flex items-center p-4 bg-blue-50 border-l-4 border-blue-500 rounded-r-lg">
+                                    <div class="text-center mr-4">
+                                        <p class="text-sm font-medium text-blue-600">9:00</p>
+                                        <p class="text-xs text-blue-500">AM</p>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="font-medium text-gray-900">Algebra II - Period 1</h4>
+                                        <p class="text-sm text-gray-600">Room 101 • 28 students</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">Active</span>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center p-4 bg-green-50 border-l-4 border-green-500 rounded-r-lg">
+                                    <div class="text-center mr-4">
+                                        <p class="text-sm font-medium text-green-600">10:30</p>
+                                        <p class="text-xs text-green-500">AM</p>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="font-medium text-gray-900">Calculus - Period 2</h4>
+                                        <p class="text-sm text-gray-600">Room 101 • 24 students</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs font-medium rounded-full">Upcoming</span>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center p-4 bg-purple-50 border-l-4 border-purple-500 rounded-r-lg">
+                                    <div class="text-center mr-4">
+                                        <p class="text-sm font-medium text-purple-600">1:00</p>
+                                        <p class="text-xs text-purple-500">PM</p>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="font-medium text-gray-900">Statistics - Period 5</h4>
+                                        <p class="text-sm text-gray-600">Room 101 • 26 students</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs font-medium rounded-full">Upcoming</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                        <div class="p-6 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900">Recent Activity</h3>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-4">
+                                <div class="flex items-start">
+                                    <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                                        <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-900"><strong>Alex Johnson</strong> submitted Algebra Quiz #3</p>
+                                        <p class="text-xs text-gray-500">2 minutes ago</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start">
+                                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                        <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-900"><strong>Emma Davis</strong> asked a question in Calculus</p>
+                                        <p class="text-xs text-gray-500">15 minutes ago</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start">
+                                    <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center mr-3">
+                                        <svg class="w-4 h-4 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-900">Assignment deadline reminder: <strong>Statistics Project</strong></p>
+                                        <p class="text-xs text-gray-500">1 hour ago</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar -->
+                <div class="space-y-8">
+                    <!-- Quick Actions -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                        <div class="p-6 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900">Quick Actions</h3>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-3">
+                                <button class="w-full btn-primary text-white py-3 px-4 rounded-lg font-medium flex items-center justify-center" id="createAssignmentBtn">
+                                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Create Assignment
+                                </button>
+
+                                <button class="w-full flex items-center justify-center p-3 bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg transition-colors">
+                                    <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span class="font-medium text-gray-900">Schedule Class</span>
+                                </button>
+
+                                <button class="w-full flex items-center justify-center p-3 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors">
+                                    <svg class="w-5 h-5 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <span class="font-medium text-gray-900">Grade Assignments</span>
+                                </button>
+
+                                <button class="w-full flex items-center justify-center p-3 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg transition-colors">
+                                    <svg class="w-5 h-5 text-purple-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span class="font-medium text-gray-900">Message Students</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Upcoming Deadlines -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                        <div class="p-6 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900">Upcoming Deadlines</h3>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-4">
+                                <div class="p-3 bg-red-50 border border-red-200 rounded-lg">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h4 class="font-medium text-gray-900">Statistics Project</h4>
+                                            <p class="text-sm text-gray-600">Due Tomorrow</p>
+                                        </div>
+                                        <span class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">Urgent</span>
+                                    </div>
+                                </div>
+
+                                <div class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h4 class="font-medium text-gray-900">Calculus Quiz</h4>
+                                            <p class="text-sm text-gray-600">Due Friday</p>
+                                        </div>
+                                        <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full">Soon</span>
+                                    </div>
+                                </div>
+
+                                <div class="p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h4 class="font-medium text-gray-900">Algebra Test</h4>
+                                            <p class="text-sm text-gray-600">Due Next Week</p>
+                                        </div>
+                                        <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs font-medium rounded-full">Later</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Classes Tab -->
+        <div id="classes-tab" class="tab-content hidden">
+            <div class="mb-6 flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-gray-900">My Classes</h2>
+                <button class="btn-primary text-white px-4 py-2 rounded-lg font-medium" id="addClassBtn">
+                    <svg class="w-5 h-5 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
                     </svg>
-                    Secure Login
+                    Add New Class
                 </button>
-            </form>
+            </div>
 
-            <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 text-yellow-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                    </svg>
-                    <div>
-                        <p class="text-sm font-medium text-yellow-800">Demo Credentials</p>
-                        <p class="text-xs text-yellow-700">ID: admin001 | Password: SecureAdmin123</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 card-hover">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <span class="text-blue-600 font-bold text-lg">A2</span>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="text-gray-400 hover:text-gray-600">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                                    </svg>
+                                </button>
+                                <button class="text-gray-400 hover:text-red-600">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clip-rule="evenodd"/>
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414L9 12.414l3.293-3.293a1 1 0 000-1.414z" clip-rule="evenodd"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">Algebra II</h3>
+                        <p class="text-gray-600 text-sm mb-4">Period 1 • Room 101</p>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-600">28 Students</span>
+                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">Active</span>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-gray-200">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">Progress</span>
+                                <span class="text-gray-900 font-medium">75%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                                <div class="bg-blue-600 h-2 rounded-full progress-bar" style="width: 75%"></div>
+                            </div>
+                        </div>
                     </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 card-hover">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                <span class="text-green-600 font-bold text-lg">C</span>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="text-gray-400 hover:text-gray-600">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                                    </svg>
+                                </button>
+                                <button class="text-gray-400 hover:text-red-600">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clip-rule="evenodd"/>
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414L9 12.414l3.293-3.293a1 1 0 000-1.414z" clip-rule="evenodd"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">Calculus</h3>
+                        <p class="text-gray-600 text-sm mb-4">Period 2 • Room 101</p>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-600">24 Students</span>
+                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">Active</span>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-gray-200">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">Progress</span>
+                                <span class="text-gray-900 font-medium">60%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                                <div class="bg-green-600 h-2 rounded-full progress-bar" style="width: 60%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 card-hover">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                                <span class="text-purple-600 font-bold text-lg">S</span>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="text-gray-400 hover:text-gray-600">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                                    </svg>
+                                </button>
+                                <button class="text-gray-400 hover:text-red-600">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clip-rule="evenodd"/>
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414L9 12.414l3.293-3.293a1 1 0 000-1.414z" clip-rule="evenodd"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">Statistics</h3>
+                        <p class="text-gray-600 text-sm mb-4">Period 5 • Room 101</p>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-600">26 Students</span>
+                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">Active</span>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-gray-200">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">Progress</span>
+                                <span class="text-gray-900 font-medium">85%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                                <div class="bg-purple-600 h-2 rounded-full progress-bar" style="width: 85%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Students Tab -->
+        <div id="students-tab" class="tab-content hidden">
+            <div class="mb-6 flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-gray-900">Students</h2>
+                <div class="flex space-x-3">
+                    <input type="text" placeholder="Search students..." class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <select class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <option>All Classes</option>
+                        <option>Algebra II</option>
+                        <option>Calculus</option>
+                        <option>Statistics</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Class</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grade</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attendance</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="student-avatar w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                                            <span class="text-white font-semibold text-sm">AJ</span>
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-900">Alex Johnson</div>
+                                            <div class="text-sm text-gray-500">STU001</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Algebra II</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">87%</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">95%</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">Excellent</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button class="text-indigo-600 hover:text-indigo-900 mr-3">View</button>
+                                    <button class="text-green-600 hover:text-green-900 mr-3">Message</button>
+                                    <button class="text-gray-600 hover:text-gray-900">Edit</button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="student-avatar w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                                            <span class="text-white font-semibold text-sm">ED</span>
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-900">Emma Davis</div>
+                                            <div class="text-sm text-gray-500">STU002</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Calculus</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">92%</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">98%</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">Excellent</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button class="text-indigo-600 hover:text-indigo-900 mr-3">View</button>
+                                    <button class="text-green-600 hover:text-green-900 mr-3">Message</button>
+                                    <button class="text-gray-600 hover:text-gray-900">Edit</button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="student-avatar w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                                            <span class="text-white font-semibold text-sm">MC</span>
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-900">Michael Chen</div>
+                                            <div class="text-sm text-gray-500">STU003</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Statistics</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">78%</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">88%</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full">Good</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button class="text-indigo-600 hover:text-indigo-900 mr-3">View</button>
+                                    <button class="text-green-600 hover:text-green-900 mr-3">Message</button>
+                                    <button class="text-gray-600 hover:text-gray-900">Edit</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assignments Tab -->
+        <div id="assignments-tab" class="tab-content hidden">
+            <div class="mb-6 flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-gray-900">Assignments</h2>
+                <button class="btn-primary text-white px-4 py-2 rounded-lg font-medium" id="createAssignmentBtn2">
+                    <svg class="w-5 h-5 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+                    </svg>
+                    Create Assignment
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Algebra Quiz #3</h3>
+                        <span class="assignment-urgent px-2 py-1 text-white text-xs font-medium rounded-full">Due Tomorrow</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">Quadratic equations and functions</p>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Class:</span>
+                            <span class="text-gray-900">Algebra II</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Submitted:</span>
+                            <span class="text-gray-900">18/28</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Graded:</span>
+                            <span class="text-gray-900">12/18</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-gray-200">
+                        <div class="flex space-x-2">
+                            <button class="flex-1 bg-indigo-50 text-indigo-600 py-2 px-3 rounded-lg text-sm font-medium hover:bg-indigo-100">View</button>
+                            <button class="flex-1 bg-green-50 text-green-600 py-2 px-3 rounded-lg text-sm font-medium hover:bg-green-100">Grade</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Statistics Project</h3>
+                        <span class="assignment-pending px-2 py-1 text-white text-xs font-medium rounded-full">Due Friday</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">Data analysis and interpretation</p>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Class:</span>
+                            <span class="text-gray-900">Statistics</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Submitted:</span>
+                            <span class="text-gray-900">8/26</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Graded:</span>
+                            <span class="text-gray-900">3/8</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-gray-200">
+                        <div class="flex space-x-2">
+                            <button class="flex-1 bg-indigo-50 text-indigo-600 py-2 px-3 rounded-lg text-sm font-medium hover:bg-indigo-100">View</button>
+                            <button class="flex-1 bg-green-50 text-green-600 py-2 px-3 rounded-lg text-sm font-medium hover:bg-green-100">Grade</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Calculus Test</h3>
+                        <span class="assignment-completed px-2 py-1 text-white text-xs font-medium rounded-full">Completed</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">Derivatives and applications</p>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Class:</span>
+                            <span class="text-gray-900">Calculus</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Submitted:</span>
+                            <span class="text-gray-900">24/24</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Graded:</span>
+                            <span class="text-gray-900">24/24</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-gray-200">
+                        <div class="flex space-x-2">
+                            <button class="flex-1 bg-indigo-50 text-indigo-600 py-2 px-3 rounded-lg text-sm font-medium hover:bg-indigo-100">View</button>
+                            <button class="flex-1 bg-gray-50 text-gray-600 py-2 px-3 rounded-lg text-sm font-medium">Results</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grades Tab -->
+        <div id="grades-tab" class="tab-content hidden">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">Grade Management</h2>
+                <div class="flex space-x-4">
+                    <select class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <option>All Classes</option>
+                        <option>Algebra II</option>
+                        <option>Calculus</option>
+                        <option>Statistics</option>
+                    </select>
+                    <select class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <option>All Assignments</option>
+                        <option>Quizzes</option>
+                        <option>Tests</option>
+                        <option>Projects</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="p-6 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Pending Grades</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assignment</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Class</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grade</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="student-avatar w-8 h-8 rounded-full flex items-center justify-center mr-3">
+                                            <span class="text-white font-semibold text-xs">AJ</span>
+                                        </div>
+                                        <div class="text-sm font-medium text-gray-900">Alex Johnson</div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Algebra Quiz #3</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Algebra II</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2 hours ago</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <input type="number" class="w-16 px-2 py-1 border border-gray-300 rounded text-sm" placeholder="0-100" min="0" max="100">
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button class="text-green-600 hover:text-green-900 mr-3">Save</button>
+                                    <button class="text-indigo-600 hover:text-indigo-900">View</button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="student-avatar w-8 h-8 rounded-full flex items-center justify-center mr-3">
+                                            <span class="text-white font-semibold text-xs">ED</span>
+                                        </div>
+                                        <div class="text-sm font-medium text-gray-900">Emma Davis</div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Statistics Project</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Statistics</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1 day ago</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <input type="number" class="w-16 px-2 py-1 border border-gray-300 rounded text-sm" placeholder="0-100" min="0" max="100">
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button class="text-green-600 hover:text-green-900 mr-3">Save</button>
+                                    <button class="text-indigo-600 hover:text-indigo-900">View</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Admin Dashboard -->
-    <div id="adminDashboard" class="hidden">
-        <!-- Navigation -->
-        <nav class="bg-white shadow-lg sticky top-0 z-40">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 flex items-center">
-                            <div class="bg-red-600 p-2 rounded-lg mr-3">
-                                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-4 4-4-4 4-4 .257-.257A6 6 0 1118 8zm-6-2a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
-                                </svg>
-                            </div>
-                            <span class="text-xl font-bold text-gray-900">Admin Panel</span>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <div class="flex items-center text-sm text-gray-600">
-                            <svg class="w-4 h-4 mr-1 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span id="currentAdmin">admin001</span>
-                        </div>
-                        <div class="relative">
-                            <button class="text-gray-600 hover:text-red-600 p-2 rounded-full transition-colors">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4 19h6v-2H4v2zM4 15h8v-2H4v2zM4 11h10V9H4v2zM4 7h12V5H4v2z"/>
-                                </svg>
-                                <span class="notification-badge absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">5</span>
-                            </button>
-                        </div>
-                        <button id="logoutBtn" class="text-gray-600 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                            Logout
-                        </button>
-                    </div>
-                </div>
+    <!-- Create Assignment Modal -->
+    <div id="assignmentModal" class="fixed inset-0 bg-black bg-opacity-50 modal hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4">
+            <div class="p-6 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">Create New Assignment</h3>
             </div>
-        </nav>
-
-        <div class="max-w-7xl mx-auto px-4 py-8">
-            <!-- Header -->
-            <div class="mb-8">
-                <div class="flex items-center justify-between">
+            <div class="p-6">
+                <form id="assignmentForm" class="space-y-4">
                     <div>
-                        <h1 class="text-3xl font-bold text-gray-900 flex items-center">
-                            <span class="bg-red-100 p-3 rounded-xl mr-4">
-                                <svg class="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-4 4-4-4 4-4 .257-.257A6 6 0 1118 8zm-6-2a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
-                                </svg>
-                            </span>
-                            System Administration
-                        </h1>
-                        <p class="text-gray-600 mt-2">Complete system control and monitoring dashboard</p>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Assignment Title</label>
+                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Enter assignment title">
                     </div>
-                    <div class="flex space-x-3">
-                        <button id="systemBackupBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-medium flex items-center transition-colors">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/>
-                            </svg>
-                            System Backup
-                        </button>
-                        <button id="emergencyBtn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl font-medium flex items-center transition-colors">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
-                            </svg>
-                            Emergency Mode
-                        </button>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Class</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            <option>Select a class</option>
+                            <option>Algebra II</option>
+                            <option>Calculus</option>
+                            <option>Statistics</option>
+                        </select>
                     </div>
-                </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Due Date</label>
+                        <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                        <textarea class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" rows="3" placeholder="Assignment description..."></textarea>
+                    </div>
+                </form>
             </div>
-
-            <!-- Security Alert -->
-            <div class="security-alert text-white p-4 rounded-xl mb-8">
-                <div class="flex items-center">
-                    <svg class="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-4 4-4-4 4-4 .257-.257A6 6 0 1118 8zm-6-2a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
-                    </svg>
-                    <div class="flex-1">
-                        <h3 class="font-semibold">Security Status: ACTIVE</h3>
-                        <p class="text-sm text-red-100">All systems monitored • Last security scan: 2 minutes ago • 0 threats detected</p>
-                    </div>
-                    <button class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                        View Details
-                    </button>
-                </div>
-            </div>
-
-            <!-- Key Metrics Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div class="stats-card-1 text-white p-6 rounded-2xl card-hover">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-red-100 text-sm font-medium">Total Users</p>
-                            <p class="text-3xl font-bold">1,247</p>
-                            <div class="flex items-center mt-2">
-                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
-                                </svg>
-                                <span class="text-sm text-red-200">+23 this week</span>
-                            </div>
-                        </div>
-                        <div class="bg-white bg-opacity-20 p-3 rounded-xl">
-                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="stats-card-2 text-white p-6 rounded-2xl card-hover">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-yellow-100 text-sm font-medium">System Uptime</p>
-                            <p class="text-3xl font-bold">99.8%</p>
-                            <div class="flex items-center mt-2">
-                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                </svg>
-                                <span class="text-sm text-yellow-200">45 days continuous</span>
-                            </div>
-                        </div>
-                        <div class="bg-white bg-opacity-20 p-3 rounded-xl">
-                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h12a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1V8z" clip-rule="evenodd"/>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="stats-card-3 text-white p-6 rounded-2xl card-hover">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-green-100 text-sm font-medium">Active Sessions</p>
-                            <p class="text-3xl font-bold">342</p>
-                            <div class="flex items-center mt-2">
-                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
-                                </svg>
-                                <span class="text-sm text-green-200">Peak: 387 today</span>
-                            </div>
-                        </div>
-                        <div class="bg-white bg-opacity-20 p-3 rounded-xl">
-                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="stats-card-4 text-white p-6 rounded-2xl card-hover">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-blue-100 text-sm font-medium">Security Score</p>
-                            <p class="text-3xl font-bold">A+</p>
-                            <div class="flex items-center mt-2">
-                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                </svg>
-                                <span class="text-sm text-blue-200">All checks passed</span>
-                            </div>
-                        </div>
-                        <div class="bg-white bg-opacity-20 p-3 rounded-xl">
-                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Main Content Tabs -->
-            <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
-                <div class="border-b border-gray-200">
-                    <nav class="flex space-x-8 px-6" aria-label="Tabs">
-                        <button class="tab-button active py-4 px-1 border-b-2 border-transparent font-medium text-sm" data-tab="users">
-                            👥 User Management
-                        </button>
-                        <button class="tab-button py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700" data-tab="system">
-                            ⚙️ System Settings
-                        </button>
-                        <button class="tab-button py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700" data-tab="security">
-                            🔒 Security
-                        </button>
-                        <button class="tab-button py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700" data-tab="logs">
-                            📋 System Logs
-                        </button>
-                        <button class="tab-button py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700" data-tab="analytics">
-                            📊 Analytics
-                        </button>
-                    </nav>
-                </div>
-
-                <!-- User Management Tab -->
-                <div id="users-tab" class="tab-content p-6">
-                    <div class="flex items-center justify-between mb-6">
-                        <div class="flex items-center space-x-4">
-                            <div class="relative">
-                                <input type="text" placeholder="Search users..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 w-64">
-                                <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                                </svg>
-                            </div>
-                            <select class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
-                                <option>All Roles</option>
-                                <option>Admin</option>
-                                <option>Teacher</option>
-                                <option>Student</option>
-                                <option>Staff</option>
-                            </select>
-                        </div>
-                        <button id="addUserBtn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium flex items-center transition-colors">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                            </svg>
-                            Add User
-                        </button>
-                    </div>
-
-                    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Login</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Permissions</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    <tr class="user-row">
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="flex items-center">
-                                                <div class="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center mr-3">
-                                                    <span class="text-white font-semibold">AD</span>
-                                                </div>
-                                                <div>
-                                                    <div class="text-sm font-medium text-gray-900">admin001</div>
-                                                    <div class="text-sm text-gray-500">admin@smartclassroom.edu</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="bg-red-100 text-red-800 text-xs font-semibold px-3 py-1 rounded-full">Super Admin</span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="bg-green-100 text-green-800 text-xs font-semibold px-3 py-1 rounded-full">Active</span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Just now</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Full Access</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <button class="text-blue-600 hover:text-blue-900 mr-3">Edit</button>
-                                            <button class="text-red-600 hover:text-red-900">Suspend</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="user-row">
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="flex items-center">
-                                                <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mr-3">
-                                                    <span class="text-white font-semibold">JS</span>
-                                                </div>
-                                                <div>
-                                                    <div class="text-sm font-medium text-gray-900">john.smith</div>
-                                                    <div class="text-sm text-gray-500">j.smith@smartclassroom.edu</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full">Teacher</span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="bg-green-100 text-green-800 text-xs font-semibold px-3 py-1 rounded-full">Active</span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2 hours ago</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Classroom Access</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <button class="text-blue-600 hover:text-blue-900 mr-3">Edit</button>
-                                            <button class="text-red-600 hover:text-red-900">Suspend</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="user-row">
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="flex items-center">
-                                                <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center mr-3">
-                                                    <span class="text-white font-semibold">MW</span>
-                                                </div>
-                                                <div>
-                                                    <div class="text-sm font-medium text-gray-900">mary.wilson</div>
-                                                    <div class="text-sm text-gray-500">m.wilson@smartclassroom.edu</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="bg-purple-100 text-purple-800 text-xs font-semibold px-3 py-1 rounded-full">Staff</span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-3 py-1 rounded-full">Pending</span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Never</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Limited Access</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <button class="text-green-600 hover:text-green-900 mr-3">Activate</button>
-                                            <button class="text-red-600 hover:text-red-900">Delete</button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- System Settings Tab -->
-                <div id="system-tab" class="tab-content hidden p-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div class="bg-gray-50 rounded-xl p-6">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">System Configuration</h3>
-                            <div class="space-y-4">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <h4 class="font-medium text-gray-900">Maintenance Mode</h4>
-                                        <p class="text-sm text-gray-600">Temporarily disable system access</p>
-                                    </div>
-                                    <label class="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" class="sr-only peer">
-                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
-                                    </label>
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <h4 class="font-medium text-gray-900">Auto Backup</h4>
-                                        <p class="text-sm text-gray-600">Daily automated system backups</p>
-                                    </div>
-                                    <label class="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" checked class="sr-only peer">
-                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
-                                    </label>
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <h4 class="font-medium text-gray-900">Email Notifications</h4>
-                                        <p class="text-sm text-gray-600">System alerts and updates</p>
-                                    </div>
-                                    <label class="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" checked class="sr-only peer">
-                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-gray-50 rounded-xl p-6">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Database Management</h3>
-                            <div class="space-y-4">
-                                <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium flex items-center justify-center transition-colors">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
-                                    </svg>
-                                    Optimize Database
-                                </button>
-                                <button class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg font-medium flex items-center justify-center transition-colors">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/>
-                                    </svg>
-                                    Create Backup
-                                </button>
-                                <button class="w-full bg-yellow-600 hover:bg-yellow-700 text-white py-3 px-4 rounded-lg font-medium flex items-center justify-center transition-colors">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                                    </svg>
-                                    Restore Backup
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Security Tab -->
-                <div id="security-tab" class="tab-content hidden p-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div class="bg-gray-50 rounded-xl p-6">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Security Monitoring</h3>
-                            <div class="space-y-4">
-                                <div class="bg-white p-4 rounded-lg border border-gray-200">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <h4 class="font-medium text-gray-900">Failed Login Attempts</h4>
-                                        <span class="bg-red-100 text-red-800 text-xs font-semibold px-2 py-1 rounded-full">3 today</span>
-                                    </div>
-                                    <p class="text-sm text-gray-600">Last attempt: 2 hours ago from IP 192.168.1.45</p>
-                                </div>
-                                <div class="bg-white p-4 rounded-lg border border-gray-200">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <h4 class="font-medium text-gray-900">Suspicious Activity</h4>
-                                        <span class="bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded-full">None</span>
-                                    </div>
-                                    <p class="text-sm text-gray-600">No suspicious activity detected in the last 24 hours</p>
-                                </div>
-                                <div class="bg-white p-4 rounded-lg border border-gray-200">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <h4 class="font-medium text-gray-900">System Vulnerabilities</h4>
-                                        <span class="bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded-full">0 Critical</span>
-                                    </div>
-                                    <p class="text-sm text-gray-600">Last security scan: 2 minutes ago</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-gray-50 rounded-xl p-6">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Access Control</h3>
-                            <div class="space-y-4">
-                                <button class="w-full bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-lg font-medium flex items-center justify-center transition-colors">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                                    </svg>
-                                    Force Password Reset
-                                </button>
-                                <button class="w-full bg-orange-600 hover:bg-orange-700 text-white py-3 px-4 rounded-lg font-medium flex items-center justify-center transition-colors">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18 21l-5.586-5.586m0 0L21 18l-5.586-5.586m0 0L5.636 5.636M18.364 18.364L5.636 5.636"/>
-                                    </svg>
-                                    Terminate All Sessions
-                                </button>
-                                <button class="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 px-4 rounded-lg font-medium flex items-center justify-center transition-colors">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                                    </svg>
-                                    Run Security Scan
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- System Logs Tab -->
-                <div id="logs-tab" class="tab-content hidden p-6">
-                    <div class="mb-6">
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-lg font-semibold text-gray-900">System Activity Logs</h3>
-                            <div class="flex space-x-3">
-                                <select class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
-                                    <option>All Logs</option>
-                                    <option>Security</option>
-                                    <option>System</option>
-                                    <option>User Activity</option>
-                                    <option>Errors</option>
-                                </select>
-                                <button class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                                    Export Logs
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-gray-900 rounded-xl p-6 font-mono text-sm">
-                        <div class="space-y-2 text-green-400">
-                            <div>[2024-01-15 14:32:15] <span class="text-blue-400">INFO</span> - Admin login successful: admin001 from 192.168.1.100</div>
-                            <div>[2024-01-15 14:30:42] <span class="text-yellow-400">WARN</span> - Failed login attempt: invalid_user from 192.168.1.45</div>
-                            <div>[2024-01-15 14:28:33] <span class="text-blue-400">INFO</span> - System backup completed successfully</div>
-                            <div>[2024-01-15 14:25:18] <span class="text-blue-400">INFO</span> - User created: mary.wilson (Staff)</div>
-                            <div>[2024-01-15 14:22:07] <span class="text-green-400">SUCCESS</span> - Database optimization completed</div>
-                            <div>[2024-01-15 14:20:15] <span class="text-red-400">ERROR</span> - Failed to send email notification to j.smith@smartclassroom.edu</div>
-                            <div>[2024-01-15 14:18:33] <span class="text-blue-400">INFO</span> - Security scan initiated</div>
-                            <div>[2024-01-15 14:15:22] <span class="text-blue-400">INFO</span> - User logout: john.smith</div>
-                            <div>[2024-01-15 14:12:45] <span class="text-yellow-400">WARN</span> - High CPU usage detected: 85%</div>
-                            <div>[2024-01-15 14:10:33] <span class="text-blue-400">INFO</span> - Classroom booking created: Room A101 by john.smith</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Analytics Tab -->
-                <div id="analytics-tab" class="tab-content hidden p-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div class="bg-gray-50 rounded-xl p-6">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">User Activity</h3>
-                            <div class="chart-container">
-                                <canvas id="userActivityChart"></canvas>
-                            </div>
-                        </div>
-                        <div class="bg-gray-50 rounded-xl p-6">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">System Performance</h3>
-                            <div class="chart-container">
-                                <canvas id="performanceChart"></canvas>
-                            </div>
-                        </div>
-                        <div class="bg-gray-50 rounded-xl p-6">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Security Events</h3>
-                            <div class="chart-container">
-                                <canvas id="securityChart"></canvas>
-                            </div>
-                        </div>
-                        <div class="bg-gray-50 rounded-xl p-6">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Resource Usage</h3>
-                            <div class="space-y-4">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm font-medium text-gray-700">CPU Usage</span>
-                                    <div class="flex items-center">
-                                        <div class="w-32 bg-gray-200 rounded-full h-2 mr-3">
-                                            <div class="bg-red-600 h-2 rounded-full" style="width: 45%"></div>
-                                        </div>
-                                        <span class="text-sm font-semibold text-gray-900">45%</span>
-                                    </div>
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm font-medium text-gray-700">Memory Usage</span>
-                                    <div class="flex items-center">
-                                        <div class="w-32 bg-gray-200 rounded-full h-2 mr-3">
-                                            <div class="bg-yellow-600 h-2 rounded-full" style="width: 68%"></div>
-                                        </div>
-                                        <span class="text-sm font-semibold text-gray-900">68%</span>
-                                    </div>
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm font-medium text-gray-700">Disk Usage</span>
-                                    <div class="flex items-center">
-                                        <div class="w-32 bg-gray-200 rounded-full h-2 mr-3">
-                                            <div class="bg-green-600 h-2 rounded-full" style="width: 32%"></div>
-                                        </div>
-                                        <span class="text-sm font-semibold text-gray-900">32%</span>
-                                    </div>
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm font-medium text-gray-700">Network I/O</span>
-                                    <div class="flex items-center">
-                                        <div class="w-32 bg-gray-200 rounded-full h-2 mr-3">
-                                            <div class="bg-blue-600 h-2 rounded-full" style="width: 23%"></div>
-                                        </div>
-                                        <span class="text-sm font-semibold text-gray-900">23%</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="p-6 border-t border-gray-200 flex justify-end space-x-3">
+                <button id="cancelAssignment" class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
+                <button id="saveAssignment" class="px-4 py-2 btn-primary text-white rounded-lg">Create Assignment</button>
             </div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Check if admin is already logged in
-            const isLoggedIn = localStorage.getItem('adminLoggedIn');
-            const currentAdmin = localStorage.getItem('currentAdmin');
-            
-            if (isLoggedIn === 'true' && currentAdmin) {
-                // Admin is already logged in, show dashboard directly
-                showAdminDashboard();
-                console.log(`Admin ${currentAdmin} automatically logged in from previous session`);
-            } else {
-                // Show login screen
-                showLoginScreen();
-            }
-
+            initializeDashboard();
             setupEventListeners();
         });
 
+        function initializeDashboard() {
+            // Load user data from localStorage or use default
+            const currentUser = JSON.parse(localStorage.getItem('currentUser')) || {
+                name: 'Dr. Sarah Wilson',
+                username: 'teacher@demo.com',
+                role: 'teacher'
+            };
+
+            // Update user information in the UI
+            document.getElementById('teacherName').textContent = currentUser.name;
+            
+            // Update initials
+            const initials = currentUser.name.split(' ').map(n => n[0]).join('');
+            document.getElementById('teacherInitials').textContent = initials;
+
+            // Update greeting based on time
+            updateGreeting();
+        }
+
         function setupEventListeners() {
-            // Login form
-            document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                handleLogin();
-            });
-
-            // Logout button
-            document.getElementById('logoutBtn').addEventListener('click', function() {
-                handleLogout();
-            });
-
-            // Tab switching
-            document.querySelectorAll('.tab-button').forEach(tab => {
-                tab.addEventListener('click', function() {
+            // Tab navigation
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
                     const tabName = this.dataset.tab;
                     switchTab(tabName);
                 });
             });
 
-            // Admin action buttons
-            document.getElementById('systemBackupBtn').addEventListener('click', function() {
-                alert('System Backup initiated. This process will create a complete backup of all system data and configurations. Estimated time: 15 minutes.');
-            });
-
-            document.getElementById('emergencyBtn').addEventListener('click', function() {
-                if (confirm('Are you sure you want to activate Emergency Mode? This will lock down the system and notify all administrators.')) {
-                    alert('Emergency Mode ACTIVATED. All non-essential services have been disabled. Security protocols are now in effect.');
+            // Logout button
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                if (confirm('Are you sure you want to log out?')) {
+                    localStorage.removeItem('userLoggedIn');
+                    localStorage.removeItem('currentUser');
+                    window.location.href = '/';
                 }
             });
 
-            document.getElementById('addUserBtn').addEventListener('click', function() {
-                alert('Add User feature: Create new user accounts with customizable roles and permissions.');
+            // Create assignment buttons
+            document.getElementById('createAssignmentBtn').addEventListener('click', openAssignmentModal);
+            document.getElementById('createAssignmentBtn2').addEventListener('click', openAssignmentModal);
+
+            // Modal controls
+            document.getElementById('cancelAssignment').addEventListener('click', closeAssignmentModal);
+            document.getElementById('saveAssignment').addEventListener('click', saveAssignment);
+
+            // Close modal on backdrop click
+            document.getElementById('assignmentModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeAssignmentModal();
+                }
             });
-        }
 
-        function handleLogin() {
-            const adminId = document.getElementById('adminId').value;
-            const password = document.getElementById('adminPassword').value;
-            const errorDiv = document.getElementById('loginError');
+            // Add class button
+            document.getElementById('addClassBtn').addEventListener('click', function() {
+                showNotification('Add new class feature would open a form to create a new class.', 'info');
+            });
 
-            // Demo credentials - in real implementation, this would be server-side validation
-            if (adminId === 'admin001' && password === 'SecureAdmin123') {
-                // Successful login - store in localStorage for persistence
-                localStorage.setItem('adminLoggedIn', 'true');
-                localStorage.setItem('currentAdmin', adminId);
-                localStorage.setItem('loginTime', new Date().toISOString());
-                showAdminDashboard();
-                errorDiv.classList.add('hidden');
-                console.log(`Admin ${adminId} logged in successfully at ${new Date().toISOString()}`);
-            } else {
-                // Failed login
-                errorDiv.classList.remove('hidden');
-                
-                // Log security event
-                console.log(`Failed admin login attempt: ${adminId} at ${new Date().toISOString()}`);
-                
-                // Clear form
-                document.getElementById('adminId').value = '';
-                document.getElementById('adminPassword').value = '';
-            }
-        }
-
-        function handleLogout() {
-            if (confirm('Are you sure you want to logout?')) {
-                const currentAdmin = localStorage.getItem('currentAdmin');
-                localStorage.removeItem('adminLoggedIn');
-                localStorage.removeItem('currentAdmin');
-                localStorage.removeItem('loginTime');
-                console.log(`Admin ${currentAdmin} logged out at ${new Date().toISOString()}`);
-                showLoginScreen();
-            }
-        }
-
-        function showAdminDashboard() {
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('adminDashboard').classList.remove('hidden');
-            
-            // Update current admin display
-            const currentAdmin = localStorage.getItem('currentAdmin') || 'admin001';
-            const loginTime = localStorage.getItem('loginTime');
-            document.getElementById('currentAdmin').textContent = currentAdmin;
-            
-            if (loginTime) {
-                console.log(`Dashboard loaded for ${currentAdmin}, logged in since ${new Date(loginTime).toLocaleString()}`);
-            }
-            
-            // Initialize charts
-            setTimeout(initializeCharts, 100);
-        }
-
-        function showLoginScreen() {
-            document.getElementById('loginScreen').classList.remove('hidden');
-            document.getElementById('adminDashboard').classList.add('hidden');
+            // Interactive elements
+            setupInteractiveElements();
         }
 
         function switchTab(tabName) {
@@ -828,115 +921,158 @@
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.add('hidden');
             });
-            
+
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('tab-active');
+                btn.classList.add('text-gray-600', 'hover:text-gray-900', 'hover:bg-gray-100');
+            });
+
             // Show selected tab content
-            document.getElementById(tabName + '-tab').classList.remove('hidden');
-            
-            // Update tab buttons
-            document.querySelectorAll('.tab-button').forEach(tab => {
-                tab.classList.remove('active');
-                tab.classList.add('text-gray-500', 'hover:text-gray-700');
-            });
-            
-            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-            document.querySelector(`[data-tab="${tabName}"]`).classList.remove('text-gray-500', 'hover:text-gray-700');
+            document.getElementById(`${tabName}-tab`).classList.remove('hidden');
+
+            // Add active class to selected tab button
+            const activeBtn = document.querySelector(`[data-tab="${tabName}"]`);
+            activeBtn.classList.add('tab-active');
+            activeBtn.classList.remove('text-gray-600', 'hover:text-gray-900', 'hover:bg-gray-100');
         }
 
-        function initializeCharts() {
-            // User Activity Chart
-            const userActivityCtx = document.getElementById('userActivityChart').getContext('2d');
-            new Chart(userActivityCtx, {
-                type: 'line',
-                data: {
-                    labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
-                    datasets: [{
-                        label: 'Active Users',
-                        data: [45, 23, 156, 342, 287, 98],
-                        borderColor: '#dc2626',
-                        backgroundColor: 'rgba(220, 38, 38, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    }
+        function openAssignmentModal() {
+            document.getElementById('assignmentModal').classList.remove('hidden');
+        }
+
+        function closeAssignmentModal() {
+            document.getElementById('assignmentModal').classList.add('hidden');
+            document.getElementById('assignmentForm').reset();
+        }
+
+        function saveAssignment() {
+            const form = document.getElementById('assignmentForm');
+            const formData = new FormData(form);
+            
+            // Here you would normally send the data to a server
+            showNotification('Assignment created successfully!', 'success');
+            closeAssignmentModal();
+        }
+
+        function setupInteractiveElements() {
+            // Make class cards clickable
+            document.querySelectorAll('.card-hover').forEach(card => {
+                if (card.querySelector('h3')) {
+                    card.addEventListener('click', function() {
+                        const className = this.querySelector('h3').textContent;
+                        showNotification(`Opening ${className} details...`, 'info');
+                    });
                 }
             });
 
-            // Performance Chart
-            const performanceCtx = document.getElementById('performanceChart').getContext('2d');
-            new Chart(performanceCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['CPU', 'Memory', 'Disk', 'Network'],
-                    datasets: [{
-                        data: [45, 68, 32, 23],
-                        backgroundColor: ['#dc2626', '#f59e0b', '#10b981', '#3b82f6']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
+            // Student action buttons
+            document.querySelectorAll('button').forEach(btn => {
+                const text = btn.textContent.trim();
+                if (text === 'View') {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        showNotification('Opening student profile...', 'info');
+                    });
+                } else if (text === 'Message') {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        showNotification('Opening message composer...', 'info');
+                    });
+                } else if (text === 'Grade') {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        showNotification('Opening grading interface...', 'info');
+                    });
+                } else if (text === 'Save') {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        showNotification('Grade saved successfully!', 'success');
+                    });
                 }
             });
 
-            // Security Events Chart
-            const securityCtx = document.getElementById('securityChart').getContext('2d');
-            new Chart(securityCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Login Attempts', 'Failed Logins', 'Blocked IPs', 'Scans Run'],
-                    datasets: [{
-                        label: 'Security Events',
-                        data: [1247, 23, 5, 12],
-                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#3b82f6']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    }
+            // Quick action buttons
+            document.querySelectorAll('.bg-green-50, .bg-blue-50, .bg-purple-50').forEach(btn => {
+                if (btn.textContent.includes('Schedule Class')) {
+                    btn.addEventListener('click', () => showNotification('Class scheduling interface opened!', 'info'));
+                } else if (btn.textContent.includes('Grade Assignments')) {
+                    btn.addEventListener('click', () => {
+                        switchTab('grades');
+                        showNotification('Switched to grades tab!', 'info');
+                    });
+                } else if (btn.textContent.includes('Message Students')) {
+                    btn.addEventListener('click', () => showNotification('Student messaging system opened!', 'info'));
                 }
             });
         }
 
-        // Security monitoring and session management
-        setInterval(function() {
-            // Check if admin is still logged in
-            const isLoggedIn = localStorage.getItem('adminLoggedIn');
-            const loginTime = localStorage.getItem('loginTime');
+        function updateGreeting() {
+            const hour = new Date().getHours();
+            const greetingElement = document.querySelector('h2');
             
-            if (isLoggedIn === 'true' && loginTime) {
-                // Check for session timeout (24 hours for demo, would be shorter in production)
-                const sessionAge = Date.now() - new Date(loginTime).getTime();
-                const maxSessionAge = 24 * 60 * 60 * 1000; // 24 hours
-                
-                if (sessionAge > maxSessionAge) {
-                    alert('Your admin session has expired for security reasons. Please log in again.');
-                    handleLogout();
-                }
+            let greeting = 'Good morning';
+            if (hour >= 12 && hour < 17) {
+                greeting = 'Good afternoon';
+            } else if (hour >= 17) {
+                greeting = 'Good evening';
             }
             
-            // Security monitoring
-            console.log('Security check performed at', new Date().toISOString());
-        }, 30000); // Check every 30 seconds
+            greetingElement.textContent = `${greeting}, Dr. Wilson! 👋`;
+        }
 
-        // Add page visibility change handler to maintain session
-        document.addEventListener('visibilitychange', function() {
-            if (!document.hidden && localStorage.getItem('adminLoggedIn') === 'true') {
-                console.log('Admin session maintained - page became visible');
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm notification`;
+            
+            // Set colors based on type
+            if (type === 'success') {
+                notification.className += ' bg-green-500 text-white';
+            } else if (type === 'error') {
+                notification.className += ' bg-red-500 text-white';
+            } else {
+                notification.className += ' bg-blue-500 text-white';
             }
-        });
+            
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <div class="flex-1">
+                        <p class="text-sm font-medium">${message}</p>
+                    </div>
+                    <button class="ml-3 text-white hover:text-gray-200" onclick="this.parentElement.parentElement.remove()">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 3000);
+        }
+
+        // Simulate real-time updates
+        function simulateRealTimeUpdates() {
+            setInterval(() => {
+                // Randomly update pending grades count
+                const pendingElement = document.querySelector('.text-2xl.font-bold');
+                if (pendingElement && Math.random() > 0.8) {
+                    const currentCount = parseInt(pendingElement.textContent);
+                    const newCount = Math.max(0, currentCount + (Math.random() > 0.5 ? 1 : -1));
+                    pendingElement.textContent = newCount;
+                }
+            }, 30000);
+        }
+
+        // Initialize real-time updates
+        simulateRealTimeUpdates();
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97c862fff51af655',t:'MTc1NzQzODc0Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98170ee844023e04',t:'MTc1ODI2MzY3Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
