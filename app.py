@@ -132,6 +132,14 @@ def admin_dashboard():
         return redirect(url_for('home'))
     return render_template('admin panel.html', timetable=timetable, users=users)
 
+@app.route('/admin_teachers')
+def admin_teachers():
+    if session.get('role') != 'admin':
+        return redirect(url_for('home'))
+    # For demo, show all teachers
+    teacher_list = [u for u in users if u['role'] == 'teacher']
+    return render_template('manageteachers.html', teachers=teacher_list)
+
 @app.route('/admin/mark_absent', methods=['POST'])
 def mark_teacher_absent():
     teacher_username = request.form.get('teacher_username')
