@@ -252,8 +252,6 @@ def classreport():
 
 @app.route('/analytics')
 def analytics():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
     return render_template('analytics.html')
 
 if __name__ == "__main__":
