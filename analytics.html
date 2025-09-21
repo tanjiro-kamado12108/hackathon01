@@ -4,9 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analytics Dashboard - Smart Classroom</title>
-    <link rel="stylesheet" href="analytics.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .card {
+            background: rgba(255,255,255,0.95);
+        }
+        .icon-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 4px 16px rgba(102,126,234,0.15);
+        }
+    </style>
 </head>
 <body class="gradient-bg">
     <div class="min-h-screen flex flex-col items-center justify-center p-4">
@@ -31,6 +44,61 @@
         </div>
         <a href="index.html" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-all">Back to Dashboard</a>
     </div>
-    <script src="analytics.js"></script>
+    <script>
+        // Booking Trends Chart
+        const bookingTrendsCtx = document.getElementById('bookingTrendsChart').getContext('2d');
+        new Chart(bookingTrendsCtx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+                datasets: [{
+                    label: 'Bookings',
+                    data: [12, 19, 14, 17, 22, 9],
+                    backgroundColor: 'rgba(102,126,234,0.2)',
+                    borderColor: '#667eea',
+                    borderWidth: 3,
+                    pointBackgroundColor: '#764ba2',
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        // Classroom Utilization Chart
+        const utilizationCtx = document.getElementById('utilizationChart').getContext('2d');
+        new Chart(utilizationCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Used', 'Available'],
+                datasets: [{
+                    label: 'Utilization',
+                    data: [75, 25],
+                    backgroundColor: [
+                        'rgba(16,185,129,0.8)',
+                        'rgba(102,126,234,0.2)'
+                    ],
+                    borderColor: [
+                        '#10b981',
+                        '#667eea'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+    </script>
 </body>
 </html>
