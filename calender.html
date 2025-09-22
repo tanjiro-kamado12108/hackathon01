@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Calendar - Smart Classroom</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .calendar-day {
+            transition: all 0.2s ease;
+            min-height: 120px;
+        }
+        
+        .calendar-day:hover {
+            background-color: #f8faff;
+            transform: scale(1.02);
+        }
+        
+        .calendar-day.today {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .calendar-day.other-month {
+            opacity: 0.3;
+        }
+        
+        .event-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 4px;
+        }
+        
+        .event-assignment { background-color: #ef4444; }
+        .event-class { background-color: #3b82f6; }
+        .event-exam { background-color: #f59e0b; }
+        .event-project { background-color: #10b981; }
+        .event-personal { background-color: #8b5cf6; }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .view-btn {
+            transition: all 0.2s ease;
+        }
+        
+        .view-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .agenda-item {
+            transition: all 0.2s ease;
+        }
+        
+        .agenda-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .notification {
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .priority-high { border-left: 4px solid #ef4444; }
+        .priority-medium { border-left: 4px solid #f59e0b; }
+        .priority-low { border-left: 4px solid #10b981; }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background-color: #e5e7eb;
+        }
+        
+        .time-slot {
+            border-bottom: 1px solid #e5e7eb;
+            min-height: 60px;
+        }
+        
+        .event-block {
+            border-radius: 4px;
+            padding: 4px 8px;
+            margin: 2px 0;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .event-block:hover {
+            transform: scale(1.02);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation Header -->
+    <nav class="bg-white shadow-lg border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo and Brand -->
+                <div class="flex items-center">
+                    <div class="bg-gradient-to-r from-purple-500 to-indigo-600 p-2 rounded-lg">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h1 class="text-xl font-bold text-gray-900">My Calendar</h1>
+                        <p class="text-sm text-gray-600">Smart Classroom</p>
+                    </div>
+                </div>
+
+                <!-- Student Info -->
+                <div class="flex items-center space-x-4">
+                    <div class="text-right">
+                        <p class="text-sm font-medium text-gray-900" id="studentName">Alex Johnson</p>
+                        <p class="text-xs text-gray-600">Computer Science Major</p>
+                    </div>
+                    <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full flex items-center justify-center">
+                        <span class="text-white font-semibold text-sm" id="studentInitials">AJ</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Calendar Controls -->
+    <div class="bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+                <!-- Calendar Navigation -->
+                <div class="flex items-center space-x-4">
+                    <button id="prevMonth" class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <h2 id="currentMonth" class="text-2xl font-bold text-gray-900">December 2024</h2>
+                    <button id="nextMonth" class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                    <button id="todayBtn" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+                        Today
+                    </button>
+                </div>
+
+                <!-- View Controls -->
+                <div class="flex items-center space-x-2">
+                    <div class="flex bg-gray-100 rounded-lg p-1">
+                        <button class="view-btn active px-4 py-2 rounded-md text-sm font-medium" data-view="month">Month</button>
+                        <button class="view-btn px-4 py-2 rounded-md text-sm font-medium" data-view="week">Week</button>
+                        <button class="view-btn px-4 py-2 rounded-md text-sm font-medium" data-view="agenda">Agenda</button>
+                    </div>
+                    <button id="addEventBtn" class="btn-primary text-white px-4 py-2 rounded-lg font-medium">
+                        <svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+                        </svg>
+                        Add Event
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Calendar View -->
+            <div class="lg:col-span-3">
+                <!-- Month View -->
+                <div id="monthView" class="bg-white rounded-xl shadow-sm border border-gray-200 fade-in">
+                    <!-- Calendar Header -->
+                    <div class="grid grid-cols-7 bg-gray-50 rounded-t-xl">
+                        <div class="p-4 text-center font-semibold text-gray-700 border-r border-gray-200">Sun</div>
+                        <div class="p-4 text-center font-semibold text-gray-700 border-r border-gray-200">Mon</div>
+                        <div class="p-4 text-center font-semibold text-gray-700 border-r border-gray-200">Tue</div>
+                        <div class="p-4 text-center font-semibold text-gray-700 border-r border-gray-200">Wed</div>
+                        <div class="p-4 text-center font-semibold text-gray-700 border-r border-gray-200">Thu</div>
+                        <div class="p-4 text-center font-semibold text-gray-700 border-r border-gray-200">Fri</div>
+                        <div class="p-4 text-center font-semibold text-gray-700">Sat</div>
+                    </div>
+                    
+                    <!-- Calendar Grid -->
+                    <div id="calendarGrid" class="calendar-grid">
+                        <!-- Calendar days will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Week View -->
+                <div id="weekView" class="bg-white rounded-xl shadow-sm border border-gray-200 fade-in hidden">
+                    <div class="p-6">
+                        <div class="grid grid-cols-8 gap-1">
+                            <!-- Time column -->
+                            <div class="text-right pr-4">
+                                <div class="text-xs text-gray-500 h-12"></div>
+                                <div class="time-slot flex items-center justify-end text-xs text-gray-500">8 AM</div>
+                                <div class="time-slot flex items-center justify-end text-xs text-gray-500">9 AM</div>
+                                <div class="time-slot flex items-center justify-end text-xs text-gray-500">10 AM</div>
+                                <div class="time-slot flex items-center justify-end text-xs text-gray-500">11 AM</div>
+                                <div class="time-slot flex items-center justify-end text-xs text-gray-500">12 PM</div>
+                                <div class="time-slot flex items-center justify-end text-xs text-gray-500">1 PM</div>
+                                <div class="time-slot flex items-center justify-end text-xs text-gray-500">2 PM</div>
+                                <div class="time-slot flex items-center justify-end text-xs text-gray-500">3 PM</div>
+                                <div class="time-slot flex items-center justify-end text-xs text-gray-500">4 PM</div>
+                                <div class="time-slot flex items-center justify-end text-xs text-gray-500">5 PM</div>
+                            </div>
+                            
+                            <!-- Week days -->
+                            <div id="weekDays">
+                                <!-- Week view will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Agenda View -->
+                <div id="agendaView" class="bg-white rounded-xl shadow-sm border border-gray-200 fade-in hidden">
+                    <div class="p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-6">Upcoming Events</h3>
+                        <div id="agendaList" class="space-y-4">
+                            <!-- Agenda items will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Mini Calendar -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 fade-in">
+                    <div class="p-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-900">Quick Navigation</h3>
+                    </div>
+                    <div class="p-4">
+                        <div id="miniCalendar" class="text-sm">
+                            <!-- Mini calendar will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Legend -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 fade-in">
+                    <div class="p-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-900">Event Types</h3>
+                    </div>
+                    <div class="p-4 space-y-3">
+                        <div class="flex items-center">
+                            <span class="event-dot event-assignment"></span>
+                            <span class="text-sm text-gray-700">Assignments</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="event-dot event-class"></span>
+                            <span class="text-sm text-gray-700">Classes</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="event-dot event-exam"></span>
+                            <span class="text-sm text-gray-700">Exams</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="event-dot event-project"></span>
+                            <span class="text-sm text-gray-700">Projects</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="event-dot event-personal"></span>
+                            <span class="text-sm text-gray-700">Personal</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Today's Schedule -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 fade-in">
+                    <div class="p-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-900">Today's Schedule</h3>
+                    </div>
+                    <div class="p-4">
+                        <div id="todaySchedule" class="space-y-3">
+                            <!-- Today's events will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 fade-in">
+                    <div class="p-4">
+                        <h4 class="text-sm font-semibold text-blue-900 mb-3">📊 This Week</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-blue-800">Assignments Due:</span>
+                                <span class="font-semibold text-blue-900" id="weekAssignments">3</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-blue-800">Classes:</span>
+                                <span class="font-semibold text-blue-900" id="weekClasses">12</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-blue-800">Exams:</span>
+                                <span class="font-semibold text-blue-900" id="weekExams">1</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Event Modal -->
+    <div id="addEventModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-gray-900">Add New Event</h3>
+                    <button id="closeModal" class="text-gray-500 hover:text-gray-700">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <form id="eventForm" class="p-6 space-y-4">
+                <div>
+                    <label for="eventTitle" class="block text-sm font-medium text-gray-700 mb-2">Event Title</label>
+                    <input type="text" id="eventTitle" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Enter event title...">
+                </div>
+                
+                <div>
+                    <label for="eventType" class="block text-sm font-medium text-gray-700 mb-2">Event Type</label>
+                    <select id="eventType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="assignment">Assignment</option>
+                        <option value="class">Class</option>
+                        <option value="exam">Exam</option>
+                        <option value="project">Project</option>
+                        <option value="personal">Personal</option>
+                    </select>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="eventDate" class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                        <input type="date" id="eventDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="eventTime" class="block text-sm font-medium text-gray-700 mb-2">Time</label>
+                        <input type="time" id="eventTime" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="eventDescription" class="block text-sm font-medium text-gray-700 mb-2">Description (Optional)</label>
+                    <textarea id="eventDescription" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Add event details..."></textarea>
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" id="cancelEvent" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn-primary text-white px-6 py-2 rounded-lg font-medium">
+                        Add Event
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Event Details Modal -->
+    <div id="eventDetailsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-gray-900">Event Details</h3>
+                    <button id="closeDetailsModal" class="text-gray-500 hover:text-gray-700">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div id="eventDetailsContent" class="p-6">
+                <!-- Event details will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCalendar();
+            setupEventListeners();
+            loadSampleEvents();
+        });
+
+        let currentDate = new Date();
+        let currentView = 'month';
+        let events = [];
+
+        // Sample events data
+        const sampleEvents = [
+            {
+                id: 1,
+                title: 'Math Assignment Due',
+                type: 'assignment',
+                date: new Date(2024, 11, 15),
+                time: '23:59',
+                description: 'Calculus problem set chapters 5-6',
+                priority: 'high'
+            },
+            {
+                id: 2,
+                title: 'Computer Science Lecture',
+                type: 'class',
+                date: new Date(2024, 11, 16),
+                time: '10:00',
+                description: 'Data Structures and Algorithms',
+                priority: 'medium'
+            },
+            {
+                id: 3,
+                title: 'Physics Lab Report',
+                type: 'assignment',
+                date: new Date(2024, 11, 18),
+                time: '17:00',
+                description: 'Quantum mechanics experiment analysis',
+                priority: 'high'
+            },
+            {
+                id: 4,
+                title: 'History Midterm',
+                type: 'exam',
+                date: new Date(2024, 11, 20),
+                time: '14:00',
+                description: 'World War II and Cold War era',
+                priority: 'high'
+            },
+            {
+                id: 5,
+                title: 'Group Project Meeting',
+                type: 'project',
+                date: new Date(2024, 11, 17),
+                time: '15:30',
+                description: 'Final presentation preparation',
+                priority: 'medium'
+            },
+            {
+                id: 6,
+                title: 'Study Group',
+                type: 'personal',
+                date: new Date(2024, 11, 19),
+                time: '19:00',
+                description: 'Math study session with classmates',
+                priority: 'low'
+            }
+        ];
+
+        function initializeCalendar() {
+            updateCalendarDisplay();
+            updateTodaySchedule();
+            updateWeekStats();
+        }
+
+        function setupEventListeners() {
+            // Navigation
+            document.getElementById('prevMonth').addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                updateCalendarDisplay();
+            });
+
+            document.getElementById('nextMonth').addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                updateCalendarDisplay();
+            });
+
+            document.getElementById('todayBtn').addEventListener('click', () => {
+                currentDate = new Date();
+                updateCalendarDisplay();
+            });
+
+            // View switching
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentView = this.dataset.view;
+                    switchView(currentView);
+                });
+            });
+
+            // Modal controls
+            document.getElementById('addEventBtn').addEventListener('click', showAddEventModal);
+            document.getElementById('closeModal').addEventListener('click', hideAddEventModal);
+            document.getElementById('cancelEvent').addEventListener('click', hideAddEventModal);
+            document.getElementById('closeDetailsModal').addEventListener('click', hideEventDetailsModal);
+
+            // Form submission
+            document.getElementById('eventForm').addEventListener('submit', handleAddEvent);
+        }
+
+        function loadSampleEvents() {
+            events = [...sampleEvents];
+            updateCalendarDisplay();
+            updateTodaySchedule();
+            updateWeekStats();
+        }
+
+        function updateCalendarDisplay() {
+            const monthNames = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+
+            document.getElementById('currentMonth').textContent = 
+                `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+
+            if (currentView === 'month') {
+                renderMonthView();
+            } else if (currentView === 'week') {
+                renderWeekView();
+            } else if (currentView === 'agenda') {
+                renderAgendaView();
+            }
+        }
+
+        function renderMonthView() {
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+
+            const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+            const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+            const today = new Date();
+            
+            for (let i = 0; i < 42; i++) {
+                const cellDate = new Date(startDate);
+                cellDate.setDate(startDate.getDate() + i);
+                
+                const dayEvents = events.filter(event => 
+                    event.date.toDateString() === cellDate.toDateString()
+                );
+
+                const isToday = cellDate.toDateString() === today.toDateString();
+                const isCurrentMonth = cellDate.getMonth() === currentDate.getMonth();
+                
+                const dayCell = document.createElement('div');
+                dayCell.className = `calendar-day bg-white p-2 cursor-pointer ${
+                    isToday ? 'today' : ''
+                } ${!isCurrentMonth ? 'other-month' : ''}`;
+                
+                dayCell.innerHTML = `
+                    <div class="font-semibold text-sm mb-1">${cellDate.getDate()}</div>
+                    <div class="space-y-1">
+                        ${dayEvents.slice(0, 3).map(event => `
+                            <div class="event-block bg-${getEventColor(event.type)}-100 text-${getEventColor(event.type)}-800 text-xs truncate" 
+                                 onclick="showEventDetails(${event.id})">
+                                <span class="event-dot event-${event.type}"></span>
+                                ${event.title}
+                            </div>
+                        `).join('')}
+                        ${dayEvents.length > 3 ? `
+                            <div class="text-xs text-gray-500">+${dayEvents.length - 3} more</div>
+                        ` : ''}
+                    </div>
+                `;
+
+                dayCell.addEventListener('click', () => {
+                    if (dayEvents.length === 1) {
+                        showEventDetails(dayEvents[0].id);
+                    } else if (dayEvents.length > 1) {
+                        showDayEvents(cellDate, dayEvents);
+                    } else {
+                        showAddEventModal(cellDate);
+                    }
+                });
+
+                grid.appendChild(dayCell);
+            }
+        }
+
+        function renderWeekView() {
+            const weekDays = document.getElementById('weekDays');
+            if (!weekDays) return;
+
+            const startOfWeek = new Date(currentDate);
+            startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+
+            weekDays.innerHTML = '';
+            
+            for (let i = 0; i < 7; i++) {
+                const dayDate = new Date(startOfWeek);
+                dayDate.setDate(startOfWeek.getDate() + i);
+                
+                const dayEvents = events.filter(event => 
+                    event.date.toDateString() === dayDate.toDateString()
+                );
+
+                const dayColumn = document.createElement('div');
+                dayColumn.className = 'space-y-1';
+                
+                // Day header
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'text-center p-2 font-semibold text-sm bg-gray-50 rounded';
+                dayHeader.textContent = `${dayDate.toLocaleDateString('en-US', { weekday: 'short' })} ${dayDate.getDate()}`;
+                dayColumn.appendChild(dayHeader);
+
+                // Time slots
+                for (let hour = 8; hour <= 17; hour++) {
+                    const timeSlot = document.createElement('div');
+                    timeSlot.className = 'time-slot p-1 border-b border-gray-100';
+                    
+                    const slotEvents = dayEvents.filter(event => {
+                        const eventHour = parseInt(event.time.split(':')[0]);
+                        return eventHour === hour;
+                    });
+
+                    slotEvents.forEach(event => {
+                        const eventBlock = document.createElement('div');
+                        eventBlock.className = `event-block bg-${getEventColor(event.type)}-100 text-${getEventColor(event.type)}-800`;
+                        eventBlock.textContent = event.title;
+                        eventBlock.onclick = () => showEventDetails(event.id);
+                        timeSlot.appendChild(eventBlock);
+                    });
+
+                    dayColumn.appendChild(timeSlot);
+                }
+
+                weekDays.appendChild(dayColumn);
+            }
+        }
+
+        function renderAgendaView() {
+            const agendaList = document.getElementById('agendaList');
+            const sortedEvents = [...events].sort((a, b) => a.date - b.date);
+            const upcomingEvents = sortedEvents.filter(event => event.date >= new Date());
+
+            if (upcomingEvents.length === 0) {
+                agendaList.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                        </svg>
+                        <p class="text-sm">No upcoming events</p>
+                    </div>
+                `;
+                return;
+            }
+
+            agendaList.innerHTML = upcomingEvents.map(event => `
+                <div class="agenda-item priority-${event.priority} bg-white border border-gray-200 rounded-lg p-4 cursor-pointer" 
+                     onclick="showEventDetails(${event.id})">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center mb-2">
+                                <span class="event-dot event-${event.type}"></span>
+                                <h4 class="font-semibold text-gray-900">${event.title}</h4>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-2">${event.description}</p>
+                            <div class="flex items-center text-xs text-gray-500">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                                </svg>
+                                ${event.date.toLocaleDateString()} at ${event.time}
+                            </div>
+                        </div>
+                        <span class="px-2 py-1 bg-${getEventColor(event.type)}-100 text-${getEventColor(event.type)}-800 text-xs font-medium rounded-full">
+                            ${event.type}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function switchView(view) {
+            document.getElementById('monthView').classList.add('hidden');
+            document.getElementById('weekView').classList.add('hidden');
+            document.getElementById('agendaView').classList.add('hidden');
+
+            document.getElementById(`${view}View`).classList.remove('hidden');
+            updateCalendarDisplay();
+        }
+
+        function updateTodaySchedule() {
+            const today = new Date();
+            const todayEvents = events.filter(event => 
+                event.date.toDateString() === today.toDateString()
+            ).sort((a, b) => a.time.localeCompare(b.time));
+
+            const scheduleContainer = document.getElementById('todaySchedule');
+            
+            if (todayEvents.length === 0) {
+                scheduleContainer.innerHTML = `
+                    <div class="text-center py-4 text-gray-500">
+                        <p class="text-sm">No events today</p>
+                        <p class="text-xs text-gray-400">Enjoy your free time! 🎉</p>
+                    </div>
+                `;
+                return;
+            }
+
+            scheduleContainer.innerHTML = todayEvents.map(event => `
+                <div class="flex items-center p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
+                     onclick="showEventDetails(${event.id})">
+                    <span class="event-dot event-${event.type}"></span>
+                    <div class="flex-1">
+                        <p class="text-sm font-medium text-gray-900">${event.title}</p>
+                        <p class="text-xs text-gray-600">${event.time}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateWeekStats() {
+            const startOfWeek = new Date();
+            startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+            const weekEvents = events.filter(event => 
+                event.date >= startOfWeek && event.date <= endOfWeek
+            );
+
+            const assignments = weekEvents.filter(e => e.type === 'assignment').length;
+            const classes = weekEvents.filter(e => e.type === 'class').length;
+            const exams = weekEvents.filter(e => e.type === 'exam').length;
+
+            document.getElementById('weekAssignments').textContent = assignments;
+            document.getElementById('weekClasses').textContent = classes;
+            document.getElementById('weekExams').textContent = exams;
+        }
+
+        function showAddEventModal(selectedDate = null) {
+            if (selectedDate) {
+                document.getElementById('eventDate').value = selectedDate.toISOString().split('T')[0];
+            }
+            document.getElementById('addEventModal').classList.remove('hidden');
+        }
+
+        function hideAddEventModal() {
+            document.getElementById('addEventModal').classList.add('hidden');
+            document.getElementById('eventForm').reset();
+        }
+
+        function showEventDetails(eventId) {
+            const event = events.find(e => e.id === eventId);
+            if (!event) return;
+
+            const content = document.getElementById('eventDetailsContent');
+            content.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex items-center">
+                        <span class="event-dot event-${event.type}"></span>
+                        <h4 class="text-xl font-semibold text-gray-900">${event.title}</h4>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <span class="font-medium text-gray-700">Type:</span>
+                            <span class="ml-2 px-2 py-1 bg-${getEventColor(event.type)}-100 text-${getEventColor(event.type)}-800 rounded-full text-xs font-medium">
+                                ${event.type}
+                            </span>
+                        </div>
+                        <div>
+                            <span class="font-medium text-gray-700">Priority:</span>
+                            <span class="ml-2 px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">
+                                ${event.priority}
+                            </span>
+                        </div>
+                        <div>
+                            <span class="font-medium text-gray-700">Date:</span>
+                            <span class="ml-2">${event.date.toLocaleDateString()}</span>
+                        </div>
+                        <div>
+                            <span class="font-medium text-gray-700">Time:</span>
+                            <span class="ml-2">${event.time}</span>
+                        </div>
+                    </div>
+                    
+                    ${event.description ? `
+                        <div>
+                            <span class="font-medium text-gray-700">Description:</span>
+                            <p class="mt-1 text-gray-600">${event.description}</p>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                        <button onclick="editEvent(${event.id})" class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg font-medium hover:bg-blue-200 transition-colors">
+                            Edit
+                        </button>
+                        <button onclick="deleteEvent(${event.id})" class="px-4 py-2 bg-red-100 text-red-700 rounded-lg font-medium hover:bg-red-200 transition-colors">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('eventDetailsModal').classList.remove('hidden');
+        }
+
+        function hideEventDetailsModal() {
+            document.getElementById('eventDetailsModal').classList.add('hidden');
+        }
+
+        function handleAddEvent(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('eventTitle').value;
+            const type = document.getElementById('eventType').value;
+            const date = new Date(document.getElementById('eventDate').value);
+            const time = document.getElementById('eventTime').value;
+            const description = document.getElementById('eventDescription').value;
+
+            if (!title || !date || !time) {
+                showNotification('Please fill in all required fields.', 'error');
+                return;
+            }
+
+            const newEvent = {
+                id: Date.now(),
+                title,
+                type,
+                date,
+                time,
+                description,
+                priority: 'medium'
+            };
+
+            events.push(newEvent);
+            updateCalendarDisplay();
+            updateTodaySchedule();
+            updateWeekStats();
+            hideAddEventModal();
+            
+            showNotification('Event added successfully! 📅', 'success');
+        }
+
+        function editEvent(eventId) {
+            showNotification('Edit functionality would open here with pre-filled form.', 'info');
+            hideEventDetailsModal();
+        }
+
+        function deleteEvent(eventId) {
+            if (confirm('Are you sure you want to delete this event?')) {
+                events = events.filter(e => e.id !== eventId);
+                updateCalendarDisplay();
+                updateTodaySchedule();
+                updateWeekStats();
+                hideEventDetailsModal();
+                showNotification('Event deleted successfully.', 'success');
+            }
+        }
+
+        function getEventColor(type) {
+            const colors = {
+                assignment: 'red',
+                class: 'blue',
+                exam: 'yellow',
+                project: 'green',
+                personal: 'purple'
+            };
+            return colors[type] || 'gray';
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm notification`;
+            
+            if (type === 'success') {
+                notification.className += ' bg-green-500 text-white';
+            } else if (type === 'error') {
+                notification.className += ' bg-red-500 text-white';
+            } else if (type === 'warning') {
+                notification.className += ' bg-yellow-500 text-white';
+            } else {
+                notification.className += ' bg-blue-500 text-white';
+            }
+            
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <div class="flex-1">
+                        <p class="text-sm font-medium">${message}</p>
+                    </div>
+                    <button class="ml-3 text-white hover:text-gray-200" onclick="this.parentElement.parentElement.remove()">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 4000);
+        }
+
+        console.log('Student calendar initialized successfully');
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'982fd647622821dd',t:'MTc1ODUyMzUwMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
