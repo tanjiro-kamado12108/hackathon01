@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 
-app = Flask(__name__, template_folder='.')  # Look for templates in current directory
+app = Flask(__name__)  # Default template folder is 'templates'
 app.secret_key = "supersecretkey"
 
 # In-memory data
