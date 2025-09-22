@@ -1,177 +1,1336 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart Classroom & Timetable Scheduler</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    body { font-family: 'Inter', sans-serif; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Classroom & Timetable Scheduler</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
 
-    .gradient-bg {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    .card-hover { transition: all 0.3s ease; }
-    .card-hover:hover { transform: translateY(-2px); box-shadow: 0 20px 40px rgba(59, 130, 246, 0.1); }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
 
-    .input-focus { transition: all 0.2s ease; }
-    .input-focus:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        
+        .schedule-slot {
+            transition: all 0.2s ease;
+        }
+        
+        .schedule-slot:hover {
+            background-color: #f8fafc;
+            border-color: #3b82f6;
+        }
+        
 
-    .btn-primary {
-        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-        transition: all 0.3s ease;
-    }
-    .btn-primary:hover {
-        background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
-        transform: translateY(-1px);
-        box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
-    }
+        
+        .occupied {
+            background-color: #dbeafe;
+            border-color: #3b82f6;
+        }
+        
 
-    .floating-shapes { position: absolute; width: 100%; height: 100%; overflow: hidden; z-index: 0; }
-    .shape { position: absolute; opacity: 0.1; animation: float 6s ease-in-out infinite; }
-    .shape:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
-    .shape:nth-child(2) { top: 60%; right: 10%; animation-delay: 2s; }
-    .shape:nth-child(3) { bottom: 20%; left: 20%; animation-delay: 4s; }
+        
+        .available {
+            background-color: #dcfce7;
+            border-color: #22c55e;
+        }
+        
 
-    @keyframes float {
-        0%, 100% { transform: translateY(0px) rotate(0deg); }
-        50% { transform: translateY(-20px) rotate(10deg); }
-    }
+        
 
-    .schedule-slot { transition: all 0.2s ease; text-align: center; }
-    .schedule-slot:hover { background-color: #f8fafc; border-color: #3b82f6; }
-
-    .occupied { background-color: #dbeafe; border-color: #3b82f6; }
-    .available { background-color: #dcfce7; border-color: #22c55e; }
-    .backlog { background-color: #fde68a; border-color: #fbbf24; }
-    .backlog:hover { background-color: #fcd34d; border-color: #f59e0b; }
-  </style>
+    </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-6">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-white bg-opacity-20 p-2 rounded-lg">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold">Smart Classroom</h1>
+                        <p class="text-blue-100">Timetable & Resource Manager</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg transition-all">
+                        📊 Analytics
+                    </button>
+                    <button id="settingsBtn" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg transition-all">
+                        ⚙️ Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
 
-  <!-- Header -->
-  <header class="gradient-bg text-white shadow-lg">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center py-6">
-        <div class="flex items-center space-x-3">
-          <div class="bg-white bg-opacity-20 p-2 rounded-lg">
-            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
-            </svg>
-          </div>
-          <div>
-            <h1 class="text-2xl font-bold">Smart Classroom</h1>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Total Classrooms</p>
+                        <p class="text-2xl font-bold text-gray-900">24</p>
+                    </div>
+                    <div class="bg-blue-100 p-3 rounded-lg">
+                        🏫
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Available Now</p>
+                        <p class="text-2xl font-bold text-green-600">8</p>
+                    </div>
+                    <div class="bg-green-100 p-3 rounded-lg">
+                        ✅
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">In Use</p>
+                        <p class="text-2xl font-bold text-orange-600">12</p>
+                    </div>
+                    <div class="bg-orange-100 p-3 rounded-lg">
+                        📚
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Maintenance</p>
+                        <p class="text-2xl font-bold text-red-600">4</p>
+                    </div>
+                    <div class="bg-red-100 p-3 rounded-lg">
+                        🔧
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Timetable Section -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-semibold text-gray-900">Today's Schedule</h2>
+                        <div class="flex space-x-2">
+                            <select class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                                <option>Room A101</option>
+                                <option>Room A102</option>
+                                <option>Room B201</option>
+                                <option>Lab C301</option>
+                            </select>
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                                + New Booking
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <div class="grid grid-cols-8 gap-2 text-xs font-medium text-gray-500 mb-4">
+                            <div>Time</div>
+                            <div>Monday</div>
+                            <div>Tuesday</div>
+                            <div>Wednesday</div>
+                            <div>Thursday</div>
+                            <div>Friday</div>
+                            <div>Saturday</div>
+                            <div>Sunday</div>
+                        </div>
+                        
+                        <div class="grid grid-cols-8 gap-2 items-center schedule-slot border border-gray-200 rounded-lg p-2">
+                            <div class="text-sm font-medium text-gray-700">08:00</div>
+                            <div class="occupied p-2 rounded text-xs text-center cursor-pointer">Math 101</div>
+                            <div class="available p-2 rounded text-xs text-center cursor-pointer">Available</div>
+                            <div class="occupied p-2 rounded text-xs text-center cursor-pointer">Physics</div>
+                            <div class="available p-2 rounded text-xs text-center cursor-pointer">Available</div>
+                            <div class="occupied p-2 rounded text-xs text-center cursor-pointer">Chemistry</div>
+                            <div class="available p-2 rounded text-xs text-center cursor-pointer">Available</div>
+                            <div class="available p-2 rounded text-xs text-center cursor-pointer">Available</div>
+                        </div>
+                        
+                        <div class="grid grid-cols-8 gap-2 items-center schedule-slot border border-gray-200 rounded-lg p-2">
+                            <div class="text-sm font-medium text-gray-700">10:00</div>
+                            <div class="available p-2 rounded text-xs text-center cursor-pointer">Available</div>
+                            <div class="occupied p-2 rounded text-xs text-center cursor-pointer">Biology</div>
+                            <div class="available p-2 rounded text-xs text-center cursor-pointer">Available</div>
+                            <div class="occupied p-2 rounded text-xs text-center cursor-pointer">English</div>
+                            <div class="available p-2 rounded text-xs text-center cursor-pointer">Available</div>
+                            <div class="occupied p-2 rounded text-xs text-center cursor-pointer">History</div>
+                            <div class="available p-2 rounded text-xs text-center cursor-pointer">Available</div>
+                        </div>
+                        
+                        <div class="grid grid-cols-8 gap-2 items-center schedule-slot border border-gray-200 rounded-lg p-2">
+                            <div class="text-sm font-medium text-gray-700">12:00</div>
+                            <div class="occupied p-2 rounded text-xs text-center cursor-pointer">Lunch Break</div>
+                            <div class="occupied p-2 rounded text-xs text-center cursor-pointer">Lunch Break</div>
+                            <div class="occupied p-2 rounded text-xs text-center cursor-pointer">Lunch Break</div>
+                            <div class="occupied p-2 rounded text-xs text-center cursor-pointer">Lunch Break</div>
+                            <div class="occupied p-2 rounded text-xs text-center cursor-pointer">Lunch Break</div>
+                            <div class="occupied p-2 rounded text-xs text-center cursor-pointer">Lunch Break</div>
+                            <div class="available p-2 rounded text-xs text-center cursor-pointer">Available</div>
+                        </div>
+                        
+                        <div class="grid grid-cols-8 gap-2 items-center schedule-slot border border-gray-200 rounded-lg p-2">
+                            <div class="text-sm font-medium text-gray-700">14:00</div>
+                            <div class="occupied p-2 rounded text-xs text-center cursor-pointer">Computer Sci</div>
+                            <div class="available p-2 rounded text-xs text-center cursor-pointer">Available</div>
+                            <div class="occupied p-2 rounded text-xs text-center cursor-pointer">Art Class</div>
+                            <div class="available p-2 rounded text-xs text-center cursor-pointer">Available</div>
+                            <div class="occupied p-2 rounded text-xs text-center cursor-pointer">Music</div>
+                            <div class="available p-2 rounded text-xs text-center cursor-pointer">Available</div>
+                            <div class="available p-2 rounded text-xs text-center cursor-pointer">Available</div>
+                        </div>
+                        
+                        <div class="grid grid-cols-8 gap-2 items-center schedule-slot border border-gray-200 rounded-lg p-2">
+                            <div class="text-sm font-medium text-gray-700">16:00</div>
+                            <div class="available p-2 rounded text-xs text-center cursor-pointer">Available</div>
+                            <div class="occupied p-2 rounded text-xs text-center cursor-pointer">Study Hall</div>
+                            <div class="available p-2 rounded text-xs text-center cursor-pointer">Available</div>
+                            <div class="occupied p-2 rounded text-xs text-center cursor-pointer">Lab Work</div>
+                            <div class="available p-2 rounded text-xs text-center cursor-pointer">Available</div>
+                            <div class="available p-2 rounded text-xs text-center cursor-pointer">Available</div>
+                            <div class="available p-2 rounded text-xs text-center cursor-pointer">Available</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 flex items-center space-x-4 text-sm">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 bg-blue-200 border border-blue-400 rounded"></div>
+                            <span class="text-gray-600">Occupied</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 bg-green-200 border border-green-400 rounded"></div>
+                            <span class="text-gray-600">Available</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-6">
+                <!-- Quick Actions -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 transition-colors duration-300">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
+                    <div class="space-y-3">
+                        <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
+                            <span>📅</span>
+                            <span>Book Classroom</span>
+                        </button>
+                        <button class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
+                            <span>👥</span>
+                            <span>Manage Teachers</span>
+                        </button>
+                        <button class="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
+                            <span>📊</span>
+                            <span>View Reports</span>
+                        </button>
+                        <button class="w-full bg-orange-600 hover:bg-orange-700 text-white py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
+                            <span>🔧</span>
+                            <span>Maintenance</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Upcoming Classes -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 transition-colors duration-300">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Upcoming Classes</h3>
+                    <div class="space-y-4">
+                        <div class="border-l-4 border-blue-500 pl-4 py-2">
+                            <p class="font-medium text-gray-900 dark:text-white">Mathematics 101</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Room A101 • 10:00 AM</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-500">Prof. Johnson</p>
+                        </div>
+                        <div class="border-l-4 border-green-500 pl-4 py-2">
+                            <p class="font-medium text-gray-900 dark:text-white">Physics Lab</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Lab C301 • 2:00 PM</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-500">Dr. Smith</p>
+                        </div>
+                        <div class="border-l-4 border-purple-500 pl-4 py-2">
+                            <p class="font-medium text-gray-900 dark:text-white">Computer Science</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Room B205 • 4:00 PM</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-500">Prof. Davis</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Backlog Classes -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 transition-colors duration-300">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Backlog Classes</h3>
+                        <span class="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 text-xs font-medium px-2.5 py-0.5 rounded-full">5 Pending</span>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="border-l-4 border-red-500 pl-4 py-2 bg-red-50 dark:bg-red-900/20 rounded-r-lg">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-gray-900 dark:text-white">Advanced Calculus</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Originally: Mon 2:00 PM</p>
+                                    <p class="text-xs text-red-600 dark:text-red-400">Cancelled - Teacher Sick</p>
+                                </div>
+                                <button class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium">Reschedule</button>
+                            </div>
+                        </div>
+                        
+                        <div class="border-l-4 border-orange-500 pl-4 py-2 bg-orange-50 dark:bg-orange-900/20 rounded-r-lg">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-gray-900 dark:text-white">Chemistry Lab</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Originally: Tue 10:00 AM</p>
+                                    <p class="text-xs text-orange-600 dark:text-orange-400">Postponed - Equipment Issue</p>
+                                </div>
+                                <button class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium">Reschedule</button>
+                            </div>
+                        </div>
+                        
+                        <div class="border-l-4 border-yellow-500 pl-4 py-2 bg-yellow-50 dark:bg-yellow-900/20 rounded-r-lg">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-gray-900 dark:text-white">English Literature</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Originally: Wed 11:00 AM</p>
+                                    <p class="text-xs text-yellow-600 dark:text-yellow-400">Rescheduled - Room Conflict</p>
+                                </div>
+                                <button class="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 text-sm font-medium">Confirm</button>
+                            </div>
+                        </div>
+                        
+                        <div class="border-l-4 border-red-500 pl-4 py-2 bg-red-50 dark:bg-red-900/20 rounded-r-lg">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-gray-900 dark:text-white">Biology Practical</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Originally: Thu 3:00 PM</p>
+                                    <p class="text-xs text-red-600 dark:text-red-400">Cancelled - Power Outage</p>
+                                </div>
+                                <button class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium">Reschedule</button>
+                            </div>
+                        </div>
+                        
+                        <div class="border-l-4 border-orange-500 pl-4 py-2 bg-orange-50 dark:bg-orange-900/20 rounded-r-lg">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-gray-900 dark:text-white">Art Workshop</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Originally: Fri 1:00 PM</p>
+                                    <p class="text-xs text-orange-600 dark:text-orange-400">Postponed - Material Shortage</p>
+                                </div>
+                                <button class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium">Reschedule</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                        <button class="w-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg text-sm transition-colors">
+                            View All Backlog Classes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Room Status -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 transition-colors duration-300">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Room Status</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                            <div>
+                                <p class="font-medium text-gray-900 dark:text-white">Room A101</p>
+                                <p class="text-sm text-green-600 dark:text-green-400">Available</p>
+                            </div>
+                            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                            <div>
+                                <p class="font-medium text-gray-900 dark:text-white">Room B205</p>
+                                <p class="text-sm text-blue-600 dark:text-blue-400">In Use</p>
+                            </div>
+                            <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                            <div>
+                                <p class="font-medium text-gray-900 dark:text-white">Lab C301</p>
+                                <p class="text-sm text-red-600 dark:text-red-400">Maintenance</p>
+                            </div>
+                            <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto transition-colors duration-300">
+            <div class="p-6">
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Settings</h2>
+                    <button id="closeSettings" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- User Profile Section -->
+                <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <div class="flex items-center space-x-3 mb-3">
+                        <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                            JD
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900 dark:text-white">John Doe</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Administrator</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-500">john.doe@school.edu</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Authentication Section -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                        <span class="mr-2">🔐</span>
+                        Account Management
+                    </h3>
+                    
+                    <!-- Auth Toggle Buttons -->
+                    <div id="authButtons" class="space-y-3">
+                        <button id="showLoginBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
+                            <span>🔑</span>
+                            <span>Login to Different Account</span>
+                        </button>
+                        <button id="showSignupBtn" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
+                            <span>📝</span>
+                            <span>Create New Account</span>
+                        </button>
+                        <button id="logoutBtn" class="w-full bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
+                            <span>🚪</span>
+                            <span>Logout</span>
+                        </button>
+                    </div>
+
+                    <!-- Login Form -->
+                    <div id="loginFormContainer" class="hidden">
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-4">
+                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">Sign In</h4>
+                            <form id="loginForm" class="space-y-3">
+                                <div>
+                                    <input type="email" id="loginEmail" placeholder="Email address" required
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-600 dark:text-white rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                                <div>
+                                    <input type="password" id="loginPassword" placeholder="Password" required
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-600 dark:text-white rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                                <div class="flex items-center justify-between text-sm">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                        <span class="ml-2 text-gray-600 dark:text-gray-400">Remember me</span>
+                                    </label>
+                                    <a href="#" class="text-blue-600 dark:text-blue-400 hover:underline">Forgot password?</a>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded-lg text-sm transition-colors">
+                                        Sign In
+                                    </button>
+                                    <button type="button" id="cancelLogin" class="flex-1 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-300 py-2 px-3 rounded-lg text-sm transition-colors">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                            <div class="mt-3 text-xs text-gray-600 dark:text-gray-400">
+                                <p>Demo accounts:</p>
+                                <p>• admin@school.edu (Administrator)</p>
+                                <p>• teacher@school.edu (Teacher)</p>
+                                <p>• staff@school.edu (Staff)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Signup Form -->
+                    <div id="signupFormContainer" class="hidden">
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-4">
+                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">Create Account</h4>
+                            <form id="signupForm" class="space-y-3">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input type="text" id="firstName" placeholder="First name" required
+                                           class="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-600 dark:text-white rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                                    <input type="text" id="lastName" placeholder="Last name" required
+                                           class="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-600 dark:text-white rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                                </div>
+                                <div>
+                                    <input type="email" id="signupEmail" placeholder="Email address" required
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-600 dark:text-white rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                                </div>
+                                <div>
+                                    <select id="userRole" required
+                                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-600 dark:text-white rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                                        <option value="">Select role</option>
+                                        <option value="admin">Administrator</option>
+                                        <option value="teacher">Teacher</option>
+                                        <option value="staff">Staff Member</option>
+                                        <option value="student">Student</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <select id="department" required
+                                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-600 dark:text-white rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                                        <option value="">Select department</option>
+                                        <option value="mathematics">Mathematics</option>
+                                        <option value="science">Science</option>
+                                        <option value="english">English</option>
+                                        <option value="history">History</option>
+                                        <option value="computer">Computer Science</option>
+                                        <option value="arts">Arts</option>
+                                        <option value="admin">Administration</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <input type="password" id="signupPassword" placeholder="Password" required
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-600 dark:text-white rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                                </div>
+                                <div>
+                                    <input type="password" id="confirmPassword" placeholder="Confirm password" required
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-600 dark:text-white rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                                </div>
+                                <div class="flex items-start">
+                                    <input type="checkbox" id="agreeTerms" required class="mt-1 rounded border-gray-300 text-green-600 focus:ring-green-500">
+                                    <span class="ml-2 text-xs text-gray-600 dark:text-gray-400">
+                                        I agree to the Terms of Service and Privacy Policy
+                                    </span>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button type="submit" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-3 rounded-lg text-sm transition-colors">
+                                        Create Account
+                                    </button>
+                                    <button type="button" id="cancelSignup" class="flex-1 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-300 py-2 px-3 rounded-lg text-sm transition-colors">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Theme Settings -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                        <span class="mr-2">🎨</span>
+                        Appearance
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <div>
+                                <p class="font-medium text-gray-900 dark:text-white">Dark Mode</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Toggle dark/light theme</p>
+                            </div>
+                            <button id="themeToggle" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                                <span id="themeIcon">🌙</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Settings -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                        <span class="mr-2">🔔</span>
+                        Notifications
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <div>
+                                <p class="font-medium text-gray-900 dark:text-white">Email Notifications</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Receive updates via email</p>
+                            </div>
+                            <input type="checkbox" checked class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <div>
+                                <p class="font-medium text-gray-900 dark:text-white">Schedule Reminders</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Get notified before classes</p>
+                            </div>
+                            <input type="checkbox" checked class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <div>
+                                <p class="font-medium text-gray-900 dark:text-white">System Updates</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Important system announcements</p>
+                            </div>
+                            <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Settings -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                        <span class="mr-2">⚙️</span>
+                        System Preferences
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <div>
+                                <p class="font-medium text-gray-900 dark:text-white">Auto-refresh Dashboard</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Update data every 30 seconds</p>
+                            </div>
+                            <input type="checkbox" checked class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        </div>
+                        <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <p class="font-medium text-gray-900 dark:text-white mb-2">Default View</p>
+                            <select class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-600 dark:text-white rounded-lg px-3 py-2 text-sm">
+                                <option>Weekly Schedule</option>
+                                <option>Daily Schedule</option>
+                                <option>Room Overview</option>
+                                <option>Analytics Dashboard</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Help & Support -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                        <span class="mr-2">❓</span>
+                        Help & Support
+                    </h3>
+                    <div class="space-y-2">
+                        <button class="w-full text-left p-3 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors">
+                            <p class="font-medium text-gray-900 dark:text-white">📚 User Guide</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Learn how to use the system</p>
+                        </button>
+                        <button class="w-full text-left p-3 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors">
+                            <p class="font-medium text-gray-900 dark:text-white">💬 Contact Support</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Get help from our team</p>
+                        </button>
+                        <button class="w-full text-left p-3 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors">
+                            <p class="font-medium text-gray-900 dark:text-white">🐛 Report Bug</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Report issues or bugs</p>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="text-center pt-4 border-t border-gray-200 dark:border-gray-600">
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Smart Classroom v2.1.0</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">© 2024 Educational Technology Solutions</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dark mode functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const darkModeIcon = document.getElementById('darkModeIcon');
+            const darkModeText = document.getElementById('darkModeText');
+            const html = document.documentElement;
+
+            // Settings modal elements
+            const settingsBtn = document.getElementById('settingsBtn');
+            const settingsModal = document.getElementById('settingsModal');
+            const closeSettings = document.getElementById('closeSettings');
+            const loginBtn = document.getElementById('loginBtn');
+            const signupBtn = document.getElementById('signupBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+
+            // Check for saved dark mode preference or default to light mode
+            const savedTheme = localStorage.getItem('theme');
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+                html.classList.add('dark');
+                updateDarkModeButton(true);
+            } else {
+                html.classList.remove('dark');
+                updateDarkModeButton(false);
+            }
+
+            // Dark mode toggle handler
+            darkModeToggle.addEventListener('click', function() {
+                const isDark = html.classList.contains('dark');
+                
+                if (isDark) {
+                    html.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                    updateDarkModeButton(false);
+                } else {
+                    html.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                    updateDarkModeButton(true);
+                }
+            });
+
+            function updateDarkModeButton(isDark) {
+                if (isDark) {
+                    darkModeIcon.textContent = '☀️';
+                    darkModeText.textContent = 'Light';
+                    if (themeIcon) themeIcon.textContent = '☀️';
+                } else {
+                    darkModeIcon.textContent = '🌙';
+                    darkModeText.textContent = 'Dark';
+                    if (themeIcon) themeIcon.textContent = '🌙';
+                }
+            }
+
+            // Settings modal handlers
+            settingsBtn.addEventListener('click', function() {
+                settingsModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            });
+
+            closeSettings.addEventListener('click', function() {
+                settingsModal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            });
+
+            // Close modal when clicking outside
+            settingsModal.addEventListener('click', function(e) {
+                if (e.target === settingsModal) {
+                    settingsModal.classList.add('hidden');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+
+            // Theme toggle in settings
+            themeToggle.addEventListener('click', function() {
+                const isDark = html.classList.contains('dark');
+                
+                if (isDark) {
+                    html.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                    updateDarkModeButton(false);
+                } else {
+                    html.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                    updateDarkModeButton(true);
+                }
+            });
+
+            // Authentication handlers
+            const showLoginBtn = document.getElementById('showLoginBtn');
+            const showSignupBtn = document.getElementById('showSignupBtn');
+            const authButtons = document.getElementById('authButtons');
+            const loginFormContainer = document.getElementById('loginFormContainer');
+            const signupFormContainer = document.getElementById('signupFormContainer');
+            const cancelLogin = document.getElementById('cancelLogin');
+            const cancelSignup = document.getElementById('cancelSignup');
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+
+            // Show login form
+            showLoginBtn.addEventListener('click', function() {
+                authButtons.classList.add('hidden');
+                loginFormContainer.classList.remove('hidden');
+                signupFormContainer.classList.add('hidden');
+            });
+
+            // Show signup form
+            showSignupBtn.addEventListener('click', function() {
+                authButtons.classList.add('hidden');
+                signupFormContainer.classList.remove('hidden');
+                loginFormContainer.classList.add('hidden');
+            });
+
+            // Cancel login
+            cancelLogin.addEventListener('click', function() {
+                loginFormContainer.classList.add('hidden');
+                authButtons.classList.remove('hidden');
+                loginForm.reset();
+            });
+
+            // Cancel signup
+            cancelSignup.addEventListener('click', function() {
+                signupFormContainer.classList.add('hidden');
+                authButtons.classList.remove('hidden');
+                signupForm.reset();
+            });
+
+            // Handle login form submission
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                
+                // Simulate login process
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'Signing In...';
+                submitBtn.disabled = true;
+                
+                setTimeout(() => {
+                    // Check demo accounts
+                    let userType = 'User';
+                    if (email === 'admin@school.edu') userType = 'Administrator';
+                    else if (email === 'teacher@school.edu') userType = 'Teacher';
+                    else if (email === 'staff@school.edu') userType = 'Staff Member';
+                    
+                    alert(`✅ Login Successful!\n\nWelcome back, ${userType}!\nEmail: ${email}\n\nDashboard will refresh with your permissions.`);
+                    
+                    // Update user profile in settings
+                    const userName = email.split('@')[0].replace('.', ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    document.querySelector('.w-12.h-12').textContent = userName.split(' ').map(n => n[0]).join('');
+                    document.querySelector('.font-semibold.text-gray-900').textContent = userName;
+                    document.querySelector('.text-sm.text-gray-600').textContent = userType;
+                    document.querySelector('.text-xs.text-gray-500').textContent = email;
+                    
+                    // Reset form and hide
+                    loginForm.reset();
+                    loginFormContainer.classList.add('hidden');
+                    authButtons.classList.remove('hidden');
+                    
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                    
+                    // Close settings modal
+                    setTimeout(() => {
+                        settingsModal.classList.add('hidden');
+                        document.body.style.overflow = 'auto';
+                    }, 1000);
+                    
+                }, 2000);
+            });
+
+            // Handle signup form submission
+            signupForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const firstName = document.getElementById('firstName').value;
+                const lastName = document.getElementById('lastName').value;
+                const email = document.getElementById('signupEmail').value;
+                const role = document.getElementById('userRole').value;
+                const department = document.getElementById('department').value;
+                const password = document.getElementById('signupPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                // Validate passwords match
+                if (password !== confirmPassword) {
+                    alert('❌ Error: Passwords do not match!\n\nPlease make sure both password fields are identical.');
+                    return;
+                }
+                
+                // Validate password strength
+                if (password.length < 6) {
+                    alert('❌ Error: Password too weak!\n\nPassword must be at least 6 characters long.');
+                    return;
+                }
+                
+                // Simulate signup process
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'Creating Account...';
+                submitBtn.disabled = true;
+                
+                setTimeout(() => {
+                    const fullName = `${firstName} ${lastName}`;
+                    const roleText = role.charAt(0).toUpperCase() + role.slice(1);
+                    const deptText = department.charAt(0).toUpperCase() + department.slice(1);
+                    
+                    alert(`✅ Account Created Successfully!\n\nWelcome, ${fullName}!\nRole: ${roleText}\nDepartment: ${deptText}\nEmail: ${email}\n\nYou can now sign in with your new credentials.`);
+                    
+                    // Reset form and show login
+                    signupForm.reset();
+                    signupFormContainer.classList.add('hidden');
+                    loginFormContainer.classList.remove('hidden');
+                    
+                    // Pre-fill login email
+                    document.getElementById('loginEmail').value = email;
+                    
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                    
+                }, 2500);
+            });
+
+            // Handle forgot password
+            document.querySelector('a[href="#"]').addEventListener('click', function(e) {
+                e.preventDefault();
+                const email = document.getElementById('loginEmail').value;
+                
+                if (!email) {
+                    alert('Please enter your email address first, then click "Forgot password?"');
+                    document.getElementById('loginEmail').focus();
+                    return;
+                }
+                
+                alert(`🔐 Password Reset\n\nA password reset link has been sent to:\n${email}\n\nPlease check your email and follow the instructions to reset your password.\n\n(This is a demo - no actual email was sent)`);
+            });
+
+            logoutBtn.addEventListener('click', function() {
+                const confirmed = confirm('Are you sure you want to logout?\n\nYou will be redirected to the login page.');
+                
+                if (confirmed) {
+                    // Simulate logout process
+                    logoutBtn.innerHTML = '<span>🔄</span><span>Logging out...</span>';
+                    logoutBtn.disabled = true;
+                    
+                    setTimeout(() => {
+                        alert('✅ Successfully logged out!\n\nRedirecting to login page...');
+                        
+                        // In a real app, this would redirect to login
+                        setTimeout(() => {
+                            showLoginPage();
+                        }, 1000);
+                    }, 1500);
+                }
+            });
+
+            // Handle schedule slot clicks
+            const scheduleSlots = document.querySelectorAll('.schedule-slot .available, .schedule-slot .occupied');
+            
+            scheduleSlots.forEach(slot => {
+                slot.addEventListener('click', function() {
+                    if (this.classList.contains('available')) {
+                        const time = this.closest('.schedule-slot').querySelector('.text-sm').textContent;
+                        alert(`Book this slot?\nTime: ${time}\nStatus: Available`);
+                    } else {
+                        const className = this.textContent;
+                        const time = this.closest('.schedule-slot').querySelector('.text-sm').textContent;
+                        alert(`Class Details:\n${className}\nTime: ${time}`);
+                    }
+                });
+            });
+
+            // Handle quick action buttons
+            const actionButtons = document.querySelectorAll('.bg-blue-600, .bg-green-600, .bg-purple-600, .bg-orange-600');
+            
+            actionButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const action = this.textContent.trim();
+                    
+                    switch(action) {
+                        case '📅 Book Classroom':
+                            showBookingForm();
+                            break;
+                        case '👥 Manage Teachers':
+                            showTeacherManagement();
+                            break;
+                        case '📊 View Reports':
+                            showReports();
+                            break;
+                        case '🔧 Maintenance':
+                            showMaintenance();
+                            break;
+                    }
+                });
+            });
+
+            // Handle backlog class buttons
+            const backlogButtons = document.querySelectorAll('.text-blue-600, .text-green-600');
+            
+            backlogButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const action = this.textContent.trim();
+                    const classCard = this.closest('.border-l-4');
+                    const className = classCard.querySelector('.font-medium').textContent;
+                    const originalTime = classCard.querySelector('.text-sm').textContent;
+                    
+                    if (action === 'Reschedule') {
+                        showRescheduleModal(className, originalTime);
+                    } else if (action === 'Confirm') {
+                        confirmReschedule(className, classCard);
+                    }
+                });
+            });
+
+            // Handle "View All Backlog Classes" button
+            const viewAllBacklogBtn = document.querySelector('.bg-gray-100, .dark\\:bg-gray-700');
+            if (viewAllBacklogBtn) {
+                viewAllBacklogBtn.addEventListener('click', function() {
+                    showAllBacklogClasses();
+                });
+            }
+
+            // Room dropdown change handler
+            const roomSelect = document.querySelector('select');
+            roomSelect.addEventListener('change', function() {
+                const selectedRoom = this.value;
+                console.log(`Loading schedule for ${selectedRoom}`);
+                
+                const scheduleContainer = document.querySelector('.lg\\:col-span-2 .bg-white, .lg\\:col-span-2 .dark\\:bg-gray-800');
+                scheduleContainer.style.opacity = '0.7';
+                
+                setTimeout(() => {
+                    scheduleContainer.style.opacity = '1';
+                }, 500);
+            });
+        });
+
+        function showLoginPage() {
+            // Create login page HTML
+            const loginPageHTML = `
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .input-focus {
+            transition: all 0.2s ease;
+        }
+        
+        .input-focus:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+        
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .shape:nth-child(1) {
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .shape:nth-child(2) {
+            top: 60%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+        
+        .shape:nth-child(3) {
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+    </style>
+</head>
+<body class="min-h-screen gradient-bg flex items-center justify-center p-4">
+    <!-- Floating Background Shapes -->
+    <div class="floating-shapes">
+        <div class="shape w-32 h-32 bg-white rounded-full"></div>
+        <div class="shape w-24 h-24 bg-white rounded-lg"></div>
+        <div class="shape w-40 h-40 bg-white rounded-full"></div>
+    </div>
+
+    <div class="w-full max-w-md relative z-10">
+        <!-- Logo and Header -->
+        <div class="text-center mb-8">
+            <div class="bg-white bg-opacity-20 p-4 rounded-2xl inline-block mb-4">
+                <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
+                </svg>
+            </div>
+            <h1 class="text-3xl font-bold text-white mb-2">Smart Classroom</h1>
             <p class="text-blue-100">Timetable & Resource Manager</p>
-          </div>
         </div>
-        <div class="flex items-center space-x-4">
-          <a href="#" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
-            <span>👤</span> <span>Sign Up</span>
-          </a>
-          <a href="#" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
-            <span>🔑</span> <span>Sign In</span>
-          </a>
-        </div>
-      </div>
-    </div>
-  </header>
 
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Dashboard Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-      <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-gray-600">Total Classrooms</p>
-            <p class="text-2xl font-bold text-gray-900">24</p>
-          </div>
-          <div class="bg-blue-100 p-3 rounded-lg">🏫</div>
-        </div>
-      </div>
-      <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-gray-600">Available Now</p>
-            <p class="text-2xl font-bold text-green-600">8</p>
-          </div>
-          <div class="bg-green-100 p-3 rounded-lg">✅</div>
-        </div>
-      </div>
-      <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-gray-600">In Use</p>
-            <p class="text-2xl font-bold text-orange-600">12</p>
-          </div>
-          <div class="bg-orange-100 p-3 rounded-lg">📚</div>
-        </div>
-      </div>
-      <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-gray-600">Maintenance</p>
-            <p class="text-2xl font-bold text-red-600">4</p>
-          </div>
-          <div class="bg-red-100 p-3 rounded-lg">🔧</div>
-        </div>
-      </div>
-    </div>
+        <!-- Auth Container -->
+        <div class="bg-white rounded-2xl shadow-2xl p-8 card-hover">
+            <!-- Tab Navigation -->
+            <div class="flex mb-8 bg-gray-100 rounded-lg p-1">
+                <button id="loginTab" class="flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all bg-white text-blue-600 shadow-sm">
+                    Sign In
+                </button>
+                <button id="signupTab" class="flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all text-gray-600 hover:text-gray-900">
+                    Sign Up
+                </button>
+            </div>
 
-    <!-- Timetable Section -->
-    {% set times = ['08:00', '10:00', '12:00', '14:00', '16:00'] %}
-    {% set days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] %}
-    <div class="overflow-x-auto mb-4">
-      <table class="min-w-full border border-gray-200 rounded-lg">
-        <thead>
-          <tr class="bg-gray-100">
-            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Time</th>
-            {% for day in days %}
-              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">{{ day }}</th>
-            {% endfor %}
-          </tr>
-        </thead>
-        <tbody>
-          {% for time in times %}
-            <tr>
-              <td class="px-4 py-2 text-sm font-medium text-gray-700">{{ time }}</td>
-              {% for day in days %}
-                {% set entry = timetable | selectattr('day', 'equalto', day) 
-                                           | selectattr('period', 'equalto', time) | list | first %}
-                {% set backlog_entry = backlog | selectattr('day', 'equalto', day) 
-                                                | selectattr('period', 'equalto', time) | list | first %}
-                <td class="px-4 py-2 border schedule-slot 
-                           {% if backlog_entry %}backlog{% elif entry %}occupied{% else %}available{% endif %}">
-                  {% if backlog_entry %}
-                    {{ backlog_entry.subject }}<br>
-                    <span class="text-xs text-gray-700 font-semibold">[Backlog]</span><br>
-                    <span class="text-xs text-gray-500">{{ backlog_entry.room }}</span>
-                  {% elif entry %}
-                    {{ entry.subject }}<br><span class="text-xs text-gray-500">{{ entry.room }}</span>
-                  {% else %}
-                    Free
-                  {% endif %}
-                </td>
-              {% endfor %}
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+            <!-- Login Form -->
+            <div id="loginForm" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                    <input type="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus outline-none" placeholder="Enter your email" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus outline-none" placeholder="Enter your password" required>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center">
+                        <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <span class="ml-2 text-sm text-gray-600">Remember me</span>
+                    </label>
+                    <a href="#" class="text-sm text-blue-600 hover:text-blue-800">Forgot password?</a>
+                </div>
+                
+                <button type="submit" class="w-full btn-primary text-white py-3 px-4 rounded-lg font-medium">
+                    Sign In to Dashboard
+                </button>
+                
+                <div class="text-center">
+                    <p class="text-sm text-gray-600">
+                        Demo Accounts: 
+                        <span class="font-medium text-blue-600">admin@school.edu</span> | 
+                        <span class="font-medium text-green-600">teacher@school.edu</span>
+                    </p>
+                </div>
+            </div>
 
-    <!-- Legend -->
-    <div class="flex space-x-4 mt-4">
-      <div class="flex items-center space-x-2">
-        <span class="w-4 h-4 block bg-blue-200 rounded"></span><span>Occupied</span>
-      </div>
-      <div class="flex items-center space-x-2">
-        <span class="w-4 h-4 block bg-green-200 rounded"></span><span>Free</span>
-      </div>
-      <div class="flex items-center space-x-2">
-        <span class="w-4 h-4 block bg-yellow-300 rounded"></span><span>Backlog</span>
-      </div>
-    </div>
-  </div>
+            <!-- Signup Form -->
+            <div id="signupForm" class="space-y-6 hidden">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                        <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus outline-none" placeholder="John" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                        <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus outline-none" placeholder="Doe" required>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                    <input type="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus outline-none" placeholder="john.doe@school.edu" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                    <select class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus outline-none" required>
+                        <option value="">Select your role</option>
+                        <option value="admin">Administrator</option>
+                        <option value="teacher">Teacher</option>
+                        <option value="staff">Staff Member</option>
+                        <option value="student">Student</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Department</label>
+                    <select class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus outline-none" required>
+                        <option value="">Select department</option>
+                        <option value="mathematics">Mathematics</option>
+                        <option value="science">Science</option>
+                        <option value="english">English</option>
+                        <option value="history">History</option>
+                        <option value="computer">Computer Science</option>
+                        <option value="arts">Arts</option>
+                        <option value="admin">Administration</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus outline-none" placeholder="Create a strong password" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                    <input type="password" class="w-full px-4 py-3 border border-gray-300 rounded-lg input-focus outline-none" placeholder="Confirm your password" required>
+                </div>
+                
+                <div class="flex items-start">
+                    <input type="checkbox" class="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500" required>
+                    <span class="ml-2 text-sm text-gray-600">
+                        I agree to the <a href="#" class="text-blue-600 hover:text-blue-800">Terms of Service</a> and 
+                        <a href="#" class="text-blue-600 hover:text-blue-800">Privacy Policy</a>
+                    </span>
+                </div>
+                
+                <button type="submit" class="w-full btn-primary text-white py-3 px-4 rounded-lg font-medium">
+                    Create Account
+                </button>
+            </div>
+        </div>
 
+        <!-- Back to Dashboard -->
+        <div class="text-center mt-6">
+            <button onclick="history.back()" class="text-blue-100 hover:text-white transition-colors">
+                ← Back to Dashboard
+            </button>
+        </div>
+    </div>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98332ec196b5bcff',t:'MTc1ODU1ODU4Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
+            `;
+            
+            // Open in new window or replace current content
+            const newWindow = window.open('', '_blank');
+            newWindow.document.write(loginPageHTML);
+            newWindow.document.close();
+        }
+
+        function showSignupPage() {
+            showLoginPage(); // Same page with signup tab active
+            // In the new window, we could add JavaScript to switch to signup tab
+        }
+
+        function showBookingForm() {
+            alert('Booking Form:\n\n• Select Date & Time\n• Choose Room\n• Add Subject\n• Assign Teacher\n• Set Duration\n\n(This would open a detailed booking modal in the full application)');
+        }
+
+        function showTeacherManagement() {
+            alert('Teacher Management:\n\n• Add/Remove Teachers\n• Assign Subjects\n• Set Availability\n• View Schedules\n\n(This would open the teacher management panel)');
+        }
+
+        function showReports() {
+            alert('Analytics & Reports:\n\n• Room Utilization\n• Teacher Workload\n• Popular Time Slots\n• Maintenance History\n\n(This would show detailed analytics dashboard)');
+        }
+
+        function showMaintenance() {
+            alert('Maintenance Panel:\n\n• Schedule Maintenance\n• Report Issues\n• Track Repairs\n• Equipment Status\n\n(This would open the maintenance management system)');
+        }
+
+        function showRescheduleModal(className, originalTime) {
+            const availableSlots = [
+                'Monday 9:00 AM - Room A102',
+                'Tuesday 2:00 PM - Room B201',
+                'Wednesday 11:00 AM - Room A101',
+                'Thursday 1:00 PM - Lab C302',
+                'Friday 3:00 PM - Room B205'
+            ];
+            
+            const slotsList = availableSlots.map((slot, index) => `${index + 1}. ${slot}`).join('\n');
+            
+            const choice = prompt(`Reschedule "${className}"\n${originalTime}\n\nAvailable slots:\n${slotsList}\n\nEnter slot number (1-5) or 0 to cancel:`);
+            
+            if (choice && choice !== '0' && choice >= '1' && choice <= '5') {
+                const selectedSlot = availableSlots[parseInt(choice) - 1];
+                alert(`✅ "${className}" has been rescheduled to:\n${selectedSlot}\n\nStudents and teachers will be notified automatically.`);
+                
+                updateBacklogCount(-1);
+                
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            }
+        }
+
+        function confirmReschedule(className, classCard) {
+            const confirmed = confirm(`Confirm the new schedule for "${className}"?\n\nThis will finalize the rescheduling and notify all participants.`);
+            
+            if (confirmed) {
+                alert(`✅ "${className}" schedule confirmed!\n\nAll participants have been notified of the new time.`);
+                
+                updateBacklogCount(-1);
+                
+                classCard.style.opacity = '0.5';
+                setTimeout(() => {
+                    classCard.remove();
+                }, 500);
+            }
+        }
+
+        function showAllBacklogClasses() {
+            const backlogData = `
+COMPLETE BACKLOG REPORT
+=======================
+
+CANCELLED CLASSES (3):
+• Advanced Calculus - Mon 2:00 PM (Teacher Sick)
+• Biology Practical - Thu 3:00 PM (Power Outage)  
+• Physics Lab Session - Fri 4:00 PM (Equipment Failure)
+
+POSTPONED CLASSES (2):
+• Chemistry Lab - Tue 10:00 AM (Equipment Issue)
+• Art Workshop - Fri 1:00 PM (Material Shortage)
+
+PENDING RESCHEDULE (1):
+• English Literature - Wed 11:00 AM (Room Conflict)
+
+TOTAL AFFECTED STUDENTS: 156
+PRIORITY RESCHEDULES: 4
+
+Actions Available:
+- Bulk Reschedule
+- Send Notifications
+- Generate Report
+- Contact Teachers
+            `;
+            
+            alert(backlogData);
+        }
+
+        function updateBacklogCount(change) {
+            const badge = document.querySelector('.bg-red-100, .dark\\:bg-red-900');
+            if (badge) {
+                const currentCount = parseInt(badge.textContent.split(' ')[0]);
+                const newCount = Math.max(0, currentCount + change);
+                badge.textContent = `${newCount} Pending`;
+                
+                if (newCount === 0) {
+                    badge.className = 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs font-medium px-2.5 py-0.5 rounded-full';
+                    badge.textContent = 'All Clear';
+                }
+            }
+        }
+
+        // Simulate real-time updates
+        setInterval(() => {
+            const stats = document.querySelectorAll('.text-2xl.font-bold');
+            if (Math.random() > 0.8) {
+                const availableCount = stats[1];
+                const currentCount = parseInt(availableCount.textContent);
+                const newCount = Math.max(0, Math.min(24, currentCount + (Math.random() > 0.5 ? 1 : -1)));
+                availableCount.textContent = newCount;
+                
+                const inUseCount = stats[2];
+                inUseCount.textContent = 24 - newCount - 4;
+            }
+        }, 5000);
+    </script>
 </body>
 </html>
