@@ -547,6 +547,87 @@ def api_teacher_student_messages():
     teacher_id = session['user_id']
     conversation_messages = [msg for msg in messages
                            if ((msg['sender_id'] == teacher_id and msg['receiver_id'] == student_id) or
+                               (msg['sender_id'] == student_id and msg['receiver_id'] == teacher_id))]
+
+    # Format messages for response
+    formatted_messages = []
+    for msg in conversation_messages:
+        sender = get_user_by_id(msg['sender_id'])
+        formatted_messages.append({
+            'id': msg['id'],
+            'sender': 'teacher' if msg['sender_id'] == teacher_id else 'student',
+            'content': msg['message'],
+            'timestamp': msg['timestamp'],
+            'read': msg['read']
+        })
+
+    # Sort by timestamp (oldest first for conversation flow)
+    formatted_messages.sort(key=lambda x: x['timestamp'])
+
+    return jsonify(formatted_messages)
+
+@app.route('/api/teacher/send_message', methods=['POST'])
+def api_teacher_send_message():
+    """API endpoint for teachers to send messages to students"""
+    if session.get('role') != 'teacher':
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'Invalid request data'}), 400
+
+    student_id = data.get('student_id')
+    message_text = data.get('content')
+
+    if not student_id or not message_text:
+        return jsonify({'error': 'Missing student_id or content'}), 400
+
+    # Verify student exists
+    student = get_user_by_id(student_id)
+    if not student or student['role'] != 'student':
+        return jsonify({'error': 'Invalid student'}), 400
+
+    teacher_id = session['user_id']
+
+    # Send the message
+    message = send_message(teacher_id, student_id, message_text)
+
+    # Create notification for the student
+    add_notification(student_id, f"New message from {get_user_by_id(teacher_id)['username']}")
+
+    return jsonify({
+        'success': True,
+        'message': 'Message sent successfully',
+        'message_id': message['id']
+    })
+
+@app.route('/api/teacher/mark_message_read', methods=['POST'])
+def api_teacher_mark_message_read():
+    """API endpoint for teachers to mark messages as read"""
+    if session.get('role') != 'teacher':
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'Invalid request data'}), 400
+
+    student_id = data.get('student_id')
+    if not student_id:
+        return jsonify({'error': 'Missing student_id'}), 400
+
+    teacher_id = session['user_id']
+
+    # Mark all messages from this student as read
+    updated_count = 0
+    for msg in messages:
+        if msg['sender_id'] == student_id and msg['receiver_id'] == teacher_id and not msg['read']:
+            msg['read'] = True
+            updated_count += 1
+
+    return jsonify({
+        'success': True,
+        'message': f'Marked {updated_count} messages as read'
+    })
 
 if __name__ == "__main__":
     app.run(debug=True)
