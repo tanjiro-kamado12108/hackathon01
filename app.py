@@ -1,43 +1,3 @@
-'''
-Smart Classroom & Timetable Scheduler
-
-Opening & Problem Statement
-Good morning everyone, respected judges and mentors. I am Shubham Dash. Today we are presenting our project: Smart Classroom and Timetable Scheduler.
-
-Right now, making timetables in schools and colleges is:
-- Very slow and mostly manual.
-- Full of mistakes like overlapping classes or teachers getting extra load.
-- Hard to change if a teacher is absent or a room is not available.
-- Smart classrooms like labs and projectors are not used properly because there is no smart allocation.
-
-In short, we are using old methods in today's smart world.
-
-Proposed Solution (Pratyush)
-Good morning everyone, I am Pratyush. Now I will explain our proposed solution.
-
-Our idea is to build an AI-powered Timetable Scheduler with Smart Classroom allocation.
-It works in four simple steps:
-1. Input – Admin enters subjects, teachers, students, and classrooms.
-2. AI Scheduling – Our AI makes a clash-free timetable using smart algorithms.
-3. Smart Allocation – The system automatically gives the right room, like a lab for practicals or a projector room for presentations.
-4. Dynamic Updates – If a teacher is absent or a class gets cancelled, the timetable updates instantly and students/faculty get a notification.
-
-Key Features
-- No scheduling issues – No overlapping classes for students or teachers.
-- Smart use of classrooms – Labs and projectors are used properly.
-- Auto rescheduling – Quick updates if something changes.
-- Dashboard – Shows classroom use and teacher workload.
-- Easy access – Students and teachers can see their timetable on mobile or web.
-
-Impact
-This project will have a strong impact:
-- Save 60–70% of admin time.
-- Increase classroom usage by up to 40%.
-- Remove last-minute confusion and timetable clashes.
-- Provide clear and fair information to students, teachers, and management.
-
-So, our Smart Classroom & Timetable Scheduler is not just a timetable tool – it is a smart system that saves time, reduces errors, and makes education smoother and smarter.
-'''
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 
@@ -111,7 +71,7 @@ def login():
             else:
                 return redirect(url_for('student_dashboard'))
         else:
-            pass
+            flash("Invalid credentials")
     return render_template('signin.html')
 
 @app.route('/signup', methods=['GET', 'POST'])
