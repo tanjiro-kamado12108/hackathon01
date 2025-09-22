@@ -252,6 +252,12 @@ def classreport():
 def analytics():
     return render_template('analytics.html')
 
+@app.route('/assignment')
+def assignment():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    return render_template('assignment.html')
+
 # API Routes for Student Dashboard
 @app.route('/api/auth/status')
 def api_auth_status():
