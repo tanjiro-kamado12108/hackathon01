@@ -254,23 +254,90 @@
       </div>
       <div class="space-y-6">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 transition-colors duration-300">
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Upcoming Classes</h3>
-          <div class="space-y-4">
-            <div class="border-l-4 border-blue-500 pl-4 py-2">
-              <p class="font-medium text-gray-900 dark:text-white">Mathematics 101</p>
-              <p class="text-sm text-gray-600 dark:text-gray-400">Room A101 • 10:00 AM</p>
-              <p class="text-xs text-gray-500 dark:text-gray-500">Prof. Johnson</p>
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Notification Center</h3>
+            <div class="flex items-center space-x-2">
+              <span class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium px-2 py-1 rounded-full">3 New</span>
+              <button id="clearAllNotifs" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-sm">Clear All</button>
             </div>
-            <div class="border-l-4 border-green-500 pl-4 py-2">
-              <p class="font-medium text-gray-900 dark:text-white">Physics Lab</p>
-              <p class="text-sm text-gray-600 dark:text-gray-400">Lab C301 • 2:00 PM</p>
-              <p class="text-xs text-gray-500 dark:text-gray-500">Dr. Smith</p>
+          </div>
+          <div id="notificationList" class="space-y-3">
+            <div class="border-l-4 border-blue-500 pl-4 py-3 bg-blue-50 dark:bg-blue-900/20 rounded-r-lg">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center space-x-2 mb-1">
+                    <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">Info</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">2 min ago</span>
+                  </div>
+                  <p class="font-medium text-gray-900 dark:text-white text-sm">System Maintenance Scheduled</p>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">Server maintenance will occur tonight from 2:00 AM to 4:00 AM. Some services may be temporarily unavailable.</p>
+                </div>
+                <button class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 ml-2" onclick="closeNotification(this)">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+              </div>
             </div>
-            <div class="border-l-4 border-purple-500 pl-4 py-2">
-              <p class="font-medium text-gray-900 dark:text-white">Computer Science</p>
-              <p class="text-sm text-gray-600 dark:text-gray-400">Room B205 • 4:00 PM</p>
-              <p class="text-xs text-gray-500 dark:text-gray-500">Prof. Davis</p>
+            <div class="border-l-4 border-green-500 pl-4 py-3 bg-green-50 dark:bg-green-900/20 rounded-r-lg">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center space-x-2 mb-1">
+                    <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full">Success</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">15 min ago</span>
+                  </div>
+                  <p class="font-medium text-gray-900 dark:text-white text-sm">Room Booking Confirmed</p>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">Your booking for Room A101 on Friday at 10:00 AM has been confirmed.</p>
+                </div>
+                <button class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 ml-2" onclick="closeNotification(this)">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+              </div>
             </div>
+            <div class="border-l-4 border-yellow-500 pl-4 py-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-r-lg">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center space-x-2 mb-1">
+                    <span class="bg-yellow-500 text-white text-xs px-2 py-1 rounded-full">Warning</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">1 hour ago</span>
+                  </div>
+                  <p class="font-medium text-gray-900 dark:text-white text-sm">Class Rescheduled</p>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">Advanced Calculus class originally scheduled for Monday 2:00 PM has been moved to Wednesday 3:00 PM due to teacher unavailability.</p>
+                </div>
+                <button class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 ml-2" onclick="closeNotification(this)">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="border-l-4 border-red-500 pl-4 py-3 bg-red-50 dark:bg-red-900/20 rounded-r-lg">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center space-x-2 mb-1">
+                    <span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">Alert</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">2 hours ago</span>
+                  </div>
+                  <p class="font-medium text-gray-900 dark:text-white text-sm">Equipment Maintenance Required</p>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">Projector in Room B205 needs immediate maintenance. Classes scheduled for this room today may be affected.</p>
+                </div>
+                <button class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 ml-2" onclick="closeNotification(this)">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+            <button id="viewAllNotifs" class="w-full bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 text-blue-700 dark:text-blue-300 py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center space-x-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+              </svg>
+              <span>View All Notifications</span>
+            </button>
           </div>
         </div>
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 transition-colors duration-300">
