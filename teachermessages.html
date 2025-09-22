@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Messages - Smart Classroom</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal {
+            backdrop-filter: blur(10px);
+        }
+
+        .notification {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .student-avatar {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+
+        .message-student {
+            background: #f3f4f6;
+            color: #1f2937;
+        }
+
+        .message-teacher {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .typing-indicator {
+            display: none;
+        }
+
+        .typing-indicator.show {
+            display: flex;
+        }
+
+        .online-indicator {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            border: 2px solid white;
+        }
+
+        .student-item {
+            transition: all 0.2s ease;
+        }
+
+        .student-item:hover {
+            background: #f9fafb;
+        }
+
+        .student-item.active {
+            background: #eef2ff;
+            border-left: 3px solid #667eea;
+        }
+
+        .unread-badge {
+            background: #ef4444;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation Header -->
+    <nav class="bg-white shadow-lg border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo and Brand -->
+                <div class="flex items-center">
+                    <button onclick="goBackToDashboard()" class="mr-4 p-2 rounded-lg hover:bg-gray-100">
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <div class="bg-gradient-to-r from-indigo-500 to-purple-600 p-2 rounded-lg">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 3a1 1 0 00-1.447-.894L8.763 6H5a3 3 0 000 6h.28l1.771 5.316A1 1 0 008 18h1a1 1 0 001-1v-4.382l6.553 3.276A1 1 0 0018 15V3z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h1 class="text-xl font-bold text-gray-900">Messages</h1>
+                        <p class="text-sm text-gray-600">Teacher Portal</p>
+                    </div>
+                </div>
+
+                <!-- User Profile -->
+                <div class="flex items-center space-x-4">
+                    <div class="text-right">
+                        <p class="text-sm font-medium text-gray-900" id="teacherName">Dr. Sarah Wilson</p>
+                        <p class="text-xs text-gray-600">Mathematics Teacher</p>
+                    </div>
+                    <div class="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+                        <span class="text-white font-semibold text-sm" id="teacherInitials">SW</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 h-[calc(100vh-200px)]">
+            <div class="flex h-full">
+                <!-- Students List Sidebar -->
+                <div class="w-80 border-r border-gray-200 flex flex-col">
+                    <div class="p-4 border-b border-gray-200">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-3">Students</h2>
+                        <div class="relative">
+                            <input type="text" id="studentSearch" placeholder="Search students..."
+                                   class="w-full px-3 py-2 pl-9 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                            <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 overflow-y-auto" id="studentsList">
+                        <!-- Students will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Chat Area -->
+                <div class="flex-1 flex flex-col">
+                    <!-- Chat Header -->
+                    <div class="p-4 border-b border-gray-200 bg-gray-50" id="chatHeader">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 student-avatar rounded-full flex items-center justify-center mr-3 relative">
+                                    <span class="text-white font-semibold text-sm" id="chatStudentInitials">AJ</span>
+                                    <div class="online-indicator"></div>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-900" id="chatStudentName">Select a student</h3>
+                                    <p class="text-sm text-gray-600" id="chatStudentClass">to start messaging</p>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button onclick="markAllAsRead()" class="px-3 py-1 text-sm text-indigo-600 hover:text-indigo-900">
+                                    Mark as Read
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Messages Area -->
+                    <div class="flex-1 overflow-y-auto p-4 space-y-4" id="messagesArea">
+                        <div class="text-center text-gray-500 py-8">
+                            <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                            </svg>
+                            <p>Select a student to view messages</p>
+                        </div>
+                    </div>
+
+                    <!-- Message Input Area -->
+                    <div class="p-4 border-t border-gray-200" id="messageInputArea">
+                        <div class="flex space-x-3">
+                            <div class="flex-1">
+                                <textarea id="messageInput" rows="1"
+                                          placeholder="Type your message..."
+                                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none"
+                                          style="min-height: 40px; max-height: 120px;"></textarea>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button onclick="sendMessage()" id="sendButton"
+                                        class="btn-primary text-white px-4 py-2 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Quick Reply Buttons -->
+                        <div class="mt-3 flex flex-wrap gap-2" id="quickReplies">
+                            <button onclick="insertQuickReply('Great work! Keep it up! 👍')" class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm hover:bg-blue-100">
+                                Great work!
+                            </button>
+                            <button onclick="insertQuickReply('I need to see your work. Please show me your calculations. 📝')" class="px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm hover:bg-green-100">
+                                Show work
+                            </button>
+                            <button onclick="insertQuickReply('Let me know if you need help with this. I\'m here to help! 🤝')" class="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-sm hover:bg-purple-100">
+                                Need help?
+                            </button>
+                            <button onclick="insertQuickReply('Please come see me after class so we can discuss this. 📚')" class="px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full text-sm hover:bg-yellow-100">
+                                See me
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Message Modal -->
+    <div id="newMessageModal" class="fixed inset-0 bg-black bg-opacity-50 modal hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4">
+            <div class="p-6 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">Start New Conversation</h3>
+            </div>
+            <div class="p-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Select Student</label>
+                        <select id="newMessageStudent" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="">Choose a student...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                        <textarea id="newMessageText" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Type your message..."></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6 border-t border-gray-200 flex justify-end space-x-3">
+                <button onclick="closeNewMessageModal()" class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
+                <button onclick="sendNewMessage()" class="px-4 py-2 btn-primary text-white rounded-lg">Send Message</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStudent = null;
+        let messages = {};
+        let students = [];
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeMessaging();
+        });
+
+        function initializeMessaging() {
+            // Load user data
+            currentUser = JSON.parse(localStorage.getItem('currentUser')) || {
+                name: 'Dr. Sarah Wilson',
+                username: 'teacher@demo.com',
+                role: 'teacher'
+            };
+
+            // Update UI with user info
+            document.getElementById('teacherName').textContent = currentUser.name;
+            const initials = currentUser.name.split(' ').map(n => n[0]).join('');
+            document.getElementById('teacherInitials').textContent = initials;
+
+            // Load students and messages
+            loadStudents();
+            setupEventListeners();
+        }
+
+        function setupEventListeners() {
+            // Student search
+            document.getElementById('studentSearch').addEventListener('input', function() {
+                filterStudents(this.value);
+            });
+
+            // Message input auto-resize
+            document.getElementById('messageInput').addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+
+            // Send message on Enter (Shift+Enter for new line)
+            document.getElementById('messageInput').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+        }
+
+        async function loadStudents() {
+            try {
+                const response = await fetch('/api/teacher/students');
+                if (response.ok) {
+                    students = await response.json();
+                } else {
+                    // Fallback to demo data
+                    students = [
+                        { id: 1, name: 'Alex Johnson', class: 'Algebra II', unread: 2, online: true },
+                        { id: 2, name: 'Emma Davis', class: 'Calculus', unread: 0, online: true },
+                        { id: 3, name: 'Michael Chen', class: 'Statistics', unread: 1, online: false },
+                        { id: 4, name: 'Sarah Brown', class: 'Algebra II', unread: 0, online: true },
+                        { id: 5, name: 'David Wilson', class: 'Calculus', unread: 3, online: false }
+                    ];
+                }
+
+                // Populate new message modal
+                populateStudentSelect();
+
+                // Display students
+                displayStudents();
+            } catch (error) {
+                console.error('Error loading students:', error);
+                // Use demo data
+                students = [
+                    { id: 1, name: 'Alex Johnson', class: 'Algebra II', unread: 2, online: true },
+                    { id: 2, name: 'Emma Davis', class: 'Calculus', unread: 0, online: true },
+                    { id: 3, name: 'Michael Chen', class: 'Statistics', unread: 1, online: false },
+                    { id: 4, name: 'Sarah Brown', class: 'Algebra II', unread: 0, online: true },
+                    { id: 5, name: 'David Wilson', class: 'Calculus', unread: 3, online: false }
+                ];
+                populateStudentSelect();
+                displayStudents();
+            }
+        }
+
+        function populateStudentSelect() {
+            const select = document.getElementById('newMessageStudent');
+            select.innerHTML = '<option value="">Choose a student...</option>';
+
+            students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.id;
+                option.textContent = `${student.name} (${student.class})`;
+                select.appendChild(option);
+            });
+        }
+
+        function displayStudents() {
+            const studentsList = document.getElementById('studentsList');
+            studentsList.innerHTML = '';
+
+            students.forEach(student => {
+                const studentItem = document.createElement('div');
+                studentItem.className = `student-item p-3 border-b border-gray-100 cursor-pointer ${currentStudent && currentStudent.id === student.id ? 'active' : ''}`;
+                studentItem.onclick = () => selectStudent(student);
+
+                studentItem.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center flex-1">
+                            <div class="w-10 h-10 student-avatar rounded-full flex items-center justify-center mr-3 relative">
+                                <span class="text-white font-semibold text-sm">${student.name.split(' ').map(n => n[0]).join('')}</span>
+                                ${student.online ? '<div class="online-indicator"></div>' : ''}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <p class="text-sm font-medium text-gray-900 truncate">${student.name}</p>
+                                    ${student.unread > 0 ? `<span class="unread-badge px-2 py-1 rounded-full text-xs">${student.unread}</span>` : ''}
+                                </div>
+                                <p class="text-xs text-gray-600 truncate">${student.class}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                studentsList.appendChild(studentItem);
+            });
+        }
+
+        function filterStudents(query) {
+            const filteredStudents = students.filter(student =>
+                student.name.toLowerCase().includes(query.toLowerCase()) ||
+                student.class.toLowerCase().includes(query.toLowerCase())
+            );
+
+            const studentsList = document.getElementById('studentsList');
+            studentsList.innerHTML = '';
+
+            filteredStudents.forEach(student => {
+                const studentItem = document.createElement('div');
+                studentItem.className = `student-item p-3 border-b border-gray-100 cursor-pointer ${currentStudent && currentStudent.id === student.id ? 'active' : ''}`;
+                studentItem.onclick = () => selectStudent(student);
+
+                studentItem.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center flex-1">
+                            <div class="w-10 h-10 student-avatar rounded-full flex items-center justify-center mr-3 relative">
+                                <span class="text-white font-semibold text-sm">${student.name.split(' ').map(n => n[0]).join('')}</span>
+                                ${student.online ? '<div class="online-indicator"></div>' : ''}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <p class="text-sm font-medium text-gray-900 truncate">${student.name}</p>
+                                    ${student.unread > 0 ? `<span class="unread-badge px-2 py-1 rounded-full text-xs">${student.unread}</span>` : ''}
+                                </div>
+                                <p class="text-xs text-gray-600 truncate">${student.class}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                studentsList.appendChild(studentItem);
+            });
+        }
+
+        async function selectStudent(student) {
+            currentStudent = student;
+
+            // Update UI
+            document.getElementById('chatStudentName').textContent = student.name;
+            document.getElementById('chatStudentClass').textContent = student.class;
+            document.getElementById('chatStudentInitials').textContent = student.name.split(' ').map(n => n[0]).join('');
+
+            // Update active state
+            document.querySelectorAll('.student-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+
+            // Load messages
+            await loadMessages(student.id);
+
+            // Mark messages as read
+            await markMessagesAsRead(student.id);
+        }
+
+        async function loadMessages(studentId) {
+            try {
+                const response = await fetch(`/api/teacher/messages?student_id=${studentId}`);
+                if (response.ok) {
+                    messages[studentId] = await response.json();
+                } else {
+                    // Fallback to demo messages
+                    messages[studentId] = generateDemoMessages(studentId);
+                }
+
+                displayMessages(studentId);
+            } catch (error) {
+                console.error('Error loading messages:', error);
+                messages[studentId] = generateDemoMessages(studentId);
+                displayMessages(studentId);
+            }
+        }
+
+        function generateDemoMessages(studentId) {
+            const student = students.find(s => s.id === studentId);
+            const demoMessages = [
+                {
+                    id: 1,
+                    sender: 'student',
+                    content: `Hi ${currentUser.name.split(' ')[1]}, I have a question about the homework from yesterday. Could you help me understand problem #5?`,
+                    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+                    read: false
+                },
+                {
+                    id: 2,
+                    sender: 'teacher',
+                    content: "Of course! I'd be happy to help. Problem #5 is asking you to solve for x in the quadratic equation. Let me know what you're having trouble with specifically.",
+                    timestamp: new Date(Date.now() - 1.5 * 60 * 60 * 1000).toISOString(),
+                    read: true
+                },
+                {
+                    id: 3,
+                    sender: 'student',
+                    content: "I'm not sure how to factor it. The equation is x² + 5x + 6 = 0. I tried but I keep getting stuck.",
+                    timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+                    read: false
+                }
+            ];
+
+            return demoMessages;
+        }
+
+        function displayMessages(studentId) {
+            const messagesArea = document.getElementById('messagesArea');
+            const studentMessages = messages[studentId] || [];
+
+            messagesArea.innerHTML = '';
+
+            if (studentMessages.length === 0) {
+                messagesArea.innerHTML = `
+                    <div class="text-center text-gray-500 py-8">
+                        <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                        <p>No messages yet. Start the conversation!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            studentMessages.forEach(message => {
+                const messageElement = document.createElement('div');
+                messageElement.className = `flex ${message.sender === 'teacher' ? 'justify-end' : 'justify-start'} mb-4`;
+
+                const bubbleClass = message.sender === 'teacher' ? 'message-teacher' : 'message-student';
+                const timeString = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                messageElement.innerHTML = `
+                    <div class="message-bubble ${bubbleClass} px-4 py-2 rounded-lg">
+                        <p class="text-sm">${message.content}</p>
+                        <p class="text-xs ${message.sender === 'teacher' ? 'text-white' : 'text-gray-500'} mt-1 opacity-75">
+                            ${timeString}
+                        </p>
+                    </div>
+                `;
+
+                messagesArea.appendChild(messageElement);
+            });
+
+            // Scroll to bottom
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+        }
+
+        async function sendMessage() {
+            if (!currentStudent) {
+                showNotification('Please select a student first', 'error');
+                return;
+            }
+
+            const messageInput = document.getElementById('messageInput');
+            const content = messageInput.value.trim();
+
+            if (!content) {
+                return;
+            }
+
+            const sendButton = document.getElementById('sendButton');
+            sendButton.disabled = true;
+
+            try {
+                const response = await fetch('/api/teacher/send_message', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        student_id: currentStudent.id,
+                        content: content
+                    })
+                });
+
+                if (response.ok) {
+                    // Add message to local messages
+                    const newMessage = {
+                        id: Date.now(),
+                        sender: 'teacher',
+                        content: content,
+                        timestamp: new Date().toISOString(),
+                        read: true
+                    };
+
+                    if (!messages[currentStudent.id]) {
+                        messages[currentStudent.id] = [];
+                    }
+                    messages[currentStudent.id].push(newMessage);
+
+                    // Clear input
+                    messageInput.value = '';
+                    messageInput.style.height = 'auto';
+
+                    // Refresh messages
+                    displayMessages(currentStudent.id);
+
+                    showNotification('Message sent successfully!', 'success');
+
+                    // Simulate student response after a delay
+                    setTimeout(() => {
+                        simulateStudentResponse(currentStudent.id);
+                    }, 2000);
+                } else {
+                    showNotification('Failed to send message', 'error');
+                }
+            } catch (error) {
+                console.error('Error sending message:', error);
+                showNotification('Failed to send message', 'error');
+            }
+
+            sendButton.disabled = false;
+        }
+
+        function simulateStudentResponse(studentId) {
+            const responses = [
+                "Thank you for your help! I understand now.",
+                "That makes sense. I'll try working on it again.",
+                "Could you explain that part again? I'm still a bit confused.",
+                "I think I got it now. Thanks!",
+                "I'll come see you after class if I need more help."
+            ];
+
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+
+            const studentMessage = {
+                id: Date.now(),
+                sender: 'student',
+                content: randomResponse,
+                timestamp: new Date().toISOString(),
+                read: false
+            };
+
+            if (!messages[studentId]) {
+                messages[studentId] = [];
+            }
+            messages[studentId].push(studentMessage);
+
+            // Update unread count
+            const student = students.find(s => s.id === studentId);
+            if (student) {
+                student.unread = (student.unread || 0) + 1;
+                displayStudents();
+            }
+
+            // Refresh messages if this student is currently selected
+            if (currentStudent && currentStudent.id === studentId) {
+                displayMessages(studentId);
+            }
+        }
+
+        function insertQuickReply(text) {
+            const messageInput = document.getElementById('messageInput');
+            messageInput.value = text;
+            messageInput.focus();
+        }
+
+        async function markMessagesAsRead(studentId) {
+            try {
+                await fetch('/api/teacher/mark_message_read', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        student_id: studentId
+                    })
+                });
+
+                // Update local unread count
+                const student = students.find(s => s.id === studentId);
+                if (student) {
+                    student.unread = 0;
+                    displayStudents();
+                }
+            } catch (error) {
+                console.error('Error marking messages as read:', error);
+            }
+        }
+
+        async function markAllAsRead() {
+            if (!currentStudent) return;
+
+            await markMessagesAsRead(currentStudent.id);
+            showNotification('All messages marked as read', 'success');
+        }
+
+        function goBackToDashboard() {
+            window.location.href = 'teacher.html';
+        }
+
+        function openNewMessageModal() {
+            document.getElementById('newMessageModal').classList.remove('hidden');
+        }
+
+        function closeNewMessageModal() {
+            document.getElementById('newMessageModal').classList.add('hidden');
+            document.getElementById('newMessageText').value = '';
+        }
+
+        async function sendNewMessage() {
+            const studentSelect = document.getElementById('newMessageStudent');
+            const messageText = document.getElementById('newMessageText');
+
+            const studentId = parseInt(studentSelect.value);
+            const content = messageText.value.trim();
+
+            if (!studentId || !content) {
+                showNotification('Please select a student and enter a message', 'error');
+                return;
+            }
+
+            const student = students.find(s => s.id === studentId);
+            if (student) {
+                // Add message to local messages
+                const newMessage = {
+                    id: Date.now(),
+                    sender: 'teacher',
+                    content: content,
+                    timestamp: new Date().toISOString(),
+                    read: true
+                };
+
+                if (!messages[studentId]) {
+                    messages[studentId] = [];
+                }
+                messages[studentId].push(newMessage);
+
+                // Update unread count for student
+                student.unread = (student.unread || 0) + 1;
+                displayStudents();
+
+                closeNewMessageModal();
+                selectStudent(student);
+                showNotification('Message sent successfully!', 'success');
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm notification`;
+
+            if (type === 'success') {
+                notification.className += ' bg-green-500 text-white';
+            } else if (type === 'error') {
+                notification.className += ' bg-red-500 text-white';
+            } else {
+                notification.className += ' bg-blue-500 text-white';
+            }
+
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <div class="flex-1">
+                        <p class="text-sm font-medium">${message}</p>
+                    </div>
+                    <button class="ml-3 text-white hover:text-gray-200" onclick="this.parentElement.parentElement.remove()">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                </div>
+            `;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
