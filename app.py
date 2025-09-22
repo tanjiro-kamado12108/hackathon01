@@ -1,17 +1,82 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
+import os
 
 app = Flask(__name__, template_folder='.')  # Look for templates in current directory
 app.secret_key = "supersecretkey"
 
-# In-memory data
-users = [
-    {"id": 1, "username": "admin", "password": "adminpass", "role": "admin", "is_absent": False},
-    {"id": 2, "username": "teacher1", "password": "teachpass", "role": "teacher", "is_absent": False},
-    {"id": 3, "username": "student1", "password": "studpass", "role": "student", "is_absent": False},
-]
-timetable = []
-notifications = []
-messages = []
+# Database configuration
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'instance', 'school.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
+# Database Models
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password = db.Column(db.String(120), nullable=False)
+    role = db.Column(db.String(20), nullable=False)
+    is_absent = db.Column(db.Boolean, default=False)
+
+    def __repr__(self):
+        return f'<User {self.username}>'
+
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    message = db.Column(db.String(500), nullable=False)
+    read = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Message(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    read = db.Column(db.Boolean, default=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Timetable(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    day = db.Column(db.String(20), nullable=False)
+    period = db.Column(db.String(10), nullable=False)
+    subject = db.Column(db.String(50), nullable=False)
+    teacher = db.Column(db.String(80), nullable=False)
+    classroom = db.Column(db.String(20), nullable=False)
+
+# Initialize database tables
+with app.app_context():
+    db.create_all()
+
+    # Create default users if they don't exist
+    if not User.query.first():
+        admin = User(username="admin", password="adminpass", role="admin", is_absent=False)
+        teacher = User(username="teacher1", password="teachpass", role="teacher", is_absent=False)
+        student = User(username="student1", password="studpass", role="student", is_absent=False)
+        db.session.add(admin)
+        db.session.add(teacher)
+        db.session.add(student)
+        db.session.commit()
+
+        # Create sample timetable
+        days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+        times = ['08:00', '10:00', '12:00', '14:00', '16:00']
+        subjects = ['Math', 'Science', 'English', 'History', 'Art', 'PE', 'Music']
+
+        for day in days:
+            for time in times:
+                timetable_entry = Timetable(
+                    day=day,
+                    period=time,
+                    subject=subjects[(hash(day+time) % len(subjects))],
+                    teacher=teacher.username,
+                    classroom=f"Room {((hash(day+time) % 10) + 1)}"
+                )
+                db.session.add(timetable_entry)
+        db.session.commit()
 
 # ----------------- Helpers -----------------
 def get_user(username):
