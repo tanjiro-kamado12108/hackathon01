@@ -3,98 +3,120 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
+  <title>Student Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 flex items-start justify-center min-h-screen p-6">
 
-  <!-- Grid for Notification + Backlog -->
-  <div class="grid grid-cols-2 gap-6 w-full max-w-6xl">
+  <div class="w-full max-w-6xl space-y-6">
 
-    <!-- Notice/Notification Center -->
+    <!-- 📌 Timetable Section -->
     <div class="bg-white shadow-lg rounded-2xl p-6">
-      <h2 class="text-xl font-semibold text-gray-800 mb-4">Notice Center</h2>
-      <ul class="space-y-4">
-
-        <!-- Notice 1 -->
-        <li class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
-          <p class="text-sm text-gray-600"><span class="font-semibold">[Exam]</span> Mid-term exams will begin from <span class="font-medium">Oct 10, 2025</span>.</p>
-        </li>
-
-        <!-- Notice 2 -->
-        <li class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded">
-          <p class="text-sm text-gray-600"><span class="font-semibold">[Event]</span> Cultural Fest scheduled on <span class="font-medium">Oct 15, 2025</span>.</p>
-        </li>
-
-        <!-- Notice 3 -->
-        <li class="bg-green-50 border-l-4 border-green-500 p-4 rounded">
-          <p class="text-sm text-gray-600"><span class="font-semibold">[Holiday]</span> College will remain closed on <span class="font-medium">Oct 2, 2025</span> for Gandhi Jayanti.</p>
-        </li>
-
-        <!-- Notice 4 -->
-        <li class="bg-red-50 border-l-4 border-red-500 p-4 rounded">
-          <p class="text-sm text-gray-600"><span class="font-semibold">[Alert]</span> Library will be under maintenance from <span class="font-medium">Sept 25–27</span>.</p>
-        </li>
-
-      </ul>
+      <h2 class="text-xl font-semibold text-gray-800 mb-4">Weekly Timetable</h2>
+      <table class="w-full border-collapse text-sm">
+        <thead>
+          <tr class="bg-gray-200 text-gray-700">
+            <th class="p-2 border">Day</th>
+            <th class="p-2 border">9:00 AM</th>
+            <th class="p-2 border">11:00 AM</th>
+            <th class="p-2 border">2:00 PM</th>
+            <th class="p-2 border">3:00 PM</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="text-center">
+            <td class="p-2 border font-medium">Mon</td>
+            <td class="p-2 border">Math</td>
+            <td class="p-2 border">English</td>
+            <td class="p-2 border">Physics</td>
+            <td class="p-2 border">--</td>
+          </tr>
+          <tr class="text-center bg-gray-50">
+            <td class="p-2 border font-medium">Tue</td>
+            <td class="p-2 border">Chemistry</td>
+            <td class="p-2 border">Biology</td>
+            <td class="p-2 border">--</td>
+            <td class="p-2 border">Sports</td>
+          </tr>
+          <tr class="text-center">
+            <td class="p-2 border font-medium">Wed</td>
+            <td class="p-2 border">Computer Sci</td>
+            <td class="p-2 border">English Lit</td>
+            <td class="p-2 border">--</td>
+            <td class="p-2 border">Physics Lab</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
-    <!-- Backlog Classes -->
-    <div class="bg-gray-900 text-white shadow-lg rounded-2xl p-6">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-semibold">Backlog Classes</h2>
-        <span class="text-sm bg-red-600 text-white px-3 py-1 rounded-full">5 Pending</span>
+    <!-- 📌 Bottom Grid: Notice Center + Backlog Classes -->
+    <div class="grid grid-cols-2 gap-6">
+
+      <!-- Notice Center -->
+      <div class="bg-white shadow-lg rounded-2xl p-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Notice Center</h2>
+        <ul class="space-y-4">
+          <li class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+            <p class="text-sm text-gray-600"><span class="font-semibold">[Exam]</span> Mid-term exams will begin from <span class="font-medium">Oct 10, 2025</span>.</p>
+          </li>
+          <li class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded">
+            <p class="text-sm text-gray-600"><span class="font-semibold">[Event]</span> Cultural Fest scheduled on <span class="font-medium">Oct 15, 2025</span>.</p>
+          </li>
+          <li class="bg-green-50 border-l-4 border-green-500 p-4 rounded">
+            <p class="text-sm text-gray-600"><span class="font-semibold">[Holiday]</span> College will remain closed on <span class="font-medium">Oct 2, 2025</span> for Gandhi Jayanti.</p>
+          </li>
+          <li class="bg-red-50 border-l-4 border-red-500 p-4 rounded">
+            <p class="text-sm text-gray-600"><span class="font-semibold">[Alert]</span> Library will be under maintenance from <span class="font-medium">Sept 25–27</span>.</p>
+          </li>
+        </ul>
       </div>
 
-      <div class="space-y-4">
-
-        <!-- Class 1 -->
-        <div class="bg-gray-800 p-4 rounded border-l-4 border-red-500">
-          <p class="font-medium">Advanced Calculus</p>
-          <p class="text-sm text-gray-400">Originally: Mon 2:00 PM</p>
-          <p class="text-xs text-red-400">Cancelled - Teacher Sick</p>
-          <a href="#" class="text-blue-400 text-sm">Reschedule</a>
+      <!-- Backlog Classes -->
+      <div class="bg-gray-900 text-white shadow-lg rounded-2xl p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold">Backlog Classes</h2>
+          <span class="text-sm bg-red-600 text-white px-3 py-1 rounded-full">5 Pending</span>
         </div>
 
-        <!-- Class 2 -->
-        <div class="bg-gray-800 p-4 rounded border-l-4 border-yellow-500">
-          <p class="font-medium">Chemistry Lab</p>
-          <p class="text-sm text-gray-400">Originally: Tue 10:00 AM</p>
-          <p class="text-xs text-yellow-400">Postponed - Equipment Issue</p>
-          <a href="#" class="text-blue-400 text-sm">Reschedule</a>
+        <div class="space-y-4">
+          <div class="bg-gray-800 p-4 rounded border-l-4 border-red-500">
+            <p class="font-medium">Advanced Calculus</p>
+            <p class="text-sm text-gray-400">Originally: Mon 2:00 PM</p>
+            <p class="text-xs text-red-400">Cancelled - Teacher Sick</p>
+            <a href="#" class="text-blue-400 text-sm">Reschedule</a>
+          </div>
+          <div class="bg-gray-800 p-4 rounded border-l-4 border-yellow-500">
+            <p class="font-medium">Chemistry Lab</p>
+            <p class="text-sm text-gray-400">Originally: Tue 10:00 AM</p>
+            <p class="text-xs text-yellow-400">Postponed - Equipment Issue</p>
+            <a href="#" class="text-blue-400 text-sm">Reschedule</a>
+          </div>
+          <div class="bg-gray-800 p-4 rounded border-l-4 border-green-500">
+            <p class="font-medium">English Literature</p>
+            <p class="text-sm text-gray-400">Originally: Wed 11:00 AM</p>
+            <p class="text-xs text-green-400">Rescheduled - Room Conflict</p>
+            <a href="#" class="text-green-400 text-sm">Confirm</a>
+          </div>
+          <div class="bg-gray-800 p-4 rounded border-l-4 border-red-500">
+            <p class="font-medium">Biology Practical</p>
+            <p class="text-sm text-gray-400">Originally: Thu 3:00 PM</p>
+            <p class="text-xs text-red-400">Cancelled - Power Outage</p>
+            <a href="#" class="text-blue-400 text-sm">Reschedule</a>
+          </div>
+          <div class="bg-gray-800 p-4 rounded border-l-4 border-yellow-500">
+            <p class="font-medium">Art Workshop</p>
+            <p class="text-sm text-gray-400">Originally: Fri 1:00 PM</p>
+            <p class="text-xs text-yellow-400">Postponed - Material Shortage</p>
+            <a href="#" class="text-blue-400 text-sm">Reschedule</a>
+          </div>
         </div>
 
-        <!-- Class 3 -->
-        <div class="bg-gray-800 p-4 rounded border-l-4 border-green-500">
-          <p class="font-medium">English Literature</p>
-          <p class="text-sm text-gray-400">Originally: Wed 11:00 AM</p>
-          <p class="text-xs text-green-400">Rescheduled - Room Conflict</p>
-          <a href="#" class="text-green-400 text-sm">Confirm</a>
-        </div>
-
-        <!-- Class 4 -->
-        <div class="bg-gray-800 p-4 rounded border-l-4 border-red-500">
-          <p class="font-medium">Biology Practical</p>
-          <p class="text-sm text-gray-400">Originally: Thu 3:00 PM</p>
-          <p class="text-xs text-red-400">Cancelled - Power Outage</p>
-          <a href="#" class="text-blue-400 text-sm">Reschedule</a>
-        </div>
-
-        <!-- Class 5 -->
-        <div class="bg-gray-800 p-4 rounded border-l-4 border-yellow-500">
-          <p class="font-medium">Art Workshop</p>
-          <p class="text-sm text-gray-400">Originally: Fri 1:00 PM</p>
-          <p class="text-xs text-yellow-400">Postponed - Material Shortage</p>
-          <a href="#" class="text-blue-400 text-sm">Reschedule</a>
-        </div>
-
+        <button class="mt-6 w-full bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-600">
+          View All Backlog Classes
+        </button>
       </div>
 
-      <button class="mt-6 w-full bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-600">
-        View All Backlog Classes
-      </button>
     </div>
-
   </div>
 
 </body>
