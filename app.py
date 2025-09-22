@@ -8,7 +8,9 @@ app.secret_key = "supersecretkey"
 
 # Database configuration
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'instance', 'school.db')
+db_path = os.path.join(basedir, 'instance')
+os.makedirs(db_path, exist_ok=True)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(db_path, 'school.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -47,10 +49,9 @@ class Timetable(db.Model):
     teacher = db.Column(db.String(80), nullable=False)
     classroom = db.Column(db.String(20), nullable=False)
 
-# Initialize database tables
+# Initialize database tables and sample data
 with app.app_context():
     db.create_all()
-
     # Create default users if they don't exist
     if not User.query.first():
         admin = User(username="admin", password="adminpass", role="admin", is_absent=False)
@@ -80,69 +81,44 @@ with app.app_context():
 
 # ----------------- Helpers -----------------
 def get_user(username):
-    for user in users:
-        if user["username"] == username:
-            return user
-    return None
+    return User.query.filter_by(username=username).first()
 
 def get_user_by_id(user_id):
-    for user in users:
-        if user["id"] == user_id:
-            return user
-    return None
+    return User.query.get(user_id)
 
 def add_notification(user_id, message):
-    notifications.append({"user_id": user_id, "message": message, "read": False})
+    notif = Notification(user_id=user_id, message=message, read=False)
+    db.session.add(notif)
+    db.session.commit()
 
 def send_message(sender_id, receiver_id, message_text):
-    from datetime import datetime
-    message_id = len(messages) + 1
-    timestamp = datetime.now().isoformat()
-    message = {
-        "id": message_id,
-        "sender_id": sender_id,
-        "receiver_id": receiver_id,
-        "message": message_text,
-        "read": False,
-        "timestamp": timestamp
-    }
-    messages.append(message)
+    message = Message(sender_id=sender_id, receiver_id=receiver_id, message=message_text, read=False)
+    db.session.add(message)
+    db.session.commit()
     return message
 
 def get_messages_for_user(user_id):
-    return [msg for msg in messages if msg["receiver_id"] == user_id]
+    return Message.query.filter_by(receiver_id=user_id).all()
 
 def mark_message_as_read(message_id):
-    for msg in messages:
-        if msg["id"] == message_id:
-            msg["read"] = True
-            return True
+    msg = Message.query.get(message_id)
+    if msg:
+        msg.read = True
+        db.session.commit()
+        return True
     return False
 
 # ----------------- ROUTES -----------------
 @app.route('/')
 def home():
     user = None
+    user_notifications = []
     if 'user_id' in session:
         user = get_user_by_id(session['user_id'])
-    user_notifications = [n for n in notifications if user and n["user_id"] == user["id"] and not n["read"]]
+        user_notifications = Notification.query.filter_by(user_id=user.id, read=False).all()
 
     # Demo timetable
-    global timetable
-    if not timetable:
-        days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-        times = ['08:00', '10:00', '12:00', '14:00', '16:00']
-        subjects = ['Math', 'Science', 'English', 'History', 'Art', 'PE', 'Music']
-        teachers = [u["username"] for u in users if u["role"] == "teacher"]
-        for day in days:
-            for time in times:
-                timetable.append({
-                    "day": day,
-                    "period": time,
-                    "subject": subjects[(hash(day+time) % len(subjects))],
-                    "teacher": teachers[(hash(day+time) % len(teachers))],
-                    "classroom": f"Room {((hash(day+time) % 10) + 1)}"
-                })
+    timetable = Timetable.query.limit(30).all()
 
     classes = timetable[:5]
     backlog_classes = [
@@ -176,7 +152,7 @@ def student_dashboard():
     if session.get('role') != 'student':
         return redirect(url_for('home'))
     user = get_user_by_id(session['user_id'])
-    user_notifications = [n for n in notifications if n["user_id"] == user["id"] and not n["read"]]
+    user_notifications = Notification.query.filter_by(user_id=user.id, read=False).all()
     return render_template('student.html', user=user, notifications=user_notifications)
 
 @app.route('/teacher_dashboard')
@@ -184,13 +160,15 @@ def teacher_dashboard():
     if session.get('role') != 'teacher':
         return redirect(url_for('home'))
     user = get_user_by_id(session['user_id'])
-    user_notifications = [n for n in notifications if n["user_id"] == user["id"] and not n["read"]]
+    user_notifications = Notification.query.filter_by(user_id=user.id, read=False).all()
     return render_template('teacher.html', user=user, notifications=user_notifications)
 
 @app.route('/admin_dashboard')
 def admin_dashboard():
     if session.get('role') != 'admin':
         return redirect(url_for('home'))
+    timetable = Timetable.query.limit(30).all()
+    users = User.query.all()
     return render_template('admin_panel.html', timetable=timetable, users=users)
 
 # ----------------- RUN APP -----------------
