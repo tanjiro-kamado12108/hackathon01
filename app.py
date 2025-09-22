@@ -1,9 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 
-app = Flask(__name__)  # Removed template_folder='.'
+app = Flask(__name__)  # Default template folder is 'templates'
 app.secret_key = "supersecretkey"
 
-# In-memory data stores
+# In-memory data
 users = [
     {"id": 1, "username": "admin", "password": "adminpass", "role": "admin", "is_absent": False},
     {"id": 2, "username": "teacher1", "password": "teachpass", "role": "teacher", "is_absent": False},
@@ -13,7 +13,7 @@ timetable = []
 notifications = []
 messages = []
 
-# Helper functions
+# ----------------- Helpers -----------------
 def get_user(username):
     for user in users:
         if user["username"] == username:
@@ -59,10 +59,10 @@ def mark_message_as_read(message_id):
 def home():
     user = None
     if 'user_id' in session:
-        user = next((u for u in users if u["id"] == session['user_id']), None)
+        user = get_user_by_id(session['user_id'])
     user_notifications = [n for n in notifications if user and n["user_id"] == user["id"] and not n["read"]]
 
-    # Generate a simple timetable for demo
+    # Demo timetable
     global timetable
     if not timetable:
         days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
@@ -79,7 +79,7 @@ def home():
                     "classroom": f"Room {((hash(day+time) % 10) + 1)}"
                 })
 
-    classes = timetable[:5]  # Show first 5 classes for demo
+    classes = timetable[:5]
     backlog_classes = [
         {"subject": "Advanced Mathematics", "date": "2024-12-15"},
         {"subject": "Physics Lab", "date": "2024-12-16"},
@@ -105,7 +105,7 @@ def home():
                            backlog_classes=backlog_classes,
                            rooms=rooms)
 
-# ----------------- DASHBOARDS -----------------
+# ----------------- Dashboards -----------------
 @app.route('/student_dashboard')
 def student_dashboard():
     if session.get('role') != 'student':
@@ -126,7 +126,7 @@ def teacher_dashboard():
 def admin_dashboard():
     if session.get('role') != 'admin':
         return redirect(url_for('home'))
-    return render_template('admin panel.html', timetable=timetable, users=users)
+    return render_template('admin_panel.html', timetable=timetable, users=users)
 
 # ----------------- RUN APP -----------------
 if __name__ == "__main__":
