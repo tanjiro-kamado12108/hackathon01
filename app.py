@@ -109,7 +109,7 @@ def login():
             else:
                 return redirect(url_for('student_dashboard'))
         else:
-            flash("Invalid credentials")
+            pass
     return render_template('signin.html')
 
 @app.route('/signup', methods=['GET', 'POST'])
