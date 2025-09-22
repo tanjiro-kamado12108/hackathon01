@@ -1,1 +1,880 @@
-index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Classroom - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .slide-in-left {
+            animation: slideInLeft 0.6s ease-out;
+        }
+        
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .slide-in-right {
+            animation: slideInRight 0.6s ease-out;
+        }
+        
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .notification-badge {
+            animation: bounce 1s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        .progress-bar {
+            transition: width 1s ease-in-out;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #f8faff 0%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+        }
+        
+        .quick-action-btn {
+            transition: all 0.2s ease;
+        }
+        
+        .quick-action-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .assignment-item {
+            transition: all 0.3s ease;
+        }
+        
+        .assignment-item:hover {
+            background-color: #f8faff;
+            border-left: 4px solid #667eea;
+        }
+        
+        .grade-circle {
+            transition: all 0.5s ease;
+        }
+        
+        .notification {
+            animation: slideInNotification 0.3s ease-out;
+        }
+        
+        @keyframes slideInNotification {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+        }
+        
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .role-toggle {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation Header -->
+    <nav class="bg-white shadow-lg border-b border-gray-200 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo and Brand -->
+                <div class="flex items-center">
+                    <div class="bg-gradient-to-r from-purple-500 to-indigo-600 p-2 rounded-lg">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h1 class="text-xl font-bold text-gray-900">Smart Classroom</h1>
+                        <p class="text-sm text-gray-600">Learning Management System</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium transition-colors">Dashboard</a>
+                    <a href="#" class="text-gray-500 hover:text-indigo-600 transition-colors" id="coursesLink">Courses</a>
+                    <a href="#" class="text-gray-500 hover:text-indigo-600 transition-colors" id="assignmentsLink">Assignments</a>
+                    <a href="#" class="text-gray-500 hover:text-indigo-600 transition-colors" id="gradesLink">Grades</a>
+                    <a href="#" class="text-gray-500 hover:text-indigo-600 transition-colors">Calendar</a>
+                </div>
+
+                <!-- User Profile -->
+                <div class="flex items-center space-x-4">
+                    <!-- Role Toggle -->
+                    <div class="role-toggle rounded-lg p-1">
+                        <div class="flex items-center space-x-2">
+                            <button id="studentRole" class="role-btn px-3 py-1 rounded text-sm font-medium text-white bg-white bg-opacity-20">
+                                Student
+                            </button>
+                            <button id="teacherRole" class="role-btn px-3 py-1 rounded text-sm font-medium text-white hover:bg-white hover:bg-opacity-20 transition-colors">
+                                Teacher
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Notifications -->
+                    <div class="relative">
+                        <button class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg relative">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
+                            </svg>
+                            <span class="notification-badge absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+                        </button>
+                    </div>
+
+                    <!-- User Avatar -->
+                    <div class="flex items-center space-x-3">
+                        <div class="text-right">
+                            <p class="text-sm font-medium text-gray-900" id="userName">Alex Johnson</p>
+                            <p class="text-xs text-gray-600" id="userRole">Computer Science Student</p>
+                        </div>
+                        <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full flex items-center justify-center">
+                            <span class="text-white font-semibold text-sm" id="userInitials">AJ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section text-white py-16 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center fade-in">
+                <h1 class="text-4xl md:text-6xl font-bold mb-6">
+                    Welcome to Your
+                    <span class="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
+                        Learning Journey
+                    </span>
+                </h1>
+                <p class="text-xl md:text-2xl text-purple-100 mb-8 max-w-3xl mx-auto">
+                    Manage your courses, track assignments, and excel in your academic goals with our comprehensive learning platform.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button class="btn-primary text-white px-8 py-4 rounded-xl font-semibold text-lg">
+                        <svg class="w-6 h-6 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                        Get Started
+                    </button>
+                    <button class="bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-opacity-30 transition-all">
+                        <svg class="w-6 h-6 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
+                        </svg>
+                        View Demo
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Floating Elements -->
+        <div class="absolute top-20 left-10 floating-element">
+            <div class="w-16 h-16 bg-white bg-opacity-10 rounded-full flex items-center justify-center">
+                <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+        </div>
+        <div class="absolute top-32 right-20 floating-element" style="animation-delay: -2s;">
+            <div class="w-12 h-12 bg-white bg-opacity-10 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Stats -->
+    <section class="py-12 -mt-8 relative z-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 slide-in-left">
+                <div class="stat-card rounded-xl p-6 text-center card-hover">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900" id="completedAssignments">24</h3>
+                    <p class="text-gray-600">Assignments Completed</p>
+                </div>
+                
+                <div class="stat-card rounded-xl p-6 text-center card-hover">
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900" id="activeCourses">6</h3>
+                    <p class="text-gray-600">Active Courses</p>
+                </div>
+                
+                <div class="stat-card rounded-xl p-6 text-center card-hover">
+                    <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-6 h-6 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900" id="currentGPA">3.8</h3>
+                    <p class="text-gray-600">Current GPA</p>
+                </div>
+                
+                <div class="stat-card rounded-xl p-6 text-center card-hover">
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900" id="upcomingDeadlines">5</h3>
+                    <p class="text-gray-600">Upcoming Deadlines</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Dashboard Content -->
+    <section class="py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Column -->
+                <div class="lg:col-span-2 space-y-8">
+                    <!-- Quick Actions -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 fade-in">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-6">Quick Actions</h2>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="quickActions">
+                            <!-- Quick action buttons will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Recent Assignments -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 slide-in-left">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-xl font-semibold text-gray-900" id="assignmentsTitle">Recent Assignments</h2>
+                            <a href="#" class="text-indigo-600 hover:text-indigo-800 font-medium">View All</a>
+                        </div>
+                        <div class="space-y-4" id="assignmentsList">
+                            <!-- Assignments will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Course Progress -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 slide-in-right">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-6">Course Progress</h2>
+                        <div class="space-y-6" id="courseProgress">
+                            <!-- Course progress will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="space-y-8">
+                    <!-- Today's Schedule -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 fade-in">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Today's Schedule</h3>
+                        <div class="space-y-3" id="todaySchedule">
+                            <!-- Today's schedule will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Recent Grades -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 slide-in-right">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4" id="gradesTitle">Recent Grades</h3>
+                        <div class="space-y-3" id="recentGrades">
+                            <!-- Recent grades will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Announcements -->
+                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-6 fade-in">
+                        <h3 class="text-lg font-semibold text-blue-900 mb-4">📢 Announcements</h3>
+                        <div class="space-y-3" id="announcements">
+                            <!-- Announcements will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Calendar Widget -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 slide-in-left">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900">Calendar</h3>
+                            <button class="text-indigo-600 hover:text-indigo-800">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div id="miniCalendar" class="text-sm">
+                            <!-- Mini calendar will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-gradient-to-r from-purple-500 to-indigo-600 p-2 rounded-lg">
+                            <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3z"/>
+                            </svg>
+                        </div>
+                        <span class="ml-3 text-xl font-bold">Smart Classroom</span>
+                    </div>
+                    <p class="text-gray-300 mb-4">
+                        Empowering education through innovative technology. Create, learn, and grow with our comprehensive learning management system.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#" class="hover:text-white transition-colors">Dashboard</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Courses</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Assignments</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Calendar</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#" class="hover:text-white transition-colors">Help Center</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Contact Us</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 Smart Classroom. All rights reserved. Built with ❤️ for education.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDashboard();
+            setupEventListeners();
+            loadUserData();
+        });
+
+        let currentUserRole = 'student';
+        let userData = {
+            student: {
+                name: 'Alex Johnson',
+                role: 'Computer Science Student',
+                initials: 'AJ',
+                stats: {
+                    completedAssignments: 24,
+                    activeCourses: 6,
+                    currentGPA: 3.8,
+                    upcomingDeadlines: 5
+                }
+            },
+            teacher: {
+                name: 'Dr. Sarah Wilson',
+                role: 'Mathematics Professor',
+                initials: 'SW',
+                stats: {
+                    completedAssignments: 156,
+                    activeCourses: 4,
+                    currentGPA: 'N/A',
+                    upcomingDeadlines: 12
+                }
+            }
+        };
+
+        function initializeDashboard() {
+            updateUserInterface();
+            loadQuickActions();
+            loadAssignments();
+            loadCourseProgress();
+            loadTodaySchedule();
+            loadRecentGrades();
+            loadAnnouncements();
+            loadMiniCalendar();
+        }
+
+        function setupEventListeners() {
+            // Role switching
+            document.getElementById('studentRole').addEventListener('click', () => switchRole('student'));
+            document.getElementById('teacherRole').addEventListener('click', () => switchRole('teacher'));
+
+            // Quick action buttons
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.quick-action-btn')) {
+                    const action = e.target.closest('.quick-action-btn').dataset.action;
+                    handleQuickAction(action);
+                }
+            });
+        }
+
+        function switchRole(role) {
+            currentUserRole = role;
+            
+            // Update role buttons
+            document.querySelectorAll('.role-btn').forEach(btn => {
+                btn.classList.remove('bg-white', 'bg-opacity-20');
+                btn.classList.add('hover:bg-white', 'hover:bg-opacity-20');
+            });
+            
+            if (role === 'student') {
+                document.getElementById('studentRole').classList.add('bg-white', 'bg-opacity-20');
+                document.getElementById('studentRole').classList.remove('hover:bg-white', 'hover:bg-opacity-20');
+            } else {
+                document.getElementById('teacherRole').classList.add('bg-white', 'bg-opacity-20');
+                document.getElementById('teacherRole').classList.remove('hover:bg-white', 'hover:bg-opacity-20');
+            }
+
+            updateUserInterface();
+            loadQuickActions();
+            loadAssignments();
+            loadRecentGrades();
+            
+            showNotification(`Switched to ${role} view`, 'success');
+        }
+
+        function updateUserInterface() {
+            const user = userData[currentUserRole];
+            
+            // Update user info
+            document.getElementById('userName').textContent = user.name;
+            document.getElementById('userRole').textContent = user.role;
+            document.getElementById('userInitials').textContent = user.initials;
+
+            // Update stats
+            document.getElementById('completedAssignments').textContent = user.stats.completedAssignments;
+            document.getElementById('activeCourses').textContent = user.stats.activeCourses;
+            document.getElementById('currentGPA').textContent = user.stats.currentGPA;
+            document.getElementById('upcomingDeadlines').textContent = user.stats.upcomingDeadlines;
+
+            // Update navigation links
+            if (currentUserRole === 'teacher') {
+                document.getElementById('coursesLink').textContent = 'My Classes';
+                document.getElementById('assignmentsLink').textContent = 'Create Assignment';
+                document.getElementById('gradesLink').textContent = 'Gradebook';
+            } else {
+                document.getElementById('coursesLink').textContent = 'Courses';
+                document.getElementById('assignmentsLink').textContent = 'Assignments';
+                document.getElementById('gradesLink').textContent = 'Grades';
+            }
+        }
+
+        function loadQuickActions() {
+            const quickActions = document.getElementById('quickActions');
+            
+            const studentActions = [
+                { icon: '📚', title: 'View Courses', action: 'viewCourses', color: 'blue' },
+                { icon: '📝', title: 'Assignments', action: 'viewAssignments', color: 'green' },
+                { icon: '📊', title: 'Grades', action: 'viewGrades', color: 'purple' },
+                { icon: '📅', title: 'Calendar', action: 'openCalendar', color: 'orange' }
+            ];
+
+            const teacherActions = [
+                { icon: '➕', title: 'Create Assignment', action: 'createAssignment', color: 'blue' },
+                { icon: '👥', title: 'Manage Classes', action: 'manageClasses', color: 'green' },
+                { icon: '📊', title: 'Gradebook', action: 'openGradebook', color: 'purple' },
+                { icon: '📈', title: 'Analytics', action: 'viewAnalytics', color: 'orange' }
+            ];
+
+            const actions = currentUserRole === 'student' ? studentActions : teacherActions;
+
+            quickActions.innerHTML = actions.map(action => `
+                <button class="quick-action-btn bg-${action.color}-50 hover:bg-${action.color}-100 border border-${action.color}-200 rounded-xl p-4 text-center transition-all" data-action="${action.action}">
+                    <div class="text-2xl mb-2">${action.icon}</div>
+                    <div class="text-sm font-medium text-${action.color}-800">${action.title}</div>
+                </button>
+            `).join('');
+        }
+
+        function loadAssignments() {
+            const assignmentsList = document.getElementById('assignmentsList');
+            const assignmentsTitle = document.getElementById('assignmentsTitle');
+            
+            if (currentUserRole === 'teacher') {
+                assignmentsTitle.textContent = 'Recent Class Activities';
+                
+                const teacherAssignments = [
+                    { title: 'Calculus Midterm Grading', course: 'MATH 201', status: 'In Progress', priority: 'high', dueDate: 'Today' },
+                    { title: 'Linear Algebra Quiz', course: 'MATH 301', status: 'Published', priority: 'medium', dueDate: 'Dec 20' },
+                    { title: 'Statistics Project Review', course: 'MATH 401', status: 'Pending', priority: 'low', dueDate: 'Dec 22' }
+                ];
+
+                assignmentsList.innerHTML = teacherAssignments.map(assignment => `
+                    <div class="assignment-item flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div class="flex-1">
+                            <h4 class="font-medium text-gray-900">${assignment.title}</h4>
+                            <p class="text-sm text-gray-600">${assignment.course}</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="px-2 py-1 bg-${assignment.priority === 'high' ? 'red' : assignment.priority === 'medium' ? 'yellow' : 'green'}-100 text-${assignment.priority === 'high' ? 'red' : assignment.priority === 'medium' ? 'yellow' : 'green'}-800 text-xs font-medium rounded-full">
+                                ${assignment.status}
+                            </span>
+                            <p class="text-xs text-gray-500 mt-1">${assignment.dueDate}</p>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                assignmentsTitle.textContent = 'Recent Assignments';
+                
+                const studentAssignments = [
+                    { title: 'Data Structures Project', course: 'CS 201', status: 'Due Soon', priority: 'high', dueDate: 'Dec 18' },
+                    { title: 'Calculus Problem Set', course: 'MATH 101', status: 'In Progress', priority: 'medium', dueDate: 'Dec 20' },
+                    { title: 'Physics Lab Report', course: 'PHYS 101', status: 'Submitted', priority: 'low', dueDate: 'Dec 15' }
+                ];
+
+                assignmentsList.innerHTML = studentAssignments.map(assignment => `
+                    <div class="assignment-item flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div class="flex-1">
+                            <h4 class="font-medium text-gray-900">${assignment.title}</h4>
+                            <p class="text-sm text-gray-600">${assignment.course}</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="px-2 py-1 bg-${assignment.priority === 'high' ? 'red' : assignment.priority === 'medium' ? 'yellow' : 'green'}-100 text-${assignment.priority === 'high' ? 'red' : assignment.priority === 'medium' ? 'yellow' : 'green'}-800 text-xs font-medium rounded-full">
+                                ${assignment.status}
+                            </span>
+                            <p class="text-xs text-gray-500 mt-1">Due ${assignment.dueDate}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function loadCourseProgress() {
+            const courseProgress = document.getElementById('courseProgress');
+            
+            const courses = currentUserRole === 'student' ? [
+                { name: 'Computer Science 201', progress: 85, color: 'blue' },
+                { name: 'Mathematics 101', progress: 92, color: 'green' },
+                { name: 'Physics 101', progress: 78, color: 'purple' },
+                { name: 'English Literature', progress: 88, color: 'orange' }
+            ] : [
+                { name: 'Advanced Calculus', progress: 75, color: 'blue' },
+                { name: 'Linear Algebra', progress: 90, color: 'green' },
+                { name: 'Statistics', progress: 82, color: 'purple' },
+                { name: 'Discrete Mathematics', progress: 95, color: 'orange' }
+            ];
+
+            courseProgress.innerHTML = courses.map(course => `
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <h4 class="font-medium text-gray-900">${course.name}</h4>
+                        <span class="text-sm font-semibold text-${course.color}-600">${course.progress}%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="progress-bar bg-${course.color}-500 h-2 rounded-full" style="width: ${course.progress}%"></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadTodaySchedule() {
+            const todaySchedule = document.getElementById('todaySchedule');
+            
+            const schedule = currentUserRole === 'student' ? [
+                { time: '9:00 AM', title: 'Computer Science Lecture', location: 'Room 201' },
+                { time: '11:00 AM', title: 'Mathematics Tutorial', location: 'Room 105' },
+                { time: '2:00 PM', title: 'Physics Lab', location: 'Lab 3' },
+                { time: '4:00 PM', title: 'Study Group', location: 'Library' }
+            ] : [
+                { time: '9:00 AM', title: 'Advanced Calculus', location: 'Room 301' },
+                { time: '11:00 AM', title: 'Office Hours', location: 'Office 205' },
+                { time: '2:00 PM', title: 'Faculty Meeting', location: 'Conference Room' },
+                { time: '4:00 PM', title: 'Research Session', location: 'Lab 1' }
+            ];
+
+            todaySchedule.innerHTML = schedule.map(item => `
+                <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                    <div class="w-16 text-sm font-medium text-gray-600">${item.time}</div>
+                    <div class="flex-1 ml-3">
+                        <p class="font-medium text-gray-900">${item.title}</p>
+                        <p class="text-xs text-gray-600">${item.location}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadRecentGrades() {
+            const recentGrades = document.getElementById('recentGrades');
+            const gradesTitle = document.getElementById('gradesTitle');
+            
+            if (currentUserRole === 'teacher') {
+                gradesTitle.textContent = 'Recent Submissions';
+                
+                const submissions = [
+                    { student: 'John Smith', assignment: 'Calculus Quiz', grade: 'A-', status: 'graded' },
+                    { student: 'Emma Davis', assignment: 'Linear Algebra', grade: 'B+', status: 'graded' },
+                    { student: 'Mike Johnson', assignment: 'Statistics Project', grade: 'Pending', status: 'pending' }
+                ];
+
+                recentGrades.innerHTML = submissions.map(submission => `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div>
+                            <p class="font-medium text-gray-900">${submission.student}</p>
+                            <p class="text-xs text-gray-600">${submission.assignment}</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="grade-circle w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${submission.status === 'graded' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+                                ${submission.grade === 'Pending' ? '?' : submission.grade}
+                            </span>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                gradesTitle.textContent = 'Recent Grades';
+                
+                const grades = [
+                    { course: 'Computer Science', assignment: 'Project 3', grade: 'A', points: '95/100' },
+                    { course: 'Mathematics', assignment: 'Quiz 5', grade: 'A-', points: '88/100' },
+                    { course: 'Physics', assignment: 'Lab Report', grade: 'B+', points: '87/100' }
+                ];
+
+                recentGrades.innerHTML = grades.map(grade => `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div>
+                            <p class="font-medium text-gray-900">${grade.course}</p>
+                            <p class="text-xs text-gray-600">${grade.assignment}</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="grade-circle w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                <span class="text-xs font-bold text-green-800">${grade.grade}</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">${grade.points}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function loadAnnouncements() {
+            const announcements = document.getElementById('announcements');
+            
+            const announcementList = [
+                { title: 'Winter Break Schedule', time: '2 hours ago', type: 'info' },
+                { title: 'New Course Registration Open', time: '1 day ago', type: 'success' },
+                { title: 'Library Hours Extended', time: '3 days ago', type: 'info' }
+            ];
+
+            announcements.innerHTML = announcementList.map(announcement => `
+                <div class="p-3 bg-white bg-opacity-50 rounded-lg border border-blue-200">
+                    <p class="font-medium text-blue-900 text-sm">${announcement.title}</p>
+                    <p class="text-xs text-blue-700 mt-1">${announcement.time}</p>
+                </div>
+            `).join('');
+        }
+
+        function loadMiniCalendar() {
+            const miniCalendar = document.getElementById('miniCalendar');
+            const today = new Date();
+            const currentMonth = today.getMonth();
+            const currentYear = today.getFullYear();
+            
+            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            
+            miniCalendar.innerHTML = `
+                <div class="text-center mb-3">
+                    <h4 class="font-semibold text-gray-900">${monthNames[currentMonth]} ${currentYear}</h4>
+                </div>
+                <div class="grid grid-cols-7 gap-1 text-center">
+                    <div class="text-xs text-gray-500 p-1">S</div>
+                    <div class="text-xs text-gray-500 p-1">M</div>
+                    <div class="text-xs text-gray-500 p-1">T</div>
+                    <div class="text-xs text-gray-500 p-1">W</div>
+                    <div class="text-xs text-gray-500 p-1">T</div>
+                    <div class="text-xs text-gray-500 p-1">F</div>
+                    <div class="text-xs text-gray-500 p-1">S</div>
+                    ${generateCalendarDays(currentYear, currentMonth)}
+                </div>
+            `;
+        }
+
+        function generateCalendarDays(year, month) {
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const today = new Date().getDate();
+            
+            let days = '';
+            
+            // Empty cells for days before the first day of the month
+            for (let i = 0; i < firstDay; i++) {
+                days += '<div class="p-1"></div>';
+            }
+            
+            // Days of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const isToday = day === today;
+                days += `<div class="p-1 text-xs ${isToday ? 'bg-indigo-600 text-white rounded-full' : 'text-gray-700 hover:bg-gray-100 rounded'} cursor-pointer">${day}</div>`;
+            }
+            
+            return days;
+        }
+
+        function handleQuickAction(action) {
+            const actions = {
+                viewCourses: () => showNotification('Opening courses page...', 'info'),
+                viewAssignments: () => showNotification('Opening assignments page...', 'info'),
+                viewGrades: () => showNotification('Opening grades page...', 'info'),
+                openCalendar: () => showNotification('Opening calendar...', 'info'),
+                createAssignment: () => showNotification('Opening assignment creator...', 'info'),
+                manageClasses: () => showNotification('Opening class management...', 'info'),
+                openGradebook: () => showNotification('Opening gradebook...', 'info'),
+                viewAnalytics: () => showNotification('Opening analytics dashboard...', 'info')
+            };
+
+            if (actions[action]) {
+                actions[action]();
+            }
+        }
+
+        function loadUserData() {
+            // Simulate loading user data from localStorage or API
+            const savedRole = localStorage.getItem('userRole') || 'student';
+            if (savedRole !== currentUserRole) {
+                switchRole(savedRole);
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm notification`;
+            
+            const colors = {
+                success: 'bg-green-500 text-white',
+                error: 'bg-red-500 text-white',
+                warning: 'bg-yellow-500 text-white',
+                info: 'bg-blue-500 text-white'
+            };
+            
+            notification.className += ` ${colors[type] || colors.info}`;
+            
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <div class="flex-1">
+                        <p class="text-sm font-medium">${message}</p>
+                    </div>
+                    <button class="ml-3 text-white hover:text-gray-200" onclick="this.parentElement.parentElement.remove()">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 4000);
+        }
+
+        // Save user role preference
+        window.addEventListener('beforeunload', function() {
+            localStorage.setItem('userRole', currentUserRole);
+        });
+
+        console.log('Smart Classroom dashboard initialized successfully');
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98339c85841ecbb5',t:'MTc1ODU2MzA3OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
