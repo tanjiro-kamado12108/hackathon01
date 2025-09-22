@@ -54,6 +54,68 @@ def mark_message_as_read(message_id):
             return True
     return False
 
+# ----------------- AUTHENTICATION ROUTES -----------------
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        first_name = request.form.get('firstName', '')
+        last_name = request.form.get('lastName', '')
+        role = request.form.get('role', 'student')
+
+        # Check if user already exists
+        if get_user(username):
+            flash('Username already exists. Please choose a different one.')
+            return redirect(url_for('signup'))
+
+        # Create new user
+        new_user_id = len(users) + 1
+        new_user = {
+            "id": new_user_id,
+            "username": username,
+            "password": password,
+            "role": role,
+            "is_absent": False
+        }
+        users.append(new_user)
+
+        flash('Account created successfully! Please log in.')
+        return redirect(url_for('login'))
+
+    return render_template('signup.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        user = get_user(username)
+        if user and user['password'] == password:
+            session['user_id'] = user['id']
+            session['role'] = user['role']
+            session['username'] = user['username']
+
+            flash(f'Welcome back, {user["username"]}!')
+            if user['role'] == 'admin':
+                return redirect(url_for('admin_dashboard'))
+            elif user['role'] == 'teacher':
+                return redirect(url_for('teacher_dashboard'))
+            else:
+                return redirect(url_for('student_dashboard'))
+        else:
+            flash('Invalid username or password. Please try again.')
+            return redirect(url_for('login'))
+
+    return render_template('signin.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('You have been logged out successfully.')
+    return redirect(url_for('home'))
+
 # ----------------- ROUTES -----------------
 @app.route('/')
 def home():
