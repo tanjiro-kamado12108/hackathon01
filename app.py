@@ -10,7 +10,7 @@ Right now, making timetables in schools and colleges is:
 - Hard to change if a teacher is absent or a room is not available.
 - Smart classrooms like labs and projectors are not used properly because there is no smart allocation.
 
-In short, we are using old methods in today’s smart world.
+In short, we are using old methods in today's smart world.
 
 Proposed Solution (Pratyush)
 Good morning everyone, I am Pratyush. Now I will explain our proposed solution.
@@ -39,7 +39,7 @@ This project will have a strong impact:
 So, our Smart Classroom & Timetable Scheduler is not just a timetable tool – it is a smart system that saves time, reduces errors, and makes education smoother and smarter.
 '''
 
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 
 app = Flask(__name__, template_folder='.')
 app.secret_key = "supersecretkey"
@@ -253,6 +253,155 @@ def classreport():
 @app.route('/analytics')
 def analytics():
     return render_template('analytics.html')
+
+# API Routes for Student Dashboard
+@app.route('/api/auth/status')
+def api_auth_status():
+    if 'user_id' in session:
+        user = next((u for u in users if u["id"] == session['user_id']), None)
+        if user:
+            return jsonify({
+                'authenticated': True,
+                'user': {
+                    'id': user['id'],
+                    'name': user['username'],
+                    'email': f"{user['username']}@school.edu",
+                    'role': user['role']
+                }
+            })
+    return jsonify({'authenticated': False}), 401
+
+@app.route('/api/student/assignments')
+def api_student_assignments():
+    if session.get('role') != 'student':
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    # Mock assignments data
+    assignments = [
+        {
+            'id': 1,
+            'title': 'Mathematics Quiz',
+            'due_date': '2024-12-20T23:59:00',
+            'course': 'Mathematics'
+        },
+        {
+            'id': 2,
+            'title': 'History Essay',
+            'due_date': '2024-12-22T23:59:00',
+            'course': 'History'
+        },
+        {
+            'id': 3,
+            'title': 'Science Lab Report',
+            'due_date': '2024-12-25T23:59:00',
+            'course': 'Science'
+        }
+    ]
+    return jsonify(assignments)
+
+@app.route('/api/student/courses')
+def api_student_courses():
+    if session.get('role') != 'student':
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    # Mock courses data
+    courses = [
+        {
+            'id': 1,
+            'name': 'Mathematics',
+            'teacher_name': 'Mrs. Johnson',
+            'progress': 75
+        },
+        {
+            'id': 2,
+            'name': 'Science',
+            'teacher_name': 'Dr. Smith',
+            'progress': 60
+        },
+        {
+            'id': 3,
+            'name': 'History',
+            'teacher_name': 'Mr. Davis',
+            'progress': 85
+        },
+        {
+            'id': 4,
+            'name': 'English',
+            'teacher_name': 'Ms. Wilson',
+            'progress': 90
+        }
+    ]
+    return jsonify(courses)
+
+@app.route('/api/student/stats')
+def api_student_stats():
+    if session.get('role') != 'student':
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    # Mock stats data
+    stats = {
+        'completed_assignments': 12,
+        'pending_assignments': 5,
+        'average_grade': 87,
+        'total_courses': 6
+    }
+    return jsonify(stats)
+
+@app.route('/api/student/schedule')
+def api_student_schedule():
+    if session.get('role') != 'student':
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    # Mock schedule data
+    schedule = [
+        {
+            'id': 1,
+            'title': 'Mathematics',
+            'start_time': '2024-12-19T09:00:00',
+            'location': 'Room 101'
+        },
+        {
+            'id': 2,
+            'title': 'Science',
+            'start_time': '2024-12-19T10:30:00',
+            'location': 'Lab 205'
+        },
+        {
+            'id': 3,
+            'title': 'History',
+            'start_time': '2024-12-19T13:00:00',
+            'location': 'Room 203'
+        },
+        {
+            'id': 4,
+            'title': 'English',
+            'start_time': '2024-12-19T14:30:00',
+            'location': 'Room 105'
+        }
+    ]
+    return jsonify(schedule)
+
+@app.route('/api/student/announcements')
+def api_student_announcements():
+    if session.get('role') != 'student':
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    # Mock announcements data
+    announcements = [
+        {
+            'id': 1,
+            'title': 'Library Hours Extended',
+            'content': 'The library will be open until 10 PM during exam week.',
+            'created_at': '2024-12-19T10:00:00'
+        },
+        {
+            'id': 2,
+            'title': 'Exam Schedule Released',
+            'content': 'Final exam schedules are now available in your student portal.',
+            'created_at': '2024-12-18T14:30:00'
+        }
+    ]
+    return jsonify(announcements)
 
 if __name__ == "__main__":
     app.run(debug=True)
