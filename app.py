@@ -630,4 +630,4 @@ def api_teacher_mark_message_read():
     })
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5001)
