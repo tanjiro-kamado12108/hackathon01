@@ -75,6 +75,7 @@ def home():
     if 'user_id' in session:
         user = next((u for u in users if u["id"] == session['user_id']), None)
     user_notifications = [n for n in notifications if user and n["user_id"] == user["id"] and not n["read"]]
+
     # Generate a simple timetable for demo
     global timetable
     if not timetable:
@@ -91,44 +92,34 @@ def home():
                     "teacher": teachers[(hash(day+time) % len(teachers))],
                     "classroom": f"Room {((hash(day+time) % 10) + 1)}"
                 })
-    return render_template('index.html', timetable=timetable, notifications=user_notifications)
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        user = get_user(username)
-        if user and user["password"] == password:
-            session['user_id'] = user["id"]
-            session['role'] = user["role"]
-            if user["role"] == 'admin':
-                return redirect(url_for('admin_dashboard'))
-            elif user["role"] == 'teacher':
-                return redirect(url_for('teacher_dashboard'))
-            else:
-                return redirect(url_for('student_dashboard'))
-        else:
-            pass
-    return render_template('signin.html')
+    # Prepare data for template
+    classes = timetable[:5]  # Show first 5 classes for demo
+    backlog_classes = [
+        {"subject": "Advanced Mathematics", "date": "2024-12-15"},
+        {"subject": "Physics Lab", "date": "2024-12-16"},
+        {"subject": "Chemistry", "date": "2024-12-17"},
+        {"subject": "English Literature", "date": "2024-12-18"},
+        {"subject": "Computer Science", "date": "2024-12-19"}
+    ]
 
-@app.route('/signup', methods=['GET', 'POST'])
-def signup():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        role = request.form.get('role', 'student')
-        if not username or not password:
-            flash('All fields are required')
-            return redirect(url_for('signup'))
-        if get_user(username):
-            flash('Username already exists')
-            return redirect(url_for('signup'))
-        new_id = max([u['id'] for u in users]) + 1 if users else 1
-        users.append({"id": new_id, "username": username, "password": password, "role": role, "is_absent": False})
-        flash('Account created successfully! Please log in.')
-        return redirect(url_for('login'))
-    return render_template('signup.html')
+    # Generate room availability data
+    rooms = [
+        {"name": "Room 101", "available": True},
+        {"name": "Room 102", "available": False},
+        {"name": "Room 103", "available": True},
+        {"name": "Room 104", "available": True},
+        {"name": "Lab 201", "available": False},
+        {"name": "Lab 202", "available": True},
+        {"name": "Auditorium", "available": False},
+        {"name": "Library", "available": True}
+    ]
+
+    return render_template('index.html',
+                         classes=classes,
+                         notifications=user_notifications,
+                         backlog_classes=backlog_classes,
+                         rooms=rooms)
 
 @app.route('/student_dashboard')
 def student_dashboard():
