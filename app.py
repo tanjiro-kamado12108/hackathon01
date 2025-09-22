@@ -507,5 +507,46 @@ def api_get_teachers():
 
     return jsonify(formatted_teachers)
 
+# Teacher Messaging API Routes
+@app.route('/api/teacher/students')
+def api_teacher_students():
+    """API endpoint for teachers to get list of students"""
+    if session.get('role') != 'teacher':
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    students = [user for user in users if user['role'] == 'student']
+    formatted_students = []
+    for student in students:
+        # Get unread message count for this student
+        unread_count = len([msg for msg in messages
+                           if msg['sender_id'] == student['id'] and
+                           msg['receiver_id'] == session['user_id'] and
+                           not msg['read']])
+
+        formatted_students.append({
+            'id': student['id'],
+            'name': student['username'],
+            'class': 'General',  # Default class for demo
+            'unread': unread_count,
+            'online': True  # For demo purposes
+        })
+
+    return jsonify(formatted_students)
+
+@app.route('/api/teacher/messages')
+def api_teacher_student_messages():
+    """API endpoint for teachers to get messages with a specific student"""
+    if session.get('role') != 'teacher':
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    student_id = request.args.get('student_id', type=int)
+    if not student_id:
+        return jsonify({'error': 'Missing student_id parameter'}), 400
+
+    # Get messages between teacher and this student
+    teacher_id = session['user_id']
+    conversation_messages = [msg for msg in messages
+                           if ((msg['sender_id'] == teacher_id and msg['receiver_id'] == student_id) or
+
 if __name__ == "__main__":
     app.run(debug=True)
