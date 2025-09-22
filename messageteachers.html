@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Teacher - Smart Classroom</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-success:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message-bubble {
+            animation: messageSlide 0.3s ease-out;
+        }
+        
+        @keyframes messageSlide {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .notification {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .teacher-avatar {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        }
+        
+        .student-avatar {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .online-indicator {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .typing-indicator {
+            animation: typing 1.5s infinite;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+        
+        .chat-container {
+            height: calc(100vh - 200px);
+            min-height: 400px;
+        }
+        
+        .message-input {
+            resize: none;
+            min-height: 44px;
+            max-height: 120px;
+        }
+        
+        .attachment-preview {
+            animation: fadeInScale 0.3s ease-out;
+        }
+        
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation Header -->
+    <nav class="bg-white shadow-lg border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo and Brand -->
+                <div class="flex items-center">
+                    <button id="backBtn" class="mr-4 p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                        </svg>
+                    </button>
+                    <div class="bg-gradient-to-r from-purple-500 to-indigo-600 p-2 rounded-lg">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h1 class="text-xl font-bold text-gray-900">Messages</h1>
+                        <p class="text-sm text-gray-600">Smart Classroom</p>
+                    </div>
+                </div>
+
+                <!-- Student Info -->
+                <div class="flex items-center space-x-4">
+                    <div class="text-right">
+                        <p class="text-sm font-medium text-gray-900" id="studentName">Alex Johnson</p>
+                        <p class="text-xs text-gray-600">Student ID: 2024001</p>
+                    </div>
+                    <div class="student-avatar w-10 h-10 rounded-full flex items-center justify-center">
+                        <span class="text-white font-semibold text-sm" id="studentInitials">AJ</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Teachers List Sidebar -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 fade-in">
+                    <div class="p-4 border-b border-gray-200">
+                        <h2 class="text-lg font-semibold text-gray-900">Your Teachers</h2>
+                        <div class="mt-3">
+                            <input type="text" id="teacherSearch" placeholder="Search teachers..." class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                    </div>
+                    <div class="divide-y divide-gray-200" id="teachersList">
+                        <!-- Teachers will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Interface -->
+            <div class="lg:col-span-3">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 fade-in">
+                    <!-- Chat Header -->
+                    <div id="chatHeader" class="p-4 border-b border-gray-200 hidden">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="teacher-avatar w-12 h-12 rounded-full flex items-center justify-center mr-3 relative">
+                                    <span class="text-white font-semibold" id="selectedTeacherInitials">SW</span>
+                                    <div class="online-indicator absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900" id="selectedTeacherName">Dr. Sarah Wilson</h3>
+                                    <p class="text-sm text-gray-600" id="selectedTeacherSubject">Advanced Mathematics</p>
+                                    <p class="text-xs text-green-600" id="teacherStatus">Online now</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <button id="videoCallBtn" class="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/>
+                                    </svg>
+                                </button>
+                                <button id="moreOptionsBtn" class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Welcome Screen -->
+                    <div id="welcomeScreen" class="flex items-center justify-center chat-container">
+                        <div class="text-center">
+                            <div class="w-24 h-24 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-900 mb-2">Welcome to Messages! 💬</h3>
+                            <p class="text-gray-600 mb-4">Select a teacher from the sidebar to start a conversation.</p>
+                            <p class="text-sm text-gray-500">You can ask questions about assignments, get help with coursework, or discuss your progress.</p>
+                        </div>
+                    </div>
+
+                    <!-- Chat Messages -->
+                    <div id="chatMessages" class="chat-container overflow-y-auto p-4 space-y-4 hidden">
+                        <!-- Messages will be populated here -->
+                    </div>
+
+                    <!-- Typing Indicator -->
+                    <div id="typingIndicator" class="px-4 py-2 hidden">
+                        <div class="flex items-center text-sm text-gray-500">
+                            <div class="teacher-avatar w-6 h-6 rounded-full flex items-center justify-center mr-2">
+                                <span class="text-white text-xs font-semibold">SW</span>
+                            </div>
+                            <span class="typing-indicator">Dr. Wilson is typing...</span>
+                        </div>
+                    </div>
+
+                    <!-- Message Input -->
+                    <div id="messageInput" class="border-t border-gray-200 p-4 hidden">
+                        <div class="flex items-end space-x-3">
+                            <div class="flex-1">
+                                <!-- Attachment Preview -->
+                                <div id="attachmentPreview" class="mb-3 hidden">
+                                    <div class="flex items-center p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                        <svg class="w-5 h-5 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z" clip-rule="evenodd"/>
+                                        </svg>
+                                        <span class="text-sm text-blue-800 flex-1" id="attachmentName">document.pdf</span>
+                                        <button id="removeAttachment" class="text-blue-600 hover:text-blue-800">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-end space-x-2">
+                                    <button id="attachBtn" class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </button>
+                                    <div class="flex-1 relative">
+                                        <textarea id="messageTextarea" rows="1" class="message-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 pr-12" placeholder="Type your message..."></textarea>
+                                        <button id="emojiBtn" class="absolute right-3 top-3 text-gray-500 hover:text-gray-700">
+                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-.464 5.535a1 1 0 10-1.415-1.414 3 3 0 01-4.242 0 1 1 0 00-1.415 1.414 5 5 0 007.072 0z" clip-rule="evenodd"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <button id="sendBtn" class="btn-primary text-white p-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <!-- Quick Replies -->
+                        <div class="mt-3 flex flex-wrap gap-2" id="quickReplies">
+                            <button class="quick-reply px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full hover:bg-gray-200 transition-colors">Thank you!</button>
+                            <button class="quick-reply px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full hover:bg-gray-200 transition-colors">I have a question</button>
+                            <button class="quick-reply px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full hover:bg-gray-200 transition-colors">Can we schedule a meeting?</button>
+                            <button class="quick-reply px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full hover:bg-gray-200 transition-colors">I need help with homework</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Input -->
+    <input type="file" id="fileInput" class="hidden" accept=".pdf,.doc,.docx,.txt,.jpg,.png,.gif">
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeMessaging();
+            setupEventListeners();
+            loadTeachers();
+        });
+
+        let selectedTeacher = null;
+        let currentAttachment = null;
+        let messages = {};
+
+        const teachers = [
+            {
+                id: 1,
+                name: 'Dr. Sarah Wilson',
+                subject: 'Advanced Mathematics',
+                avatar: 'SW',
+                online: true,
+                lastSeen: 'Online now',
+                unreadCount: 2
+            },
+            {
+                id: 2,
+                name: 'Prof. Michael Chen',
+                subject: 'Computer Science',
+                avatar: 'MC',
+                online: true,
+                lastSeen: 'Online now',
+                unreadCount: 0
+            },
+            {
+                id: 3,
+                name: 'Dr. Emily Rodriguez',
+                subject: 'Physics',
+                avatar: 'ER',
+                online: false,
+                lastSeen: '2 hours ago',
+                unreadCount: 1
+            },
+            {
+                id: 4,
+                name: 'Mr. David Thompson',
+                subject: 'English Literature',
+                avatar: 'DT',
+                online: false,
+                lastSeen: 'Yesterday',
+                unreadCount: 0
+            },
+            {
+                id: 5,
+                name: 'Dr. Lisa Park',
+                subject: 'Chemistry',
+                avatar: 'LP',
+                online: true,
+                lastSeen: 'Online now',
+                unreadCount: 0
+            }
+        ];
+
+        function initializeMessaging() {
+            // Load student data
+            const currentStudent = JSON.parse(localStorage.getItem('currentUser')) || {
+                name: 'Alex Johnson',
+                id: '2024001'
+            };
+
+            document.getElementById('studentName').textContent = currentStudent.name;
+            
+            // Update initials
+            const initials = currentStudent.name.split(' ').map(n => n[0]).join('');
+            document.getElementById('studentInitials').textContent = initials;
+
+            // Initialize sample messages
+            initializeSampleMessages();
+        }
+
+        function initializeSampleMessages() {
+            messages = {
+                1: [
+                    {
+                        id: 1,
+                        sender: 'teacher',
+                        content: 'Hi Alex! I noticed you had some questions about the calculus assignment. How can I help you?',
+                        timestamp: new Date(Date.now() - 3600000),
+                        read: false
+                    },
+                    {
+                        id: 2,
+                        sender: 'teacher',
+                        content: 'Also, don\'t forget that the problem set is due this Friday at 11:59 PM.',
+                        timestamp: new Date(Date.now() - 3500000),
+                        read: false
+                    },
+                    {
+                        id: 3,
+                        sender: 'student',
+                        content: 'Thank you Dr. Wilson! I\'m having trouble with problem #7. Could you explain the integration by parts technique again?',
+                        timestamp: new Date(Date.now() - 1800000),
+                        read: true
+                    }
+                ],
+                3: [
+                    {
+                        id: 1,
+                        sender: 'teacher',
+                        content: 'Great work on your physics lab report! I have some feedback for you.',
+                        timestamp: new Date(Date.now() - 7200000),
+                        read: false
+                    }
+                ]
+            };
+        }
+
+        function setupEventListeners() {
+            // Back button
+            document.getElementById('backBtn').addEventListener('click', () => {
+                window.history.back();
+            });
+
+            // Message input
+            const messageTextarea = document.getElementById('messageTextarea');
+            const sendBtn = document.getElementById('sendBtn');
+
+            messageTextarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+                
+                sendBtn.disabled = this.value.trim() === '';
+            });
+
+            messageTextarea.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (!sendBtn.disabled) {
+                        sendMessage();
+                    }
+                }
+            });
+
+            // Send button
+            sendBtn.addEventListener('click', sendMessage);
+
+            // Attachment button
+            document.getElementById('attachBtn').addEventListener('click', () => {
+                document.getElementById('fileInput').click();
+            });
+
+            // File input
+            document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+
+            // Remove attachment
+            document.getElementById('removeAttachment').addEventListener('click', removeAttachment);
+
+            // Quick replies
+            document.querySelectorAll('.quick-reply').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.getElementById('messageTextarea').value = this.textContent;
+                    document.getElementById('sendBtn').disabled = false;
+                });
+            });
+
+            // Emoji button
+            document.getElementById('emojiBtn').addEventListener('click', function() {
+                const emojis = ['😊', '👍', '❤️', '😂', '🤔', '👏', '🙏', '💯'];
+                const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+                const textarea = document.getElementById('messageTextarea');
+                textarea.value += randomEmoji;
+                textarea.focus();
+                document.getElementById('sendBtn').disabled = textarea.value.trim() === '';
+            });
+
+            // Video call button
+            document.getElementById('videoCallBtn').addEventListener('click', function() {
+                if (selectedTeacher) {
+                    showNotification(`Starting video call with ${selectedTeacher.name}...`, 'info');
+                    setTimeout(() => {
+                        showNotification('Video call feature would open here.', 'info');
+                    }, 1500);
+                }
+            });
+
+            // Teacher search
+            document.getElementById('teacherSearch').addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                filterTeachers(searchTerm);
+            });
+        }
+
+        function loadTeachers() {
+            const teachersList = document.getElementById('teachersList');
+            
+            teachersList.innerHTML = teachers.map(teacher => `
+                <div class="teacher-item p-4 hover:bg-gray-50 cursor-pointer transition-colors" data-teacher-id="${teacher.id}">
+                    <div class="flex items-center">
+                        <div class="teacher-avatar w-12 h-12 rounded-full flex items-center justify-center mr-3 relative">
+                            <span class="text-white font-semibold">${teacher.avatar}</span>
+                            ${teacher.online ? '<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>' : ''}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-sm font-semibold text-gray-900 truncate">${teacher.name}</h3>
+                                ${teacher.unreadCount > 0 ? `<span class="bg-red-500 text-white text-xs rounded-full px-2 py-1 ml-2">${teacher.unreadCount}</span>` : ''}
+                            </div>
+                            <p class="text-xs text-gray-600 truncate">${teacher.subject}</p>
+                            <p class="text-xs ${teacher.online ? 'text-green-600' : 'text-gray-500'}">${teacher.lastSeen}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Add click listeners to teacher items
+            document.querySelectorAll('.teacher-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const teacherId = parseInt(this.dataset.teacherId);
+                    selectTeacher(teacherId);
+                });
+            });
+        }
+
+        function filterTeachers(searchTerm) {
+            const teacherItems = document.querySelectorAll('.teacher-item');
+            
+            teacherItems.forEach(item => {
+                const teacherId = parseInt(item.dataset.teacherId);
+                const teacher = teachers.find(t => t.id === teacherId);
+                const matchesSearch = teacher.name.toLowerCase().includes(searchTerm) || 
+                                   teacher.subject.toLowerCase().includes(searchTerm);
+                
+                item.style.display = matchesSearch ? 'block' : 'none';
+            });
+        }
+
+        function selectTeacher(teacherId) {
+            selectedTeacher = teachers.find(t => t.id === teacherId);
+            
+            if (!selectedTeacher) return;
+
+            // Update UI
+            document.getElementById('welcomeScreen').classList.add('hidden');
+            document.getElementById('chatHeader').classList.remove('hidden');
+            document.getElementById('chatMessages').classList.remove('hidden');
+            document.getElementById('messageInput').classList.remove('hidden');
+
+            // Update teacher info in header
+            document.getElementById('selectedTeacherName').textContent = selectedTeacher.name;
+            document.getElementById('selectedTeacherSubject').textContent = selectedTeacher.subject;
+            document.getElementById('selectedTeacherInitials').textContent = selectedTeacher.avatar;
+            document.getElementById('teacherStatus').textContent = selectedTeacher.lastSeen;
+
+            // Update active state in sidebar
+            document.querySelectorAll('.teacher-item').forEach(item => {
+                item.classList.remove('bg-blue-50', 'border-l-4', 'border-blue-500');
+            });
+            
+            const activeItem = document.querySelector(`[data-teacher-id="${teacherId}"]`);
+            if (activeItem) {
+                activeItem.classList.add('bg-blue-50', 'border-l-4', 'border-blue-500');
+            }
+
+            // Load messages
+            loadMessages(teacherId);
+
+            // Mark messages as read
+            markMessagesAsRead(teacherId);
+
+            // Simulate teacher typing occasionally
+            if (Math.random() > 0.7) {
+                setTimeout(() => {
+                    showTypingIndicator();
+                    setTimeout(() => {
+                        hideTypingIndicator();
+                        simulateTeacherReply();
+                    }, 2000);
+                }, 1000);
+            }
+        }
+
+        function loadMessages(teacherId) {
+            const chatMessages = document.getElementById('chatMessages');
+            const teacherMessages = messages[teacherId] || [];
+
+            chatMessages.innerHTML = teacherMessages.map(message => {
+                const isStudent = message.sender === 'student';
+                return `
+                    <div class="message-bubble flex ${isStudent ? 'justify-end' : 'justify-start'}">
+                        <div class="flex items-end space-x-2 max-w-xs lg:max-w-md">
+                            ${!isStudent ? `
+                                <div class="teacher-avatar w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <span class="text-white text-xs font-semibold">${selectedTeacher.avatar}</span>
+                                </div>
+                            ` : ''}
+                            <div class="${isStudent ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-900'} rounded-lg px-4 py-2">
+                                <p class="text-sm">${message.content}</p>
+                                <p class="text-xs ${isStudent ? 'text-blue-100' : 'text-gray-500'} mt-1">
+                                    ${formatMessageTime(message.timestamp)}
+                                </p>
+                            </div>
+                            ${isStudent ? `
+                                <div class="student-avatar w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <span class="text-white text-xs font-semibold">${document.getElementById('studentInitials').textContent}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function sendMessage() {
+            const messageTextarea = document.getElementById('messageTextarea');
+            const content = messageTextarea.value.trim();
+            
+            if (!content && !currentAttachment) return;
+
+            const message = {
+                id: Date.now(),
+                sender: 'student',
+                content: content,
+                timestamp: new Date(),
+                read: true,
+                attachment: currentAttachment
+            };
+
+            // Add to messages
+            if (!messages[selectedTeacher.id]) {
+                messages[selectedTeacher.id] = [];
+            }
+            messages[selectedTeacher.id].push(message);
+
+            // Clear input
+            messageTextarea.value = '';
+            messageTextarea.style.height = 'auto';
+            document.getElementById('sendBtn').disabled = true;
+
+            // Remove attachment
+            if (currentAttachment) {
+                removeAttachment();
+            }
+
+            // Reload messages
+            loadMessages(selectedTeacher.id);
+
+            // Show notification
+            showNotification('Message sent!', 'success');
+
+            // Simulate teacher reply after a delay
+            setTimeout(() => {
+                showTypingIndicator();
+                setTimeout(() => {
+                    hideTypingIndicator();
+                    simulateTeacherReply();
+                }, Math.random() * 3000 + 1000);
+            }, 500);
+        }
+
+        function simulateTeacherReply() {
+            const replies = [
+                "Thanks for your message! I'll get back to you shortly.",
+                "Great question! Let me think about the best way to explain this.",
+                "I appreciate you reaching out. Let's discuss this further.",
+                "That's a very thoughtful question. Here's what I think...",
+                "I'm glad you're asking for help when you need it!",
+                "Let me know if you need any clarification on this topic."
+            ];
+
+            const reply = {
+                id: Date.now(),
+                sender: 'teacher',
+                content: replies[Math.floor(Math.random() * replies.length)],
+                timestamp: new Date(),
+                read: false
+            };
+
+            messages[selectedTeacher.id].push(reply);
+            loadMessages(selectedTeacher.id);
+            
+            // Update unread count in sidebar
+            updateUnreadCount(selectedTeacher.id);
+        }
+
+        function showTypingIndicator() {
+            document.getElementById('typingIndicator').classList.remove('hidden');
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            document.getElementById('typingIndicator').classList.add('hidden');
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Validate file
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain', 'image/jpeg', 'image/png', 'image/gif'];
+
+            if (!allowedTypes.includes(file.type)) {
+                showNotification('File type not supported. Please use PDF, DOC, DOCX, TXT, or image files.', 'error');
+                return;
+            }
+
+            if (file.size > maxSize) {
+                showNotification('File is too large. Maximum size is 10MB.', 'error');
+                return;
+            }
+
+            currentAttachment = {
+                name: file.name,
+                size: file.size,
+                type: file.type
+            };
+
+            // Show attachment preview
+            document.getElementById('attachmentName').textContent = file.name;
+            document.getElementById('attachmentPreview').classList.remove('hidden');
+            
+            showNotification('File attached successfully!', 'success');
+        }
+
+        function removeAttachment() {
+            currentAttachment = null;
+            document.getElementById('attachmentPreview').classList.add('hidden');
+            document.getElementById('fileInput').value = '';
+        }
+
+        function markMessagesAsRead(teacherId) {
+            if (messages[teacherId]) {
+                messages[teacherId].forEach(message => {
+                    if (message.sender === 'teacher') {
+                        message.read = true;
+                    }
+                });
+            }
+
+            // Update teacher's unread count
+            const teacher = teachers.find(t => t.id === teacherId);
+            if (teacher) {
+                teacher.unreadCount = 0;
+                loadTeachers(); // Refresh the sidebar
+            }
+        }
+
+        function updateUnreadCount(teacherId) {
+            const teacher = teachers.find(t => t.id === teacherId);
+            if (teacher && teacherId !== selectedTeacher?.id) {
+                teacher.unreadCount++;
+                loadTeachers(); // Refresh the sidebar
+            }
+        }
+
+        function formatMessageTime(timestamp) {
+            const now = new Date();
+            const messageTime = new Date(timestamp);
+            const diffInHours = (now - messageTime) / (1000 * 60 * 60);
+
+            if (diffInHours < 1) {
+                const minutes = Math.floor((now - messageTime) / (1000 * 60));
+                return minutes < 1 ? 'Just now' : `${minutes}m ago`;
+            } else if (diffInHours < 24) {
+                return messageTime.toLocaleTimeString('en-US', { 
+                    hour: 'numeric', 
+                    minute: '2-digit',
+                    hour12: true 
+                });
+            } else {
+                return messageTime.toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                });
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm notification`;
+            
+            if (type === 'success') {
+                notification.className += ' bg-green-500 text-white';
+            } else if (type === 'error') {
+                notification.className += ' bg-red-500 text-white';
+            } else if (type === 'warning') {
+                notification.className += ' bg-yellow-500 text-white';
+            } else {
+                notification.className += ' bg-blue-500 text-white';
+            }
+            
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <div class="flex-1">
+                        <p class="text-sm font-medium">${message}</p>
+                    </div>
+                    <button class="ml-3 text-white hover:text-gray-200" onclick="this.parentElement.parentElement.remove()">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 4000);
+        }
+
+        console.log('Teacher messaging interface initialized successfully');
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'982f7be1d46d6ed4',t:'MTc1ODUxOTc5OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

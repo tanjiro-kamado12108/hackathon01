@@ -12,6 +12,7 @@ users = [
 ]
 timetable = []
 notifications = []
+messages = []
 
 # Demo credentials for sign-in (update to match backend users)
 # Student: student1 / studpass
@@ -29,6 +30,43 @@ def get_user(username):
 
 def add_notification(user_id, message):
     notifications.append({"user_id": user_id, "message": message, "read": False})
+
+def get_user_by_id(user_id):
+    """Get user by ID"""
+    for user in users:
+        if user["id"] == user_id:
+            return user
+    return None
+
+def send_message(sender_id, receiver_id, message_text):
+    """Send a message from sender to receiver"""
+    from datetime import datetime
+    message_id = len(messages) + 1
+    timestamp = datetime.now().isoformat()
+
+    message = {
+        "id": message_id,
+        "sender_id": sender_id,
+        "receiver_id": receiver_id,
+        "message": message_text,
+        "read": False,
+        "timestamp": timestamp
+    }
+
+    messages.append(message)
+    return message
+
+def get_messages_for_user(user_id):
+    """Get all messages for a specific user"""
+    return [msg for msg in messages if msg["receiver_id"] == user_id]
+
+def mark_message_as_read(message_id):
+    """Mark a message as read"""
+    for msg in messages:
+        if msg["id"] == message_id:
+            msg["read"] = True
+            return True
+    return False
 
 # Routes
 @app.route('/')
@@ -362,6 +400,106 @@ def api_student_announcements():
         }
     ]
     return jsonify(announcements)
+
+# Messaging API Routes
+@app.route('/api/student/send_message', methods=['POST'])
+def api_send_message():
+    """API endpoint for students to send messages to teachers"""
+    if session.get('role') != 'student':
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'Invalid request data'}), 400
+
+    receiver_id = data.get('receiver_id')
+    message_text = data.get('message')
+
+    if not receiver_id or not message_text:
+        return jsonify({'error': 'Missing receiver_id or message'}), 400
+
+    # Verify receiver is a teacher
+    receiver = get_user_by_id(receiver_id)
+    if not receiver or receiver['role'] != 'teacher':
+        return jsonify({'error': 'Invalid receiver'}), 400
+
+    sender_id = session['user_id']
+
+    # Send the message
+    message = send_message(sender_id, receiver_id, message_text)
+
+    # Create notification for the teacher
+    add_notification(receiver_id, f"New message from {get_user_by_id(sender_id)['username']}")
+
+    return jsonify({
+        'success': True,
+        'message': 'Message sent successfully',
+        'message_id': message['id']
+    })
+
+@app.route('/api/teacher/messages')
+def api_teacher_messages():
+    """API endpoint for teachers to get their messages"""
+    if session.get('role') != 'teacher':
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    user_id = session['user_id']
+    messages_list = get_messages_for_user(user_id)
+
+    # Format messages for response
+    formatted_messages = []
+    for msg in messages_list:
+        sender = get_user_by_id(msg['sender_id'])
+        formatted_messages.append({
+            'id': msg['id'],
+            'sender_name': sender['username'] if sender else 'Unknown',
+            'sender_id': msg['sender_id'],
+            'message': msg['message'],
+            'read': msg['read'],
+            'timestamp': msg['timestamp']
+        })
+
+    # Sort by timestamp (newest first)
+    formatted_messages.sort(key=lambda x: x['timestamp'], reverse=True)
+
+    return jsonify(formatted_messages)
+
+@app.route('/api/teacher/mark_message_read', methods=['POST'])
+def api_mark_message_read():
+    """API endpoint for teachers to mark messages as read"""
+    if session.get('role') != 'teacher':
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'Invalid request data'}), 400
+
+    message_id = data.get('message_id')
+    if not message_id:
+        return jsonify({'error': 'Missing message_id'}), 400
+
+    success = mark_message_as_read(message_id)
+    if success:
+        return jsonify({'success': True, 'message': 'Message marked as read'})
+    else:
+        return jsonify({'error': 'Message not found'}), 404
+
+@app.route('/api/student/teachers')
+def api_get_teachers():
+    """API endpoint to get list of teachers for student messaging"""
+    if session.get('role') != 'student':
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    teachers = [user for user in users if user['role'] == 'teacher']
+    formatted_teachers = []
+    for teacher in teachers:
+        formatted_teachers.append({
+            'id': teacher['id'],
+            'name': teacher['username'],
+            'email': f"{teacher['username']}@school.edu"
+        })
+
+    return jsonify(formatted_teachers)
 
 if __name__ == "__main__":
     app.run(debug=True)
