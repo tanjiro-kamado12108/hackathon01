@@ -487,7 +487,7 @@
                         </div>
                         <div class="p-6">
                             <div class="space-y-3">
-                                <button class="w-full flex items-center justify-between p-3 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg transition-colors">
+                                <button onclick="openAssignmentSubmission()" class="w-full flex items-center justify-between p-3 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg transition-colors">
                                     <div class="flex items-center">
                                         <svg class="w-5 h-5 text-indigo-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
                                             <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -794,6 +794,11 @@
 
         function openCourse(courseId) {
             showNotification(`Opening course ${courseId}...`, 'info');
+        }
+
+        function openAssignmentSubmission() {
+            // Navigate to the assignment submission page
+            window.location.href = 'assignment.html';
         }
 
         function setupEventListeners() {

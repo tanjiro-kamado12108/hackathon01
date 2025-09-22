@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment Submission - Smart Classroom</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-success:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .file-drop-zone {
+            border: 2px dashed #d1d5db;
+            transition: all 0.3s ease;
+        }
+        
+        .file-drop-zone.dragover {
+            border-color: #667eea;
+            background-color: #f8faff;
+        }
+        
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+        
+        .notification {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .status-submitted {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .status-draft {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+        
+        .status-overdue {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+        
+        .file-item {
+            animation: slideInUp 0.3s ease-out;
+        }
+        
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation Header -->
+    <nav class="bg-white shadow-lg border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo and Brand -->
+                <div class="flex items-center">
+                    <div class="bg-gradient-to-r from-purple-500 to-indigo-600 p-2 rounded-lg">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h1 class="text-xl font-bold text-gray-900">Smart Classroom</h1>
+                        <p class="text-sm text-gray-600">Assignment Submission</p>
+                    </div>
+                </div>
+
+                <!-- Student Info -->
+                <div class="flex items-center space-x-4">
+                    <div class="text-right">
+                        <p class="text-sm font-medium text-gray-900" id="studentName">Alex Johnson</p>
+                        <p class="text-xs text-gray-600">Student ID: 2024001</p>
+                    </div>
+                    <div class="w-10 h-10 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center">
+                        <span class="text-white font-semibold text-sm" id="studentInitials">AJ</span>
+                    </div>
+                    <button id="backBtn" class="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-100">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Assignment Header -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-8 fade-in">
+            <div class="p-6">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <div class="flex items-center mb-2">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                                <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h1 class="text-2xl font-bold text-gray-900">Calculus Problem Set #5</h1>
+                                <p class="text-gray-600">Advanced Mathematics • Dr. Sarah Wilson</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                            <div class="flex items-center text-sm text-gray-600">
+                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                                </svg>
+                                <span><strong>Due:</strong> March 15, 2024 at 11:59 PM</span>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-600">
+                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                                </svg>
+                                <span><strong>Time Left:</strong> <span id="timeLeft" class="text-orange-600 font-medium">2 days 14 hours</span></span>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-600">
+                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span><strong>Points:</strong> 100</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="ml-6">
+                        <span id="submissionStatus" class="status-draft px-3 py-1 text-white text-sm font-medium rounded-full">
+                            Draft
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assignment Description -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-8 fade-in">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900">Assignment Instructions</h2>
+            </div>
+            <div class="p-6">
+                <div class="prose max-w-none">
+                    <p class="text-gray-700 mb-4">
+                        Complete the following calculus problems focusing on integration techniques and applications. 
+                        Show all work and provide detailed explanations for each step.
+                    </p>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Requirements:</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-1 mb-4">
+                        <li>Solve all 15 problems in the attached problem set</li>
+                        <li>Show complete work for each solution</li>
+                        <li>Include graphs where applicable</li>
+                        <li>Submit as PDF format only</li>
+                        <li>Maximum file size: 10MB</li>
+                    </ul>
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="flex items-start">
+                            <svg class="w-5 h-5 text-blue-600 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                            </svg>
+                            <div>
+                                <p class="text-blue-800 font-medium">Important Note:</p>
+                                <p class="text-blue-700 text-sm">Late submissions will receive a 10% penalty per day. Make sure to submit before the deadline!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- File Upload Section -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-8 fade-in">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900">Upload Your Solution</h2>
+            </div>
+            <div class="p-6">
+                <!-- File Drop Zone -->
+                <div id="dropZone" class="file-drop-zone rounded-lg p-8 text-center mb-6">
+                    <div class="mb-4">
+                        <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                        </svg>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">Drop your files here</h3>
+                        <p class="text-gray-600 mb-4">or click to browse and select files</p>
+                        <button id="browseBtn" class="btn-primary text-white px-6 py-2 rounded-lg font-medium">
+                            Browse Files
+                        </button>
+                        <input type="file" id="fileInput" class="hidden" multiple accept=".pdf,.doc,.docx,.txt,.jpg,.png">
+                    </div>
+                    <p class="text-sm text-gray-500">
+                        Supported formats: PDF, DOC, DOCX, TXT, JPG, PNG • Max size: 10MB per file
+                    </p>
+                </div>
+
+                <!-- Uploaded Files List -->
+                <div id="filesList" class="space-y-3 mb-6"></div>
+
+                <!-- Upload Progress -->
+                <div id="uploadProgress" class="hidden mb-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium text-gray-700">Uploading files...</span>
+                        <span id="progressPercent" class="text-sm text-gray-600">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div id="progressBar" class="progress-bar bg-blue-600 h-2 rounded-full" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submission Comments -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-8 fade-in">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900">Additional Comments (Optional)</h2>
+            </div>
+            <div class="p-6">
+                <textarea id="comments" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Add any additional comments or notes about your submission..."></textarea>
+            </div>
+        </div>
+
+        <!-- Submission Actions -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 fade-in">
+            <div class="p-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <button id="saveDraftBtn" class="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+                            <svg class="w-5 h-5 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6a1 1 0 10-2 0v5.586l-1.293-1.293z"/>
+                                <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"/>
+                            </svg>
+                            Save Draft
+                        </button>
+                        <button id="previewBtn" class="px-6 py-2 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg font-medium hover:bg-blue-100 transition-colors">
+                            <svg class="w-5 h-5 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                            </svg>
+                            Preview
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <div class="text-right">
+                            <p class="text-sm text-gray-600">Last saved: <span id="lastSaved">Never</span></p>
+                            <p class="text-xs text-gray-500" id="fileCount">No files uploaded</p>
+                        </div>
+                        <button id="submitBtn" class="btn-success text-white px-8 py-3 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            <svg class="w-5 h-5 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                            Submit Assignment
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4">
+            <div class="p-6 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">Confirm Submission</h3>
+            </div>
+            <div class="p-6">
+                <div class="flex items-start mb-4">
+                    <svg class="w-6 h-6 text-yellow-600 mr-3 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    <div>
+                        <p class="text-gray-900 font-medium mb-2">Are you ready to submit?</p>
+                        <p class="text-gray-600 text-sm mb-4">Once submitted, you won't be able to make changes to this assignment.</p>
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <p class="text-sm text-gray-700"><strong>Files to submit:</strong> <span id="submitFileCount">0</span></p>
+                            <p class="text-sm text-gray-700"><strong>Submission time:</strong> <span id="submitTime"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6 border-t border-gray-200 flex justify-end space-x-3">
+                <button id="cancelSubmit" class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
+                <button id="confirmSubmit" class="px-6 py-2 btn-success text-white rounded-lg">Submit Assignment</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSubmissionInterface();
+            setupEventListeners();
+            updateTimeLeft();
+            setInterval(updateTimeLeft, 60000); // Update every minute
+        });
+
+        let uploadedFiles = [];
+        let isDraft = true;
+
+        function initializeSubmissionInterface() {
+            // Load student data
+            const currentStudent = JSON.parse(localStorage.getItem('currentUser')) || {
+                name: 'Alex Johnson',
+                id: '2024001'
+            };
+
+            document.getElementById('studentName').textContent = currentStudent.name;
+            
+            // Update initials
+            const initials = currentStudent.name.split(' ').map(n => n[0]).join('');
+            document.getElementById('studentInitials').textContent = initials;
+
+            // Load any saved draft
+            loadDraft();
+        }
+
+        function setupEventListeners() {
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+            const browseBtn = document.getElementById('browseBtn');
+
+            // File upload events
+            browseBtn.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', handleFileSelect);
+
+            // Drag and drop events
+            dropZone.addEventListener('dragover', handleDragOver);
+            dropZone.addEventListener('dragleave', handleDragLeave);
+            dropZone.addEventListener('drop', handleFileDrop);
+
+            // Action buttons
+            document.getElementById('saveDraftBtn').addEventListener('click', saveDraft);
+            document.getElementById('previewBtn').addEventListener('click', previewSubmission);
+            document.getElementById('submitBtn').addEventListener('click', showConfirmModal);
+
+            // Modal events
+            document.getElementById('cancelSubmit').addEventListener('click', hideConfirmModal);
+            document.getElementById('confirmSubmit').addEventListener('click', submitAssignment);
+
+            // Back button
+            document.getElementById('backBtn').addEventListener('click', () => {
+                if (confirm('Are you sure you want to leave? Any unsaved changes will be lost.')) {
+                    window.history.back();
+                }
+            });
+
+            // Auto-save comments
+            document.getElementById('comments').addEventListener('input', debounce(saveDraft, 2000));
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            document.getElementById('dropZone').classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            document.getElementById('dropZone').classList.remove('dragover');
+        }
+
+        function handleFileDrop(e) {
+            e.preventDefault();
+            document.getElementById('dropZone').classList.remove('dragover');
+            const files = Array.from(e.dataTransfer.files);
+            processFiles(files);
+        }
+
+        function handleFileSelect(e) {
+            const files = Array.from(e.target.files);
+            processFiles(files);
+        }
+
+        function processFiles(files) {
+            const validFiles = files.filter(file => {
+                const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain', 'image/jpeg', 'image/png'];
+                const maxSize = 10 * 1024 * 1024; // 10MB
+
+                if (!validTypes.includes(file.type)) {
+                    showNotification(`${file.name} is not a supported file type.`, 'error');
+                    return false;
+                }
+
+                if (file.size > maxSize) {
+                    showNotification(`${file.name} is too large. Maximum size is 10MB.`, 'error');
+                    return false;
+                }
+
+                return true;
+            });
+
+            if (validFiles.length > 0) {
+                uploadFiles(validFiles);
+            }
+        }
+
+        function uploadFiles(files) {
+            const progressContainer = document.getElementById('uploadProgress');
+            const progressBar = document.getElementById('progressBar');
+            const progressPercent = document.getElementById('progressPercent');
+
+            progressContainer.classList.remove('hidden');
+
+            // Simulate file upload with progress
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    
+                    // Add files to uploaded list
+                    files.forEach(file => {
+                        const fileId = Date.now() + Math.random();
+                        uploadedFiles.push({
+                            id: fileId,
+                            name: file.name,
+                            size: file.size,
+                            type: file.type,
+                            uploadTime: new Date()
+                        });
+                    });
+
+                    updateFilesList();
+                    updateSubmitButton();
+                    progressContainer.classList.add('hidden');
+                    showNotification(`${files.length} file(s) uploaded successfully!`, 'success');
+                }
+
+                progressBar.style.width = `${progress}%`;
+                progressPercent.textContent = `${Math.round(progress)}%`;
+            }, 200);
+        }
+
+        function updateFilesList() {
+            const filesList = document.getElementById('filesList');
+            const fileCount = document.getElementById('fileCount');
+
+            if (uploadedFiles.length === 0) {
+                filesList.innerHTML = '';
+                fileCount.textContent = 'No files uploaded';
+                return;
+            }
+
+            fileCount.textContent = `${uploadedFiles.length} file(s) uploaded`;
+
+            filesList.innerHTML = uploadedFiles.map(file => `
+                <div class="file-item flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                            ${getFileIcon(file.type)}
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">${file.name}</p>
+                            <p class="text-xs text-gray-500">${formatFileSize(file.size)} • Uploaded ${formatTime(file.uploadTime)}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="previewFile('${file.id}')" class="text-blue-600 hover:text-blue-800 p-1">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                        <button onclick="removeFile('${file.id}')" class="text-red-600 hover:text-red-800 p-1">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function removeFile(fileId) {
+            uploadedFiles = uploadedFiles.filter(file => file.id !== fileId);
+            updateFilesList();
+            updateSubmitButton();
+            showNotification('File removed successfully.', 'info');
+        }
+
+        function previewFile(fileId) {
+            const file = uploadedFiles.find(f => f.id === fileId);
+            if (file) {
+                showNotification(`Preview for ${file.name} would open here.`, 'info');
+            }
+        }
+
+        function updateSubmitButton() {
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = uploadedFiles.length === 0;
+        }
+
+        function saveDraft() {
+            const comments = document.getElementById('comments').value;
+            const draftData = {
+                files: uploadedFiles,
+                comments: comments,
+                lastSaved: new Date()
+            };
+
+            localStorage.setItem('assignmentDraft', JSON.stringify(draftData));
+            document.getElementById('lastSaved').textContent = formatTime(new Date());
+            showNotification('Draft saved successfully!', 'success');
+        }
+
+        function loadDraft() {
+            const draftData = localStorage.getItem('assignmentDraft');
+            if (draftData) {
+                const draft = JSON.parse(draftData);
+                uploadedFiles = draft.files || [];
+                document.getElementById('comments').value = draft.comments || '';
+                document.getElementById('lastSaved').textContent = formatTime(new Date(draft.lastSaved));
+                updateFilesList();
+                updateSubmitButton();
+            }
+        }
+
+        function previewSubmission() {
+            showNotification('Submission preview would open in a new window.', 'info');
+        }
+
+        function showConfirmModal() {
+            document.getElementById('submitFileCount').textContent = uploadedFiles.length;
+            document.getElementById('submitTime').textContent = new Date().toLocaleString();
+            document.getElementById('confirmModal').classList.remove('hidden');
+        }
+
+        function hideConfirmModal() {
+            document.getElementById('confirmModal').classList.add('hidden');
+        }
+
+        function submitAssignment() {
+            hideConfirmModal();
+            
+            // Simulate submission process
+            showNotification('Submitting assignment...', 'info');
+            
+            setTimeout(() => {
+                // Update status
+                document.getElementById('submissionStatus').className = 'status-submitted px-3 py-1 text-white text-sm font-medium rounded-full';
+                document.getElementById('submissionStatus').textContent = 'Submitted';
+                
+                // Disable submit button
+                document.getElementById('submitBtn').disabled = true;
+                document.getElementById('submitBtn').textContent = 'Assignment Submitted';
+                
+                // Clear draft
+                localStorage.removeItem('assignmentDraft');
+                
+                showNotification('Assignment submitted successfully! 🎉', 'success');
+                
+                // Redirect after a delay
+                setTimeout(() => {
+                    if (confirm('Assignment submitted! Would you like to return to the assignments list?')) {
+                        window.history.back();
+                    }
+                }, 2000);
+            }, 2000);
+        }
+
+        function updateTimeLeft() {
+            const dueDate = new Date('2024-03-15T23:59:59');
+            const now = new Date();
+            const timeDiff = dueDate - now;
+
+            if (timeDiff <= 0) {
+                document.getElementById('timeLeft').textContent = 'Overdue';
+                document.getElementById('timeLeft').className = 'text-red-600 font-medium';
+                return;
+            }
+
+            const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+
+            let timeString = '';
+            if (days > 0) timeString += `${days} day${days > 1 ? 's' : ''} `;
+            if (hours > 0) timeString += `${hours} hour${hours > 1 ? 's' : ''} `;
+            if (days === 0 && minutes > 0) timeString += `${minutes} minute${minutes > 1 ? 's' : ''}`;
+
+            document.getElementById('timeLeft').textContent = timeString.trim() || 'Less than a minute';
+            
+            // Change color based on time left
+            if (days < 1) {
+                document.getElementById('timeLeft').className = 'text-red-600 font-medium';
+            } else if (days < 2) {
+                document.getElementById('timeLeft').className = 'text-orange-600 font-medium';
+            }
+        }
+
+        function getFileIcon(fileType) {
+            if (fileType.includes('pdf')) {
+                return '<svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/></svg>';
+            } else if (fileType.includes('word') || fileType.includes('document')) {
+                return '<svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/></svg>';
+            } else if (fileType.includes('image')) {
+                return '<svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/></svg>';
+            } else {
+                return '<svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/></svg>';
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function formatTime(date) {
+            return new Date(date).toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm notification`;
+            
+            if (type === 'success') {
+                notification.className += ' bg-green-500 text-white';
+            } else if (type === 'error') {
+                notification.className += ' bg-red-500 text-white';
+            } else if (type === 'warning') {
+                notification.className += ' bg-yellow-500 text-white';
+            } else {
+                notification.className += ' bg-blue-500 text-white';
+            }
+            
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <div class="flex-1">
+                        <p class="text-sm font-medium">${message}</p>
+                    </div>
+                    <button class="ml-3 text-white hover:text-gray-200" onclick="this.parentElement.parentElement.remove()">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 4000);
+        }
+
+        console.log('Assignment submission interface initialized successfully');
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'982f730873f31e8f',t:'MTc1ODUxOTQzNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
