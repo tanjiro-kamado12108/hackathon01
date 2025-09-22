@@ -792,6 +792,11 @@
             showNotification(`Opening assignment ${assignmentId}...`, 'info');
         }
 
+        function openAssignmentSubmission() {
+            // Navigate to assignment submission page
+            window.location.href = 'assignment.html';
+        }
+
         function openCourse(courseId) {
             showNotification(`Opening course ${courseId}...`, 'info');
         }
@@ -817,9 +822,7 @@
             // Quick action buttons
             document.querySelectorAll('button').forEach(btn => {
                 const text = btn.textContent.trim();
-                if (text.includes('Submit Assignment')) {
-                    btn.addEventListener('click', () => showNotification('Assignment submission portal opened!', 'success'));
-                } else if (text.includes('View Calendar')) {
+                if (text.includes('View Calendar')) {
                     btn.addEventListener('click', () => showNotification('Calendar view opened!', 'info'));
                 } else if (text.includes('Message Teacher')) {
                     btn.addEventListener('click', () => showNotification('Messaging system opened!', 'info'));
