@@ -54,68 +54,6 @@ def mark_message_as_read(message_id):
             return True
     return False
 
-# ----------------- AUTHENTICATION ROUTES -----------------
-@app.route('/signup', methods=['GET', 'POST'])
-def signup():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        first_name = request.form.get('firstName', '')
-        last_name = request.form.get('lastName', '')
-        role = request.form.get('role', 'student')
-
-        # Check if user already exists
-        if get_user(username):
-            flash('Username already exists. Please choose a different one.')
-            return redirect(url_for('signup'))
-
-        # Create new user
-        new_user_id = len(users) + 1
-        new_user = {
-            "id": new_user_id,
-            "username": username,
-            "password": password,
-            "role": role,
-            "is_absent": False
-        }
-        users.append(new_user)
-
-        flash('Account created successfully! Please log in.')
-        return redirect(url_for('login'))
-
-    return render_template('signup.html')
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-
-        user = get_user(username)
-        if user and user['password'] == password:
-            session['user_id'] = user['id']
-            session['role'] = user['role']
-            session['username'] = user['username']
-
-            flash(f'Welcome back, {user["username"]}!')
-            if user['role'] == 'admin':
-                return redirect(url_for('admin_dashboard'))
-            elif user['role'] == 'teacher':
-                return redirect(url_for('teacher_dashboard'))
-            else:
-                return redirect(url_for('student_dashboard'))
-        else:
-            flash('Invalid username or password. Please try again.')
-            return redirect(url_for('login'))
-
-    return render_template('signin.html')
-
-@app.route('/logout')
-def logout():
-    session.clear()
-    flash('You have been logged out successfully.')
-    return redirect(url_for('home'))
-
 # ----------------- ROUTES -----------------
 @app.route('/')
 def home():
@@ -124,21 +62,84 @@ def home():
         user = get_user_by_id(session['user_id'])
     user_notifications = [n for n in notifications if user and n["user_id"] == user["id"] and not n["read"]]
 
-    # Demo timetable
+    # AI-Generated Enhanced Timetable
     global timetable
     if not timetable:
         days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-        times = ['08:00', '10:00', '12:00', '14:00', '16:00']
-        subjects = ['Math', 'Science', 'English', 'History', 'Art', 'PE', 'Music']
-        teachers = [u["username"] for u in users if u["role"] == "teacher"]
+        times = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00']
+
+        # Enhanced subjects with more variety and detail
+        subjects = [
+            'Advanced Mathematics', 'Applied Physics', 'Organic Chemistry', 'World Literature',
+            'Computer Science', 'Data Structures', 'Web Development', 'Mobile App Dev',
+            'English Composition', 'Creative Writing', 'Public Speaking', 'Business English',
+            'World History', 'Ancient Civilizations', 'Modern Politics', 'Economics',
+            'Biology', 'Environmental Science', 'Genetics', 'Neuroscience',
+            'Physical Education', 'Team Sports', 'Yoga & Wellness', 'Swimming',
+            'Visual Arts', 'Digital Design', 'Photography', 'Sculpture',
+            'Music Theory', 'Jazz Ensemble', 'Piano', 'Guitar',
+            'Psychology', 'Sociology', 'Philosophy', 'Ethics',
+            'Statistics', 'Machine Learning', 'Database Systems', 'Network Security'
+        ]
+
+        # Teacher assignments with subjects they specialize in
+        teachers_subjects = {
+            'teacher1': ['Advanced Mathematics', 'Statistics', 'Machine Learning'],
+            'admin': ['Computer Science', 'Database Systems', 'Network Security']
+        }
+
+        # Generate additional teachers for more variety
+        additional_teachers = ['Dr. Smith', 'Prof. Johnson', 'Ms. Davis', 'Mr. Wilson', 'Dr. Brown']
+        all_teachers = [u["username"] for u in users if u["role"] == "teacher"] + additional_teachers
+
+        # Classrooms with different types and capacities
+        classrooms = [
+            'Room 101 (Lecture Hall)', 'Room 102 (Lab)', 'Room 103 (Seminar)',
+            'Room 201 (Studio)', 'Room 202 (Gym)', 'Room 203 (Auditorium)',
+            'Lab 301 (Computer)', 'Lab 302 (Science)', 'Lab 303 (Chemistry)',
+            'Studio 401 (Art)', 'Studio 402 (Music)', 'Conference 501'
+        ]
+
+        # Generate timetable with AI-like logic
+        import random
+        random.seed(42)  # For consistent results
+
         for day in days:
             for time in times:
+                # Skip some slots to make it more realistic (breaks, free periods)
+                if random.random() < 0.2:  # 20% chance of free period
+                    continue
+
+                # Select subject based on time of day and day of week
+                if time in ['08:00', '09:00'] and day in ['Monday', 'Wednesday', 'Friday']:
+                    # Morning core subjects
+                    subject_pool = [s for s in subjects if any(core in s.lower() for core in ['math', 'english', 'science'])]
+                elif time in ['14:00', '15:00', '16:00'] and day in ['Tuesday', 'Thursday']:
+                    # Afternoon electives
+                    subject_pool = [s for s in subjects if any(elective in s.lower() for elective in ['art', 'music', 'pe', 'psychology'])]
+                else:
+                    subject_pool = subjects
+
+                subject = random.choice(subject_pool)
+
+                # Assign teacher based on subject expertise
+                if subject in teachers_subjects.get('teacher1', []):
+                    teacher = 'teacher1'
+                elif subject in teachers_subjects.get('admin', []):
+                    teacher = 'admin'
+                else:
+                    teacher = random.choice(all_teachers)
+
+                classroom = random.choice(classrooms)
+
                 timetable.append({
                     "day": day,
                     "period": time,
-                    "subject": subjects[(hash(day+time) % len(subjects))],
-                    "teacher": teachers[(hash(day+time) % len(teachers))],
-                    "classroom": f"Room {((hash(day+time) % 10) + 1)}"
+                    "subject": subject,
+                    "teacher": teacher,
+                    "classroom": classroom,
+                    "duration": "60 min",
+                    "capacity": random.randint(15, 40)
                 })
 
     classes = timetable[:5]

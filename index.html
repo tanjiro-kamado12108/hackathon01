@@ -39,43 +39,16 @@
         50% { transform: translateY(-20px) rotate(10deg); }
     }
 
-    .schedule-slot { transition: all 0.2s ease; }
+    .schedule-slot { transition: all 0.2s ease; text-align: center; }
     .schedule-slot:hover { background-color: #f8fafc; border-color: #3b82f6; }
 
     .occupied { background-color: #dbeafe; border-color: #3b82f6; }
     .available { background-color: #dcfce7; border-color: #22c55e; }
+    .backlog { background-color: #fde68a; border-color: #fbbf24; }
+    .backlog:hover { background-color: #fcd34d; border-color: #f59e0b; }
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
-
-  <!-- Flash Messages / Notifications -->
-  {% if notifications %}
-  <div class="max-w-2xl mx-auto mt-6">
-    {% for notif in notifications %}
-      <div class="bg-yellow-400 text-white px-6 py-4 rounded-lg shadow mb-4 flex items-center">
-        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01"/>
-        </svg>
-        <span class="font-semibold">{{ notif.message }}</span>
-      </div>
-    {% endfor %}
-  </div>
-  {% endif %}
-
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      <div class="max-w-2xl mx-auto mt-6">
-        {% for message in messages %}
-          <div class="bg-green-500 text-white px-6 py-4 rounded-lg shadow mb-4 flex items-center">
-            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-            </svg>
-            <span class="font-semibold">{{ message }}</span>
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
 
   <!-- Header -->
   <header class="gradient-bg text-white shadow-lg">
@@ -93,13 +66,12 @@
           </div>
         </div>
         <div class="flex items-center space-x-4">
-          <a href="{{ url_for('signup') }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
+          <a href="#" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
             <span>👤</span> <span>Sign Up</span>
           </a>
-          <a href="{{ url_for('login') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
+          <a href="#" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
             <span>🔑</span> <span>Sign In</span>
           </a>
-          <button id="settingsBtn" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg">⚙️ Settings</button>
         </div>
       </div>
     </div>
@@ -149,8 +121,8 @@
     <!-- Timetable Section -->
     {% set times = ['08:00', '10:00', '12:00', '14:00', '16:00'] %}
     {% set days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] %}
-    <div class="overflow-x-auto mb-8">
-      <table id="timetable" class="min-w-full border border-gray-200 rounded-lg">
+    <div class="overflow-x-auto mb-4">
+      <table class="min-w-full border border-gray-200 rounded-lg">
         <thead>
           <tr class="bg-gray-100">
             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Time</th>
@@ -164,9 +136,17 @@
             <tr>
               <td class="px-4 py-2 text-sm font-medium text-gray-700">{{ time }}</td>
               {% for day in days %}
-                {% set entry = timetable | selectattr('day', 'equalto', day) | selectattr('period', 'equalto', time) | list | first %}
-                <td class="px-4 py-2 border schedule-slot {% if entry %}occupied{% else %}available{% endif %}">
-                  {% if entry %}
+                {% set entry = timetable | selectattr('day', 'equalto', day) 
+                                           | selectattr('period', 'equalto', time) | list | first %}
+                {% set backlog_entry = backlog | selectattr('day', 'equalto', day) 
+                                                | selectattr('period', 'equalto', time) | list | first %}
+                <td class="px-4 py-2 border schedule-slot 
+                           {% if backlog_entry %}backlog{% elif entry %}occupied{% else %}available{% endif %}">
+                  {% if backlog_entry %}
+                    {{ backlog_entry.subject }}<br>
+                    <span class="text-xs text-gray-700 font-semibold">[Backlog]</span><br>
+                    <span class="text-xs text-gray-500">{{ backlog_entry.room }}</span>
+                  {% elif entry %}
                     {{ entry.subject }}<br><span class="text-xs text-gray-500">{{ entry.room }}</span>
                   {% else %}
                     Free
@@ -178,41 +158,20 @@
         </tbody>
       </table>
     </div>
-  </div>
 
-  <!-- Settings Modal -->
-  <div id="settingsModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
-    <div class="bg-white rounded-lg shadow-lg p-6 w-96">
-      <h2 class="text-xl font-semibold mb-4">Settings</h2>
-      <button id="closeSettings" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800">✖️</button>
-      <p class="text-gray-700">User settings and preferences can be configured here.</p>
+    <!-- Legend -->
+    <div class="flex space-x-4 mt-4">
+      <div class="flex items-center space-x-2">
+        <span class="w-4 h-4 block bg-blue-200 rounded"></span><span>Occupied</span>
+      </div>
+      <div class="flex items-center space-x-2">
+        <span class="w-4 h-4 block bg-green-200 rounded"></span><span>Free</span>
+      </div>
+      <div class="flex items-center space-x-2">
+        <span class="w-4 h-4 block bg-yellow-300 rounded"></span><span>Backlog</span>
+      </div>
     </div>
   </div>
 
-  <!-- Scripts -->
-  <script>
-    function updateNotificationCount() {
-        const notificationList = document.getElementById('notificationList');
-        const countBadge = document.querySelector('.bg-blue-100');
-        if (notificationList && countBadge) {
-            const remainingNotifications = notificationList.children.length;
-            if (remainingNotifications === 0) {
-                countBadge.textContent = 'No New';
-                countBadge.className = 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-medium px-2 py-1 rounded-full';
-            } else {
-                countBadge.textContent = `${remainingNotifications} New`;
-                countBadge.className = 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium px-2 py-1 rounded-full';
-            }
-        }
-    }
-
-    document.getElementById('settingsBtn').addEventListener('click', () => {
-      document.getElementById('settingsModal').classList.remove('hidden');
-    });
-
-    document.getElementById('closeSettings').addEventListener('click', () => {
-      document.getElementById('settingsModal').classList.add('hidden');
-    });
-  </script>
 </body>
 </html>
